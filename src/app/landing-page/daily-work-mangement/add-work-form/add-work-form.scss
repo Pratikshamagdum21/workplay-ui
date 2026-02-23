@@ -1,0 +1,55 @@
+.add-work-container {
+    padding: 1rem;
+    .add-work-card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .field {
+        margin-bottom: 1.5rem;
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+            i {
+                margin-right: 0.5rem;
+                color: #6366f1;
+            }
+            &.required-label::after {
+                content: ' *';
+                color: #ef4444;
+            }
+        }
+    }
+    .shift-item {
+        .shift-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .shift-time {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+    }
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        @media (max-width: 768px) {
+            flex-direction: column;
+            p-button {
+                width: 100%;
+            }
+        }
+    }
+     :host ::ng-deep {
+        .p-inputnumber-button-group {
+            .p-button {
+                padding: 0.5rem;
+            }
+        }
+        .ng-invalid.ng-dirty {
+            border-color: #ef4444;
+        }
+    }
+}

@@ -1,0 +1,134 @@
+<div class="employee-details-container" *ngIf="employee">
+    <!-- Personal Information Card -->
+    <p-card styleClass="detail-card">
+        <ng-template pTemplate="header">
+            <div class="card-header">
+                <i class="pi pi-user-edit"></i>
+                <h3>Personal Information</h3>
+            </div>
+        </ng-template>
+
+        <div class="grid">
+            <div class="col-12 md:col-6">
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="pi pi-user"></i> Employee Name
+                    </span>
+                    <span class="detail-value">{{ employee.name }}</span>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="pi pi-tag"></i> Fabric Type
+                    </span>
+                    <p-tag [value]="employee.fabricType" severity="info"></p-tag>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="pi pi-gift"></i> Bonus Eligibility
+                    </span>
+                    <p-tag [value]="getBonusLabel()" [severity]="getBonusSeverity()"></p-tag>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+                <div class="detail-row">
+                    <span class="detail-label">
+                        <i class="pi pi-chart-bar"></i> Salary Type
+                    </span>
+                    <p-tag [value]="getSalaryTypeLabel()" severity="info"></p-tag>
+                </div>
+            </div>
+        </div>
+    </p-card>
+
+    <!-- Financial Information Card -->
+    <p-card styleClass="detail-card financial-card">
+        <ng-template pTemplate="header">
+            <div class="card-header">
+                <i class="pi pi-dollar"></i>
+                <h3>Financial Information</h3>
+            </div>
+        </ng-template>
+
+        <div class="grid">
+            <div class="col-12 md:col-6" *ngIf="employee.salaryType === 'MONTHLY'">
+                <div class="financial-item">
+                    <div class="financial-icon salary-icon">
+                        <i class="pi pi-money-bill"></i>
+                    </div>
+                    <div class="financial-details">
+                        <span class="financial-label">Monthly Salary</span>
+                        <span class="financial-value salary">{{ formatCurrency(employee.salary) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-6" *ngIf="employee.salaryType === 'WEEKLY'">
+                <div class="financial-item">
+                    <div class="financial-icon salary-icon">
+                        <i class="pi pi-money-bill"></i>
+                    </div>
+                    <div class="financial-details">
+                        <span class="financial-label">Rate Per Meter</span>
+                        <span class="financial-value salary">{{ formatCurrency(employee.rate) }}/m</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+                <div class="financial-item">
+                    <div class="financial-icon advance-icon">
+                        <i class="pi pi-wallet"></i>
+                    </div>
+                    <div class="financial-details">
+                        <span class="financial-label">Advance Taken</span>
+                        <span class="financial-value advance">{{ formatCurrency(employee.advanceAmount) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-6">
+                <div class="financial-item">
+                    <div class="financial-icon">
+                        <i class="pi pi-credit-card"></i>
+                    </div>
+                    <div class="financial-details">
+                        <span class="financial-label">Advance Remaining</span>
+                        <span class="financial-value">{{ formatCurrency(employee.advanceRemaining) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-6" *ngIf="employee.isBonused">
+                <div class="financial-item">
+                    <div class="financial-icon">
+                        <i class="pi pi-star"></i>
+                    </div>
+                    <div class="financial-details">
+                        <span class="financial-label">Bonus Amount</span>
+                        <span class="financial-value">{{ formatCurrency(employee.bonusAmount) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p-card>
+
+    <!-- Footer Actions -->
+    <div class="footer-actions">
+        <p-button label="Close" icon="pi pi-times" severity="secondary" [outlined]="true"
+            (onClick)="onClose()">
+        </p-button>
+    </div>
+</div>
+
+<!-- Empty State -->
+<div class="empty-state" *ngIf="!employee">
+    <i class="pi pi-exclamation-triangle"></i>
+    <p>No employee data available</p>
+</div>

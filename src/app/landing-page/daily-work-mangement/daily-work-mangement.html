@@ -1,0 +1,180 @@
+<div class="daily-work-management">
+    <p-toast></p-toast>
+
+    <!-- Page Header -->
+    <div class="page-header flex justify-content-between align-items-center">
+        <div>
+            <h1>
+                <i class="pi pi-calendar-clock"></i> Daily Work Management
+            </h1>
+            <p class="subtitle">Track and manage daily work records for all employees</p>
+        </div>
+        <div class="header-actions">
+            <p-button label="Add Work Entry" icon="pi pi-plus" severity="success" (onClick)="openAddWorkDialog()">
+            </p-button>
+        </div>
+    </div>
+
+    <!-- Add Work Form Section -->
+    <p-dialog header="Add Daily Work Entry" [(visible)]="displayAddWorkDialog" [modal]="true" [style]="{ width: '50vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="add-work-dialog">
+        <app-add-work-form></app-add-work-form>
+    </p-dialog>
+
+    <!-- Filters Section -->
+    <p-card header="Filter Work Records" styleClass="filter-card">
+        <p-toolbar styleClass="filter-toolbar">
+            <ng-template pTemplate="left">
+                <div class="quick-filters">
+                    <p-button label="This Week" icon="pi pi-calendar" [outlined]="activeFilter !== 'week'" severity="info" size="small" (onClick)="filterThisWeek()">
+                    </p-button>
+                    <p-button label="This Month" icon="pi pi-calendar" [outlined]="activeFilter !== 'month'" severity="info" size="small" (onClick)="filterThisMonth()">
+                    </p-button>
+                    <p-button label="This Year" icon="pi pi-calendar" [outlined]="activeFilter !== 'year'" severity="info" size="small" (onClick)="filterThisYear()">
+                    </p-button>
+                </div>
+            </ng-template>
+            <ng-template pTemplate="right">
+                <p-button label="Clear Filters" icon="pi pi-filter-slash" severity="secondary" [outlined]="true" size="small" (onClick)="clearFilters()">
+                </p-button>
+            </ng-template>
+        </p-toolbar>
+
+        <p-divider></p-divider>
+
+        <!-- Custom Date Range Filter -->
+        <div class="custom-filter-section">
+            <h3 class="filter-heading">
+                <i class="pi pi-sliders-h"></i> Custom Date Range
+            </h3>
+            <div class="grid">
+                <div class="col-12 md:col-5">
+                    <div class="field">
+                        <label for="fromDate">From Date</label>
+                        <p-datepicker id="fromDate" [(ngModel)]="fromDate" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="Select From Date" styleClass="w-full" (onSelect)="onCustomDateFilter()">
+                        </p-datepicker>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-5">
+                    <div class="field">
+                        <label for="toDate">To Date</label>
+                        <p-datepicker id="toDate" [(ngModel)]="toDate" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="Select To Date" styleClass="w-full" [minDate]="fromDate" (onSelect)="onCustomDateFilter()">
+                        </p-datepicker>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-2 flex align-items-center">
+                    <p-button label="Apply" icon="pi pi-check" severity="success" styleClass="w-full" (onClick)="onCustomDateFilter()">
+                    </p-button>
+                </div>
+            </div>
+        </div>
+    </p-card>
+
+    <!-- Statistics Cards -->
+    <div class="statistics-section">
+        <div class="grid">
+            <div class="col-12 md:col-4">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <i class="pi pi-list stat-icon"></i>
+                        <div class="stat-details">
+                            <span class="stat-label">Total Records</span>
+                            <span class="stat-value">{{ totalRecords }}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 md:col-4">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <i class="pi pi-chart-line stat-icon"></i>
+                        <div class="stat-details">
+                            <span class="stat-label">Total Fabric (m)</span>
+                            <span class="stat-value">{{ getTotalFabricMeters() }}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 md:col-4">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <i class="pi pi-percentage stat-icon"></i>
+                        <div class="stat-details">
+                            <span class="stat-label">Average (m)</span>
+                            <span class="stat-value">{{ getAverageFabricMeters() | number:'1.0-2' }}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+        </div>
+    </div>
+
+    <!-- Work Records Table -->
+    <p-card header="Work Records" styleClass="table-card">
+        <p-table [value]="filteredEntries" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(first)]="first" [totalRecords]="totalRecords"
+            [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="500px">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="date" style="width: 15%">
+                        Date
+                        <p-sortIcon field="date"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="employeeName" style="width: 25%">
+                        Employee Name
+                        <p-sortIcon field="employeeName"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="employeeType" style="width: 20%">
+                        Work Type
+                        <p-sortIcon field="employeeType"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="shift" style="width: 20%">
+                        Shift
+                        <p-sortIcon field="shift"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="fabricMeters" style="width: 20%" class="text-right">
+                        Fabric (meters)
+                        <p-sortIcon field="fabricMeters"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-entry>
+                <tr>
+                    <td>
+                        <div class="date-cell">
+                            <i class="pi pi-calendar"></i> {{ formatDate(entry.date) }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="employee-cell">
+                            <i class="pi pi-user"></i> {{ entry.employeeName }}
+                        </div>
+                    </td>
+                    <td>
+                        <p-tag [value]="entry.employeeType" severity="info"></p-tag>
+                    </td>
+                    <td>
+                        <p-chip [label]="entry.shift" styleClass="shift-chip"></p-chip>
+                    </td>
+                    <td class="text-right">
+                        <span class="fabric-value">{{ entry.fabricMeters }} m</span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <div class="empty-message">
+                            <i class="pi pi-inbox"></i>
+                            <p>No work records found</p>
+                            <small>Try adjusting your filters or add a new work entry</small>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+</div>

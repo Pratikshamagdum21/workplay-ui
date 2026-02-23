@@ -1,0 +1,208 @@
+.add-expense-container {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    min-height: 100vh;
+    form {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        .grid {
+            margin: 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.95rem;
+            &.required-label::after {
+                content: ' *';
+                color: #ef4444;
+            }
+        }
+        .p-error {
+            display: block;
+            margin-top: 0.25rem;
+            color: #ef4444;
+            font-size: 0.875rem;
+        }
+        textarea {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+            &:focus {
+                outline: none;
+                border-color: #6366f1;
+                box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            }
+            &::placeholder {
+                color: #94a3b8;
+            }
+        }
+        .mt-3 {
+            margin-top: 1.5rem;
+        }
+        .justify-content-end {
+            justify-content: flex-end;
+        }
+        .flex {
+            display: flex;
+            gap: 1rem;
+        }
+        @media (max-width: 768px) {
+            padding: 1rem;
+            .flex {
+                flex-direction: column;
+                button {
+                    width: 100%;
+                }
+            }
+        }
+    }
+     :host ::ng-deep {
+        .p-select,
+        .p-inputnumber,
+        .p-datepicker {
+            width: 100%;
+            .p-inputtext {
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
+                padding: 0.75rem;
+                font-size: 1rem;
+                transition: all 0.2s ease;
+                &:enabled:hover {
+                    border-color: #94a3b8;
+                }
+                &:enabled:focus {
+                    outline: none;
+                    border-color: #6366f1;
+                    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+                }
+            }
+        }
+        .p-select {
+            .p-select-label {
+                padding: 0.75rem;
+            }
+            &.p-select-open {
+                .p-select-trigger {
+                    border-color: #6366f1;
+                }
+            }
+        }
+        .p-inputnumber {
+            .p-inputnumber-input {
+                border: 1px solid #cbd5e1;
+                border-radius: 6px;
+                padding: 0.75rem;
+                &:enabled:focus {
+                    border-color: #6366f1;
+                    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+                }
+            }
+            .p-inputnumber-button-group {
+                .p-button {
+                    background: #f1f5f9;
+                    border-color: #cbd5e1;
+                    color: #475569;
+                    &:hover {
+                        background: #e2e8f0;
+                        border-color: #94a3b8;
+                    }
+                    &:active {
+                        background: #cbd5e1;
+                    }
+                }
+            }
+        }
+        .p-datepicker {
+            .p-datepicker-input-icon-container {
+                .p-icon {
+                    color: #6366f1;
+                }
+            }
+        }
+        .p-button {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+            &:active {
+                transform: translateY(0);
+            }
+        }
+        .p-inputtext:disabled,
+        .p-select:disabled,
+        .p-inputnumber:disabled {
+            background: #f1f5f9;
+            opacity: 0.7;
+        }
+        // Error states
+        .ng-invalid.ng-touched {
+            .p-inputtext,
+            .p-select-label,
+            .p-inputnumber-input {
+                border-color: #ef4444;
+                &:focus {
+                    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+                }
+            }
+        }
+    }
+}
+
+// Page header styling (if you have one)
+.page-header {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        i {
+            color: #6366f1;
+        }
+    }
+    .subtitle {
+        color: #64748b;
+        font-size: 1rem;
+        margin: 0;
+    }
+}
+
+// Card wrapper styling
+.expense-card {
+
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        background: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 1.125rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        i {
+            color: #6366f1;
+            font-size: 1.25rem;
+        }
+    }
+
+}

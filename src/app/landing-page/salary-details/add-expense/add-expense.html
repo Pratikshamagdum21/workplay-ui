@@ -1,0 +1,49 @@
+<div class="add-expense-container">
+    <div class="expense-card">
+        <div class="card-body">
+            <form [formGroup]="expenseForm" (ngSubmit)="submit()">
+                <div class="p-fluid grid">
+                    <div class="col-12 md:col-6">
+                        <label class="required-label">Expense Type</label>
+                        <p-select [options]="expenseTypes" formControlName="expenseType" placeholder="Select type">
+                        </p-select>
+                        <!-- <small class="p-error" *ngIf="expenseForm?.controls?.expenseType?.touched && expenseForm?.controls?.expenseType?.invalid">
+              Expense type is required
+            </small> -->
+                    </div>
+
+                    <div class="col-12 md:col-6">
+                        <label class="required-label">Amount</label>
+                        <p-inputNumber formControlName="amount" mode="currency" currency="INR" locale="en-IN" [min]="1">
+                        </p-inputNumber>
+                        <!-- <small class="p-error" *ngIf="expenseForm?.controls?.amount?.touched && expenseForm?.controls?.amount?.invalid">
+              Enter valid amount
+            </small> -->
+                    </div>
+
+                    <div class="col-12 md:col-6">
+                        <label class="required-label">Date</label>
+                        <p-datepicker formControlName="date" [showIcon]="true">
+                        </p-datepicker>
+                        <!-- <small class="p-error" *ngIf="expenseForm?.controls?.date?.touched && expenseForm?.controls?.date?.invalid">
+              Date is required
+            </small> -->
+                    </div>
+
+                    <div class="col-12">
+                        <label>Note</label>
+                        <textarea pInputTextarea rows="3" formControlName="note" placeholder="Optional notes about this expense">
+            </textarea>
+                    </div>
+
+                    <div class="col-12 flex justify-content-end mt-3">
+                        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" type="button">
+                        </p-button>
+                        <p-button label="Save Expense" icon="pi pi-check" severity="success" type="submit" [disabled]="expenseForm.invalid">
+                        </p-button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

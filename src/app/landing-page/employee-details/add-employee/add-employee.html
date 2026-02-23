@@ -1,0 +1,163 @@
+<div class="add-employee-container">
+    <p-toast></p-toast>
+
+    <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+        <div class="grid">
+            <!-- Employee Name -->
+            <div class="col-12 md:col-6">
+                <div class="field">
+                    <label for="name" class="required-label">
+                        <i class="pi pi-user"></i> Employee Name
+                    </label>
+                    <input pInputText id="name" [ngModel]="employeeData?.name" formControlName="name" placeholder="Enter employee name"
+                        class="w-full" [class.ng-invalid]="isFieldInvalid('name')"
+                        [class.ng-dirty]="isFieldInvalid('name')" />
+                    <small class="p-error" *ngIf="isFieldInvalid('name')">
+                        {{ getErrorMessage('name') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Salary Type -->
+            <div class="col-12 md:col-6">
+                <div class="field">
+                    <label for="salaryType" class="required-label">
+                        <i class="pi pi-gift"></i> Salary Type
+                    </label>
+                    <p-select id="salaryType" formControlName="salaryType" [options]="salaryTypes"
+                        optionLabel="label" optionValue="value" styleClass="w-full"
+                        [class.ng-invalid]="isFieldInvalid('salaryType')"
+                        [class.ng-dirty]="isFieldInvalid('salaryType')">
+                    </p-select>
+                    <small class="p-error" *ngIf="isFieldInvalid('salaryType')">
+                        {{ getErrorMessage('salaryType') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Fabric Type -->
+            <div class="col-12 md:col-6">
+                <div class="field">
+                    <label for="fabricType" class="required-label">
+                        <i class="pi pi-tag"></i> Fabric Type
+                    </label>
+                    <p-select id="fabricType" formControlName="fabricType" [options]="fabricTypes"
+                        optionLabel="name" optionValue="name" placeholder="Select Fabric Type"
+                        [showClear]="true" styleClass="w-full"
+                        [class.ng-invalid]="isFieldInvalid('fabricType')"
+                        [class.ng-dirty]="isFieldInvalid('fabricType')">
+                    </p-select>
+                    <small class="p-error" *ngIf="isFieldInvalid('fabricType')">
+                        {{ getErrorMessage('fabricType') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Bonus Eligibility -->
+            <div class="col-12 md:col-6">
+                <div class="field">
+                    <label for="isBonused" class="required-label">
+                        <i class="pi pi-gift"></i> Bonus Eligibility
+                    </label>
+                    <p-select id="isBonused" formControlName="isBonused" [options]="bonusOptions"
+                        optionLabel="label" optionValue="value" styleClass="w-full"
+                        [class.ng-invalid]="isFieldInvalid('isBonused')"
+                        [class.ng-dirty]="isFieldInvalid('isBonused')">
+                    </p-select>
+                    <small class="p-error" *ngIf="isFieldInvalid('isBonused')">
+                        {{ getErrorMessage('isBonused') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Bonus Amount -->
+            <div class="col-12 md:col-6" *ngIf="isBonus()">
+                <div class="field">
+                    <label for="bonusAmount" class="required-label">
+                        <i class="pi pi-dollar"></i> Bonus Amount
+                    </label>
+                    <p-inputNumber id="bonusAmount" formControlName="bonusAmount" mode="currency"
+                        currency="INR" locale="en-IN" [min]="0" [showButtons]="true"
+                        buttonLayout="horizontal" incrementButtonIcon="pi pi-plus"
+                        decrementButtonIcon="pi pi-minus" placeholder="Enter bonus amount"
+                        styleClass="w-full" [class.ng-invalid]="isFieldInvalid('bonusAmount')"
+                        [class.ng-dirty]="isFieldInvalid('bonusAmount')">
+                    </p-inputNumber>
+                    <small class="p-error" *ngIf="isFieldInvalid('bonusAmount')">
+                        {{ getErrorMessage('bonusAmount') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Advance Amount -->
+            <div class="col-12 md:col-6">
+                <div class="field">
+                    <label for="advanceAmount" class="required-label">
+                        <i class="pi pi-wallet"></i> Advance Amount
+                    </label>
+                    <p-inputNumber id="advanceAmount" formControlName="advanceAmount" mode="currency"
+                        currency="INR" locale="en-IN" [min]="0" [showButtons]="true"
+                        buttonLayout="horizontal" incrementButtonIcon="pi pi-plus"
+                        decrementButtonIcon="pi pi-minus" placeholder="Enter advance amount"
+                        styleClass="w-full" [class.ng-invalid]="isFieldInvalid('advanceAmount')"
+                        [class.ng-dirty]="isFieldInvalid('advanceAmount')">
+                    </p-inputNumber>
+                    <small class="p-error" *ngIf="isFieldInvalid('advanceAmount')">
+                        {{ getErrorMessage('advanceAmount') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Monthly Salary (MONTHLY only) -->
+            <div class="col-12 md:col-6" *ngIf="!isWeekly()">
+                <div class="field">
+                    <label for="salary" class="required-label">
+                        <i class="pi pi-dollar"></i> Monthly Salary
+                    </label>
+                    <p-inputNumber id="salary" formControlName="salary" mode="currency" currency="INR"
+                        locale="en-IN" [min]="0" [showButtons]="true" buttonLayout="horizontal"
+                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                        placeholder="Enter monthly salary" styleClass="w-full"
+                        [class.ng-invalid]="isFieldInvalid('salary')"
+                        [class.ng-dirty]="isFieldInvalid('salary')">
+                    </p-inputNumber>
+                    <small class="p-error" *ngIf="isFieldInvalid('salary')">
+                        {{ getErrorMessage('salary') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Rate Per Meter (WEEKLY only) -->
+            <div class="col-12 md:col-6" *ngIf="isWeekly()">
+                <div class="field">
+                    <label for="rate" class="required-label">
+                        <i class="pi pi-dollar"></i> Rate Per Meter (₹)
+                    </label>
+                    <p-inputNumber id="rate" formControlName="rate" mode="currency" currency="INR"
+                        locale="en-IN" [min]="0" [showButtons]="true" buttonLayout="horizontal"
+                        incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
+                        placeholder="Enter rate per meter" styleClass="w-full"
+                        [class.ng-invalid]="isFieldInvalid('rate')"
+                        [class.ng-dirty]="isFieldInvalid('rate')">
+                    </p-inputNumber>
+                    <small class="p-error" *ngIf="isFieldInvalid('rate')">
+                        {{ getErrorMessage('rate') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-12">
+                <div class="button-group">
+                    <p-button [label]="isEditMode ? 'Update Employee' : 'Add Employee'"
+                        [icon]="isEditMode ? 'pi pi-check' : 'pi pi-plus'" type="submit"
+                        severity="success" [loading]="saving" [disabled]="employeeForm.invalid || saving">
+                    </p-button>
+                    <p-button label="Cancel" icon="pi pi-times" type="button" severity="secondary"
+                        [outlined]="true" (onClick)="onCancel()">
+                    </p-button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

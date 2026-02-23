@@ -1,0 +1,186 @@
+.daily-work-management {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    min-height: 100vh;
+    .page-header {
+        margin-bottom: 2rem;
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            i {
+                color: #6366f1;
+            }
+        }
+        .subtitle {
+            color: #64748b;
+            font-size: 1rem;
+            margin: 0;
+        }
+    }
+    .add-work-section {
+        margin-bottom: 2rem;
+    }
+    .filter-card {
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        .filter-toolbar {
+            background: transparent;
+            border: none;
+            padding: 0;
+            .quick-filters {
+                display: flex;
+                gap: 0.75rem;
+                flex-wrap: wrap;
+            }
+        }
+        .custom-filter-section {
+            margin-top: 1rem;
+            .filter-heading {
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: #334155;
+                margin-bottom: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                i {
+                    color: #6366f1;
+                }
+            }
+            .field {
+                label {
+                    display: block;
+                    margin-bottom: 0.5rem;
+                    font-weight: 600;
+                    color: #475569;
+                }
+            }
+        }
+    }
+    .statistics-section {
+        margin-bottom: 2rem;
+        .stat-card {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #6366f1;
+            .stat-content {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                .stat-icon {
+                    font-size: 2.5rem;
+                    color: #6366f1;
+                    opacity: 0.8;
+                }
+                .stat-details {
+                    display: flex;
+                    flex-direction: column;
+                    .stat-label {
+                        font-size: 0.875rem;
+                        color: #64748b;
+                        font-weight: 500;
+                    }
+                    .stat-value {
+                        font-size: 1.75rem;
+                        font-weight: 700;
+                        color: #1e293b;
+                    }
+                }
+            }
+        }
+    }
+    .table-card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        .date-cell,
+        .employee-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            i {
+                color: #6366f1;
+            }
+        }
+        .shift-chip {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        .fabric-value {
+            font-weight: 600;
+            color: #059669;
+            font-size: 1.125rem;
+        }
+        .empty-message {
+            padding: 3rem 1rem;
+            text-align: center;
+            i {
+                font-size: 4rem;
+                color: #cbd5e1;
+                margin-bottom: 1rem;
+            }
+            p {
+                font-size: 1.125rem;
+                color: #64748b;
+                margin: 0.5rem 0;
+            }
+            small {
+                color: #94a3b8;
+            }
+        }
+    }
+    // Responsive adjustments
+    @media (max-width: 768px) {
+        padding: 1rem;
+        .page-header {
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+        .filter-toolbar {
+            .quick-filters {
+                width: 100%;
+                p-button {
+                    flex: 1;
+                }
+            }
+        }
+    }
+    // PrimeNG overrides
+     :host ::ng-deep {
+        .p-datatable {
+            .p-datatable-thead>tr>th {
+                background: #f1f5f9;
+                color: #1e293b;
+                font-weight: 600;
+                border-bottom: 2px solid #e2e8f0;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+            .p-datatable-tbody>tr {
+                &:hover {
+                    background: #f8fafc;
+                }
+                >td {
+                    padding: 1rem;
+                    border-bottom: 1px solid #e2e8f0;
+                }
+            }
+        }
+        .p-paginator {
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem;
+        }
+        .p-tag {
+            padding: 0.5rem 0.75rem;
+            font-weight: 500;
+        }
+        .p-chip {
+            padding: 0.5rem 0.75rem;
+        }
+    }
+}

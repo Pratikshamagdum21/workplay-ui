@@ -1,0 +1,37 @@
+<div class="side-menu">
+    <div class="logo-container">
+        <div class="logo-section">
+            <i class="pi pi-building"></i>
+            <span class="logo-text">Company Portal</span>
+        </div>
+
+        <div class="branch-dropdown">
+            <p-select [options]="branches" [(ngModel)]="selectedBranch" optionLabel="name" placeholder="Select Branch" (onChange)="onBranchChange($event)" styleClass="branch-dropdown" [showClear]="false">
+                <ng-template pTemplate="selectedItem" let-branch>
+                    <div class="selected-branch" *ngIf="branch">
+                        <i class="pi pi-map-marker"></i>
+                        <span>{{ branch.name }}</span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="item" let-branch>
+                    <div class="branch-option">
+                        <i class="pi pi-map-marker"></i>
+                        <div class="branch-details">
+                            <span class="branch-name">{{ branch.name }}</span>
+                            <span class="branch-code">{{ branch.code }}</span>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-select>
+        </div>
+    </div>
+
+    <p-panelMenu [model]="menuItems" [multiple]="false" styleClass="custom-panel-menu">
+        <ng-template pTemplate="item" let-item>
+            <a [routerLink]="item.routerLink" class="menu-item" routerLinkActive="active-item">
+                <i [class]="item.icon"></i>
+                <span class="menu-label">{{ item.label }}</span>
+            </a>
+        </ng-template>
+    </p-panelMenu>
+</div>

@@ -1,0 +1,181 @@
+<div class="employee-list-container">
+    <!-- Page Header -->
+    <div class="flex justify-content-between align-items-center mb-4">
+        <div class="page-header">
+            <h1>
+                <i class="pi pi-money-bill"></i> Salary Management
+            </h1>
+            <p class="subtitle">Process employee salaries - weekly and monthly</p>
+        </div>
+        <div class="flex gap-2">
+            <div class="header-actions">
+                <p-button label="Pay Salary" icon="pi pi-plus" severity="success" (onClick)="openPaySalaryDialog()">
+                </p-button>
+            </div>
+            <div class="header-actions">
+                <p-button label="Add Expenses" icon="pi pi-plus" severity="success" (onClick)="openAddExpensesDialog()">
+                </p-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <p-card header="Filters & Reports" styleClass="filter-card mb-3">
+        <div class="grid">
+            <div class="col-12 md:col-4">
+                <label for="filterSelect" class="filter-label">
+          <i class="pi pi-filter"></i> Filter By Period
+        </label>
+                <p-select id="filterSelect" [(ngModel)]="selectedFilter" [options]="filterOptions" optionLabel="label" optionValue="value" placeholder="Select filter" styleClass="w-full" (onChange)="onFilterChange($event)">
+                </p-select>
+            </div>
+
+            <div class="col-12 md:col-5" *ngIf="showCustomDatePicker">
+                <label for="customDate" class="filter-label">
+          <i class="pi pi-calendar"></i> Custom Date Range
+        </label>
+                <p-datepicker id="customDate" [(ngModel)]="customDateRange" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="Select date range" styleClass="w-full" (onSelect)="onCustomDateChange()">
+                </p-datepicker>
+            </div>
+
+            <div class="col-12 md:col-3 flex align-items-end gap-2">
+                <p-button label="Clear Filter" icon="pi pi-filter-slash" severity="secondary" [outlined]="true" styleClass="w-full" (onClick)="clearFilter()">
+                </p-button>
+                <p-button label="Generate PDF" icon="pi pi-file-pdf" severity="danger" styleClass="w-full" (onClick)="generatePDFReport()">
+                </p-button>
+            </div>
+        </div>
+
+        <!-- Filter Summary -->
+        <div class="filter-summary mt-3" *ngIf="selectedFilter !== 'all'">
+            <i class="pi pi-info-circle"></i>
+            <span>{{ filteredEmployees.length }} records found</span>
+        </div>
+    </p-card>
+ <!-- Statistics Cards -->
+    <div class="statistics-section">
+        <div class="grid">
+            <div class="col-12 md:col-4">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <i class="pi pi-list stat-icon"></i>
+                        <div class="stat-details">
+                            <span class="stat-label">Total Salary</span>
+                            <span class="stat-value">{{ totalSalary }}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 md:col-4">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <i class="pi pi-chart-line stat-icon"></i>
+                        <div class="stat-details">
+                            <span class="stat-label">Total Fabric (m)</span>
+                            <span class="stat-value">{{ getTotalFabricMeters() }}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 md:col-4">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <i class="pi pi-percentage stat-icon"></i>
+                        <div class="stat-details">
+                            <span class="stat-label">Total expenses</span>
+                            <span class="stat-value">{{ getTotalFabricMeters()  }}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+        </div>
+    </div>
+    <!-- Employee Table -->
+    <p-card header="Salary History" styleClass="employee-card">
+        <p-table [value]="filteredEmployees" [loading]="loading" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records" styleClass="p-datatable-striped"
+            [tableStyle]="{ 'min-width': '60rem' }">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="name">
+                        Employee Name
+                        <p-sortIcon field="name"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="salaryType">
+                        Salary Type
+                        <p-sortIcon field="salaryType"></p-sortIcon>
+                    </th>
+                    <th>Rate/Salary</th>
+                    <th pSortableColumn="advanceTaken" class="text-right">
+                        Advance Taken
+                        <p-sortIcon field="advanceTaken"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="advanceRemaining" class="text-right">
+                        Advance Remaining
+                        <p-sortIcon field="advanceRemaining"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="bonusEligible">
+                        Bonus
+                        <p-sortIcon field="bonusEligible"></p-sortIcon>
+                    </th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-employee>
+                <tr>
+                    <td>
+                        <div class="employee-name">
+                            <i class="pi pi-user"></i> {{ employee.name }}
+                        </div>
+                    </td>
+                    <td>
+                        <p-tag [value]="getSalaryTypeLabel(employee.salaryType)" [severity]="getSalaryTypeSeverity(employee.salaryType)">
+                        </p-tag>
+                    </td>
+                    <td>
+                        <span *ngIf="employee.salaryType === 'weekly'" class="rate-info">
+              {{ formatCurrency(employee.ratePerMeter || 0) }}/meter
+            </span>
+                        <span *ngIf="employee.salaryType === 'monthly'" class="salary-info">
+              {{ formatCurrency(employee.monthlySalary || 0) }}/month
+            </span>
+                    </td>
+                    <td class="text-right">
+                        <span class="advance-taken">{{ formatCurrency(employee.advanceTaken) }}</span>
+                    </td>
+                    <td class="text-right">
+                        <span class="advance-remaining">{{ formatCurrency(employee.advanceRemaining) }}</span>
+                    </td>
+                    <td>
+                        <p-tag [value]="getBonusLabel(employee.bonusEligible)" [severity]="getBonusSeverity(employee.bonusEligible)">
+                        </p-tag>
+                    </td>
+                    <td class="text-center">
+                        <p-button label="Edit" icon="pi pi-pencil" severity="success" size="small" (onClick)="paySalary(employee)">
+                        </p-button>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7" class="text-center">
+                        <div class="empty-state">
+                            <i class="pi pi-inbox"></i>
+                            <p>No records found for the selected filter</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+</div>
+
+<p-dialog header="Process Salary" [(visible)]="displayViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
+    <app-pay-salary></app-pay-salary>
+</p-dialog>
+
+<p-dialog header="Process Expenses" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
+    <app-add-expense></app-add-expense>
+</p-dialog>

@@ -1,0 +1,307 @@
+<div class="salary-create-container">
+    <p-toast></p-toast>
+
+    <!-- Employee Selector -->
+    <p-card header="Select Employee" styleClass="section-card employee-selector-card">
+        <div class="grid">
+            <div class="col-12 md:col-8">
+                <div class="field">
+                    <label for="employeeSelect" class="required-label">
+          <i class="pi pi-users"></i> Select Employee
+        </label>
+                    <p-select id="employeeSelect" [(ngModel)]="selectedEmployeeId" [options]="employees" optionLabel="name" optionValue="id" placeholder="Choose an employee to process salary" [filter]="true" filterBy="name" [showClear]="true" styleClass="w-full" (onChange)="onEmployeeSelect($event)">
+                        <ng-template pTemplate="item" let-emp>
+                            <div class="employee-option">
+                                <div class="emp-name">{{ emp.name }}</div>
+                                <div class="emp-details">
+                                    <p-tag [value]="emp.salaryType === 'weekly' ? 'Weekly' : 'Monthly'" [severity]="emp.salaryType === 'weekly' ? 'success' : 'info'" styleClass="emp-type-tag">
+                                    </p-tag>
+                                    <span class="emp-advance">Advance: {{ formatCurrency(emp.advanceRemaining) }}</span>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-select>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-4" *ngIf="selectedEmployeeId && employee">
+                <div class="field">
+                    <label class="info-label">
+          <i class="pi pi-briefcase"></i> Salary Type
+        </label>
+                    <div class="salary-type-display">
+                        <p-tag [value]="employee.salaryType === 'WEEKLY' ? 'Weekly (Meter-based)' : 'Monthly (Fixed)'" [severity]="employee.salaryType === 'WEEKLY' ? 'success' : 'info'" styleClass="salary-type-tag-large">
+                        </p-tag>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p-card>
+
+
+    <!-- Loading State -->
+    <div *ngIf="loading && selectedEmployeeId" class="loading-state">
+        <p-progressSpinner></p-progressSpinner>
+        <p>Loading employee details...</p>
+    </div>
+
+    <!-- Main Content -->
+    <div *ngIf="!loading && employee && salaryForm">
+        <form [formGroup]="salaryForm" (ngSubmit)="onSubmit()">
+            <div class="grid">
+                <!-- WEEKLY WORKER FORM -->
+                <ng-container *ngIf="isWeeklyWorker()">
+                    <!-- Week Range Selector -->
+                    <div class="col-12">
+                        <p-card header="Select Week Range" styleClass="section-card">
+                            <div class="field">
+                                <label for="weekRange" class="required-label">
+                  <i class="pi pi-calendar"></i> Week Range
+                </label>
+                                <p-datepicker id="weekRange" formControlName="weekRange" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [minDate]="minDate" [maxDate]="maxDate" placeholder="Select week start and end date" styleClass="w-full">
+                                </p-datepicker>
+                                <small class="p-info">Select the start and end date of the week</small>
+                            </div>
+                        </p-card>
+                    </div>
+
+                    <!-- Rate Per Meter -->
+                    <div class="col-12 md:col-6">
+                        <p-card header="Rate Configuration" styleClass="section-card">
+                            <div class="field">
+                                <label for="ratePerMeter" class="required-label">
+                  <i class="pi pi-money-bill"></i> Rate Per Meter
+                </label>
+                                <p-inputNumber id="ratePerMeter" formControlName="ratePerMeter" mode="currency" currency="INR" locale="en-IN" [min]="1" [showButtons]="true" styleClass="w-full">
+                                </p-inputNumber>
+                            </div>
+                        </p-card>
+                    </div>
+
+                    <!-- Bonus -->
+                    <div class="col-12 md:col-6">
+                        <p-card header="Bonus" styleClass="section-card">
+                            <div class="field">
+                                <label for="bonus" class="required-label">
+                  <i class="pi pi-gift"></i> Bonus Amount
+                </label>
+                                <p-inputNumber id="bonus" formControlName="bonus" mode="currency" currency="INR" locale="en-IN" [min]="0" [showButtons]="true" [disabled]="!employee.bonusEligible" styleClass="w-full">
+                                </p-inputNumber>
+                                <small class="p-info" *ngIf="!employee.bonusEligible">
+                  Employee is not eligible for bonus
+                </small>
+                            </div>
+                        </p-card>
+                    </div>
+
+                    <!-- Daily Meter Table -->
+                    <div class="col-12" *ngIf="meterDetailsArray && meterDetailsArray.length > 0">
+                        <p-card header="Daily Meter Details" styleClass="section-card">
+                            <p-table [value]="meterDetailsArray.controls" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="400px">
+
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th style="width: 20%">Date</th>
+                                        <th style="width: 15%">Meter</th>
+                                        <!-- <th style="width: 15%">Is Leave</th>
+                                        <th style="width: 20%">Leave Deduction</th> -->
+                                        <th style="width: 30%">Note</th>
+                                    </tr>
+                                </ng-template>
+
+                                <ng-template pTemplate="body" let-control let-i="rowIndex">
+                                    <tr [formGroup]="control">
+                                        <td>
+                                            <strong>{{ formatDate(control.get('date')?.value) }}</strong>
+                                        </td>
+                                        <td>
+                                            <p-inputNumber formControlName="meter" [min]="0" [showButtons]="true" styleClass="w-full meter-input">
+                                            </p-inputNumber>
+                                        </td>
+                                        <!-- <td>
+                                            <p-checkbox formControlName="isLeave" [binary]="true" [disabled]="control.get('meter')?.value > 0">
+                                            </p-checkbox>
+                                        </td>
+                                        <td>
+                                            <p-inputNumber formControlName="leaveDeduction" mode="currency" currency="INR" locale="en-IN" [min]="0" [disabled]="!control.get('isLeave')?.value" styleClass="w-full">
+                                            </p-inputNumber>
+                                        </td> -->
+                                        <td>
+                                            <input pInputText formControlName="note" placeholder="Add note" class="w-full" />
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+
+                            <!-- Weekly Summary -->
+                            <div class="weekly-summary">
+                                <div class="summary-item">
+                                    <span class="summary-label">Total Meters:</span>
+                                    <span class="summary-value">{{ totalMeters }}</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="summary-label">Base Salary:</span>
+                                    <span class="summary-value">{{ formatCurrency(baseSalary) }}</span>
+                                </div>
+                                <!-- <div class="summary-item">
+                                    <span class="summary-label">Leave Deduction:</span>
+                                    <span class="summary-value negative">{{ formatCurrency(leaveDeductionTotal) }}</span>
+                                </div> -->
+                            </div>
+                        </p-card>
+                    </div>
+                </ng-container>
+
+                <!-- MONTHLY WORKER FORM -->
+                <ng-container *ngIf="isMonthlyWorker()">
+                    <!-- Monthly Salary -->
+                    <div class="col-12 md:col-6">
+                        <p-card header="Monthly Salary" styleClass="section-card">
+                            <div class="field">
+                                <label for="salary">
+                  <i class="pi pi-money-bill"></i> Fixed Monthly Salary
+                </label>
+                                <p-inputNumber id="salary" formControlName="salary" mode="currency" currency="INR" locale="en-IN" [disabled]="true" styleClass="w-full">
+                                </p-inputNumber>
+                                <small class="p-info">This is a fixed monthly salary</small>
+                            </div>
+                        </p-card>
+                    </div>
+
+                    <!-- Bonus -->
+                    <div class="col-12 md:col-6">
+                        <p-card header="Bonus" styleClass="section-card">
+                            <div class="field">
+                                <label for="bonus" class="required-label">
+                  <i class="pi pi-gift"></i> Bonus Amount
+                </label>
+                                <p-inputNumber id="bonus" formControlName="bonus" mode="currency" currency="INR" locale="en-IN" [min]="0" [showButtons]="true" [disabled]="!employee.bonusEligible" styleClass="w-full">
+                                </p-inputNumber>
+                                <small class="p-info" *ngIf="!employee.bonusEligible">
+                  Employee is not eligible for bonus
+                </small>
+                            </div>
+                        </p-card>
+                    </div>
+
+                    <!-- Leave Details -->
+                    <div class="col-12">
+                        <p-card header="Leave Details" styleClass="section-card">
+                            <div class="grid">
+                                <div class="col-12 md:col-6">
+                                    <div class="field">
+                                        <label for="leaveDays" class="required-label">
+                      <i class="pi pi-calendar-times"></i> Number of Leave Days
+                    </label>
+                                        <p-inputNumber id="leaveDays" formControlName="leaveDays" [min]="0" [max]="31" [showButtons]="true" styleClass="w-full">
+                                        </p-inputNumber>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 md:col-6">
+                                    <div class="field">
+                                        <label for="leaveDeductionPerDay" class="required-label">
+                      <i class="pi pi-money-bill"></i> Leave Deduction Per Day
+                    </label>
+                                        <p-inputNumber id="leaveDeductionPerDay" formControlName="leaveDeductionPerDay" mode="currency" currency="INR" locale="en-IN" [min]="0" [showButtons]="true" styleClass="w-full">
+                                        </p-inputNumber>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="leave-summary">
+                                        <span class="summary-label">Total Leave Deduction:</span>
+                                        <span class="summary-value negative">{{ formatCurrency(leaveDeductionTotal) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </p-card>
+                    </div>
+                </ng-container>
+
+                <!-- Advance Deduction (Common for both) -->
+                <div class="col-12">
+                    <p-card header="Advance Deduction" styleClass="section-card advance-card">
+                        <div class="grid">
+                            <div class="col-12 md:col-4">
+                                <div class="advance-info-box">
+                                    <span class="info-label">Total Advance Taken</span>
+                                    <span class="info-value">{{ formatCurrency(employee.advanceTaken) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 md:col-4">
+                                <div class="advance-info-box">
+                                    <span class="info-label">Advance Remaining</span>
+                                    <span class="info-value remaining">{{ formatCurrency(employee.advanceRemaining) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 md:col-4">
+                                <div class="field">
+                                    <label for="advanceDeductedThisTime" class="required-label">
+                    <i class="pi pi-wallet"></i> Deduct This Time
+                  </label>
+                                    <p-inputNumber id="advanceDeductedThisTime" formControlName="advanceDeductedThisTime" mode="currency" currency="INR" locale="en-IN" [min]="0" [max]="employee.advanceRemaining" [showButtons]="true" styleClass="w-full">
+                                    </p-inputNumber>
+                                    <small class="p-info">
+                    Maximum: {{ formatCurrency(employee.advanceRemaining) }}
+                  </small>
+                                </div>
+                            </div>
+                        </div>
+                    </p-card>
+                </div>
+
+                <!-- Final Salary Calculation -->
+                <div class="col-12">
+                    <p-card header="Final Salary Calculation" styleClass="section-card final-card">
+                        <div class="calculation-breakdown">
+                            <div class="calc-row" *ngIf="isWeeklyWorker()">
+                                <span class="calc-label">Base Salary ({{ totalMeters }} meters × {{ formatCurrency(salaryForm.get('ratePerMeter')?.value || 0) }}):</span>
+                                <span class="calc-value positive">{{ formatCurrency(baseSalary) }}</span>
+                            </div>
+
+                            <div class="calc-row" *ngIf="isMonthlyWorker()">
+                                <span class="calc-label">Monthly Salary:</span>
+                                <span class="calc-value positive">{{ formatCurrency(salaryForm.get('salary')?.value || 0) }}</span>
+                            </div>
+
+                            <div class="calc-row">
+                                <span class="calc-label">Bonus:</span>
+                                <span class="calc-value positive">+ {{ formatCurrency(salaryForm.get('bonus')?.value || 0) }}</span>
+                            </div>
+
+                            <div class="calc-row">
+                                <span class="calc-label">Leave Deduction:</span>
+                                <span class="calc-value negative">- {{ formatCurrency(leaveDeductionTotal) }}</span>
+                            </div>
+
+                            <div class="calc-row">
+                                <span class="calc-label">Advance Deduction:</span>
+                                <span class="calc-value negative">- {{ formatCurrency(salaryForm.get('advanceDeductedThisTime')?.value || 0) }}</span>
+                            </div>
+
+                            <p-divider></p-divider>
+
+                            <div class="calc-row final-row">
+                                <span class="calc-label">Final Payable Amount:</span>
+                                <span class="calc-value final">{{ formatCurrency(finalPay) }}</span>
+                            </div>
+                        </div>
+                    </p-card>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="col-12">
+                    <div class="action-buttons">
+                        <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="cancel()">
+                        </p-button>
+                        <p-button label="Save Salary" icon="pi pi-check" severity="success" type="submit" [loading]="saving" [disabled]="salaryForm.invalid">
+                        </p-button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
