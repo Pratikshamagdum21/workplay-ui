@@ -147,6 +147,28 @@
                 }
             }
         }
+        .table-card {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    }
+    @media (max-width: 480px) {
+        padding: 0.5rem;
+        .page-header h1 {
+            font-size: 1.15rem;
+        }
+    }
+    @media (max-width: 640px) {
+        :host ::ng-deep {
+            .p-datatable-tbody > tr > td {
+                padding: 0.6rem 0.5rem;
+                font-size: 0.85rem;
+            }
+            .p-datatable-thead > tr > th {
+                padding: 0.6rem 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
     }
     // PrimeNG overrides
      :host ::ng-deep {

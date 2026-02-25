@@ -51,5 +51,25 @@
         .ng-invalid.ng-dirty {
             border-color: #ef4444;
         }
+        @media (max-width: 640px) {
+            .p-inputnumber {
+                width: 100%;
+                .p-inputtext {
+                    width: 100%;
+                }
+            }
+            .p-datepicker-input {
+                width: 100%;
+            }
+            .p-select {
+                width: 100%;
+            }
+        }
+    }
+    @media (max-width: 640px) {
+        padding: 0.5rem;
+        .field {
+            margin-bottom: 1rem;
+        }
     }
 }
