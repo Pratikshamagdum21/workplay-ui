@@ -1,0 +1,55 @@
+.mobile-app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #f8f9fa;
+}
+
+.mobile-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #6366f1;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  .mobile-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .mobile-logo-icon {
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-app-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    flex: 1;
+  }
+
+  .mobile-header-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 0.2rem 0.6rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+}
+
+.mobile-main-content {
+  flex: 1;
+  overflow-x: hidden;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
