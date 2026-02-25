@@ -36,9 +36,9 @@
                             }
                         ],
                         "styles": [
-                            "src/styles.scss",
                             "node_modules/primeicons/primeicons.css",
-                            "node_modules/primeflex/primeflex.scss"
+                            "node_modules/primeflex/primeflex.scss",
+                            "src/styles.scss"
                         ]
                     },
                     "configurations": {
@@ -103,6 +103,8 @@
                             "input": "public"
                         }],
                         "styles": [
+                            "node_modules/primeicons/primeicons.css",
+                            "node_modules/primeflex/primeflex.scss",
                             "src/styles.scss"
                         ]
                     }

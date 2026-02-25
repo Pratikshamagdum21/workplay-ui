@@ -15,7 +15,8 @@
         "electron:build:mac": "ng build --configuration production && electron-builder --mac",
         "electron:build:linux": "ng build --configuration production && electron-builder --linux",
         "pack": "electron-builder --dir",
-        "dist": "electron-builder"
+        "dist": "electron-builder",
+        "clean": "ng cache clean"
     },
     "prettier": {
         "printWidth": 100,
