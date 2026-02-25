@@ -1,1 +1,132 @@
-<p>landing-page works!</p>
+<div class="dashboard-container">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <h2 class="m-0"><i class="pi pi-th-large mr-2"></i>Dashboard</h2>
+    <span class="text-500 text-sm">{{ today | date:'longDate' }}</span>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+
+    <div class="kpi-wrapper kpi-indigo">
+      <p-card styleClass="kpi-card h-full">
+        <div class="kpi-content">
+          <i class="pi pi-users kpi-icon"></i>
+          <div class="kpi-info">
+            <div class="kpi-value">{{ totalEmployees }}</div>
+            <div class="kpi-label">Total Employees</div>
+            <div class="kpi-sub">Weekly: {{ weeklyCount }}&nbsp;&nbsp;|&nbsp;&nbsp;Monthly: {{ monthlyCount }}</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <div class="kpi-wrapper kpi-amber">
+      <p-card styleClass="kpi-card h-full">
+        <div class="kpi-content">
+          <i class="pi pi-wallet kpi-icon"></i>
+          <div class="kpi-info">
+            <div class="kpi-value">{{ formatCurrency(totalAdvanceOutstanding) }}</div>
+            <div class="kpi-label">Advance Outstanding</div>
+            <div class="kpi-sub">Total pending advances</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <div class="kpi-wrapper kpi-teal">
+      <p-card styleClass="kpi-card h-full">
+        <div class="kpi-content">
+          <i class="pi pi-box kpi-icon"></i>
+          <div class="kpi-info">
+            <div class="kpi-value">{{ fabricThisMonth }} m</div>
+            <div class="kpi-label">Fabric This Month</div>
+            <div class="kpi-sub">Production in meters</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <div class="kpi-wrapper kpi-green">
+      <p-card styleClass="kpi-card h-full">
+        <div class="kpi-content">
+          <i class="pi pi-star kpi-icon"></i>
+          <div class="kpi-info">
+            <div class="kpi-value">{{ bonusEligibleCount }}</div>
+            <div class="kpi-label">Bonus Eligible</div>
+            <div class="kpi-sub">Out of {{ totalEmployees }} employees</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+  </div>
+
+  <!-- Tables -->
+  <div class="tables-row">
+
+    <!-- Recent Work Entries -->
+    <p-card header="Recent Work Entries">
+      <p-table [value]="recentEntries" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Date</th>
+            <th>Employee</th>
+            <th>Work Type</th>
+            <th>Shift</th>
+            <th>Meters</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-entry>
+          <tr>
+            <td>{{ entry.date | date:'dd MMM' }}</td>
+            <td>{{ entry.employeeName }}</td>
+            <td>{{ entry.employeeType }}</td>
+            <td>{{ entry.shift }}</td>
+            <td><strong>{{ entry.fabricMeters }}</strong></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center text-500 py-4">No work entries yet</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+
+    <!-- Advance Alerts -->
+    <p-card header="Advance Alerts">
+      <p-table [value]="advanceAlerts" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Employee</th>
+            <th>Remaining</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-emp>
+          <tr>
+            <td>{{ emp.name }}</td>
+            <td>
+              <p-tag [value]="formatCurrency(emp.advanceRemaining)" severity="warn" />
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="2" class="text-center text-500 py-4">No pending advances</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <p-button label="Employees" icon="pi pi-users" (onClick)="goTo('/employee')" />
+    <p-button label="Daily Work" icon="pi pi-briefcase" severity="secondary" (onClick)="goTo('/daily-work-management')" />
+    <p-button label="Salary" icon="pi pi-dollar" severity="success" (onClick)="goTo('/salary')" />
+  </div>
+
+</div>
