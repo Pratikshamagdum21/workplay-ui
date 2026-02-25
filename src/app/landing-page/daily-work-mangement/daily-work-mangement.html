@@ -9,9 +9,15 @@
             </h1>
             <p class="subtitle">Track and manage daily work records for all employees</p>
         </div>
-        <div class="header-actions">
+        <div class="flex">
+        <div class="header-actions mr-3">
             <p-button label="Add Work Entry" icon="pi pi-plus" severity="success" (onClick)="openAddWorkDialog()">
             </p-button>
+        </div>
+         <div class="header-actions">
+                <p-button label="Add Expenses" icon="pi pi-plus" severity="success" (onClick)="openAddExpensesDialog()">
+                </p-button>
+            </div>
         </div>
     </div>
 
@@ -178,3 +184,6 @@
         </p-table>
     </p-card>
 </div>
+<p-dialog header="Process Expenses" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
+    <app-add-expense></app-add-expense>
+</p-dialog>

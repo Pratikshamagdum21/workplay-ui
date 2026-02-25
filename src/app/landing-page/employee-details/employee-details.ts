@@ -16,7 +16,7 @@ import { ViewEmployeeDetails } from './view-employee-details/view-employee-detai
 })
 export class EmployeeDetails implements OnInit, OnDestroy {
   employees: Employee[] = [];
-  selectedEmployee: Employee | null = null;
+  selectedEmployee: Employee = {} as Employee;
   loading: boolean = false;
 
   displayAddDialog: boolean = false;
@@ -64,13 +64,13 @@ export class EmployeeDetails implements OnInit, OnDestroy {
 
   openAddDialog(): void {
     this.isEditMode = false;
-    this.selectedEmployee = null;
+    this.selectedEmployee = {} as Employee;
     this.displayAddDialog = true;
   }
 
   closeAddDialog(): void {
     this.displayAddDialog = false;
-    this.selectedEmployee = null;
+    this.selectedEmployee = {} as Employee;
   }
 
   onEmployeeAdded(): void {
@@ -86,13 +86,13 @@ export class EmployeeDetails implements OnInit, OnDestroy {
 
   closeEditDialog(): void {
     this.displayEditDialog = false;
-    this.selectedEmployee = null;
+    this.selectedEmployee = {} as Employee;
     this.isEditMode = false;
   }
 
   onEmployeeUpdated(): void {
     this.displayEditDialog = false;
-    this.selectedEmployee = null;
+    this.selectedEmployee = {} as Employee;
     this.isEditMode = false;
   }
 
@@ -103,7 +103,7 @@ export class EmployeeDetails implements OnInit, OnDestroy {
 
   closeViewDialog(): void {
     this.displayViewDialog = false;
-    this.selectedEmployee = null;
+    this.selectedEmployee = {} as Employee;
   }
 
   confirmDelete(employee: Employee): void {

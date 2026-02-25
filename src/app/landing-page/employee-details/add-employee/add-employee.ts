@@ -14,7 +14,7 @@ import { SHARED_IMPORTS } from '../../../shared-imports';
 })
 export class AddEmployee implements OnInit {
   @Input() isEditMode: boolean = false;
-  @Input() employeeData!: Employee;
+  @Input() employeeData: Employee = {} as Employee;
   @Output() employeeSaved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 

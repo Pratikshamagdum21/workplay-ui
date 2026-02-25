@@ -5,10 +5,11 @@ import { WorkManagementService } from '../../../services/work-management.service
 import { MessageService } from 'primeng/api';
 import { SHARED_IMPORTS } from '../../shared-imports';
 import { AddWorkForm } from './add-work-form/add-work-form';
+import { AddExpense } from '../salary-details/add-expense/add-expense';
 
 @Component({
   selector: 'app-daily-work-mangement',
-  imports: [SHARED_IMPORTS, AddWorkForm],
+  imports: [SHARED_IMPORTS, AddWorkForm,AddExpense],
   providers: [MessageService],
   templateUrl: './daily-work-mangement.html',
   styleUrl: './daily-work-mangement.scss',
@@ -28,6 +29,7 @@ export class DailyWorkMangement {
   totalRecords: number = 0;
   displayAddWorkDialog: boolean = false;
   private destroy$ = new Subject<void>();
+  displayExpenseViewDialog: boolean = false;
 
   constructor(
     private workService: WorkManagementService,
@@ -45,6 +47,10 @@ export class DailyWorkMangement {
 
   openAddWorkDialog() {
     this.displayAddWorkDialog = true
+  }
+
+  openAddExpensesDialog(): void {
+    this.displayExpenseViewDialog = true;
   }
 
   private loadWorkEntries(): void {
