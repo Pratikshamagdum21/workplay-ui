@@ -12,6 +12,7 @@ export interface Employee {
   advanceTaken: number;
   bonusEligible: boolean;
   clothDoneInMeter: number;
+  branchId?: number;
 }
 
 export interface FabricType {
