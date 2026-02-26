@@ -51,7 +51,6 @@ export class AddEmployee implements OnInit {
       salaryType: ['', Validators.required],
       fabricType: ['', Validators.required],
       isBonused: [, Validators.required],
-      bonusAmount: [0, [Validators.required, Validators.min(0)]],
       advanceAmount: [0, [Validators.required, Validators.min(0)]],
       salary: [0, [Validators.min(0)]],
       rate: [0, [Validators.min(0)]],
@@ -163,6 +162,16 @@ export class AddEmployee implements OnInit {
     const salaryType = this.employeeForm.get('salaryType')?.value;
     return salaryType === 'WEEKLY';
   }
+   isMonthly(): boolean {
+    const salaryType = this.employeeForm.get('salaryType')?.value;
+    return salaryType === 'MONTHLY';
+  }
+
+  isWeeklyFixed(): boolean {
+    const salaryType = this.employeeForm.get('salaryType')?.value;
+    return salaryType === 'WEEKLY(Fix)';
+  }
+
   isBonus(): boolean {
     return this.employeeForm.get('isBonused')?.value === true;
   }

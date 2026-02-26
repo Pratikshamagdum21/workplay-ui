@@ -36,6 +36,7 @@ export class PaySalary implements OnInit, OnDestroy {
   baseSalary: number = 0;
   leaveDeductionTotal: number = 0;
   finalPay: number = 0;
+  autoBonus: number = 0;
 
   private destroy$ = new Subject<void>();
 
@@ -56,6 +57,11 @@ export class PaySalary implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /** Whether the selected employee receives auto-bonus on each payout */
+  get isBonusedEmployee(): boolean {
+    return this.employee?.isBonused === true;
   }
 
   private loadEmployees(): void {
@@ -128,7 +134,6 @@ export class PaySalary implements OnInit, OnDestroy {
       weekRange: [null, Validators.required],
       ratePerMeter: [this.employee?.rate || 0, [Validators.required, Validators.min(1)]],
       meterDetails: this.fb.array([]),
-      bonus: [0, [Validators.required, Validators.min(0)]],
       advanceDeductedThisTime: [0, [Validators.required, Validators.min(0)]]
     });
 
@@ -150,7 +155,6 @@ export class PaySalary implements OnInit, OnDestroy {
       salary: [this.employee?.salary || 0, [Validators.required, Validators.min(1)]],
       leaveDays: [0, [Validators.required, Validators.min(0)]],
       leaveDeductionPerDay: [0, [Validators.required, Validators.min(0)]],
-      bonus: [0, [Validators.required, Validators.min(0)]],
       advanceDeductedThisTime: [0, [Validators.required, Validators.min(0)]]
     });
 
@@ -190,7 +194,7 @@ export class PaySalary implements OnInit, OnDestroy {
 
     group.get('meter')?.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe((meter:any) => {
+      .subscribe((meter: any) => {
         if (meter > 0) {
           group.patchValue({ isLeave: false, leaveDeduction: 0 }, { emitEvent: false });
         }
@@ -226,10 +230,20 @@ export class PaySalary implements OnInit, OnDestroy {
 
     const meterDetails = this.meterDetailsArray?.value as DailyMeter[] || [];
     const ratePerMeter = this.salaryForm.get('ratePerMeter')?.value || 0;
-    const bonus = this.salaryForm.get('bonus')?.value || 0;
     const advanceDeducted = this.salaryForm.get('advanceDeductedThisTime')?.value || 0;
 
-    const calculation = this.salaryService.calculateWeeklySalary(meterDetails, ratePerMeter, bonus, advanceDeducted);
+    const totalMeters = meterDetails.reduce((sum, day) => sum + day.meter, 0);
+    const baseSalary = totalMeters * ratePerMeter;
+    const leaveDeductionTotal = meterDetails.reduce((sum, day) => sum + day.leaveDeduction, 0);
+
+    // Auto-calculate bonus for isBonused employees; zero for others (year-end bonus only)
+    this.autoBonus = this.isBonusedEmployee
+      ? this.salaryService.calculatePerSalaryBonus(baseSalary)
+      : 0;
+
+    const calculation = this.salaryService.calculateWeeklySalary(
+      meterDetails, ratePerMeter, this.autoBonus, advanceDeducted
+    );
 
     this.totalMeters = calculation.totalMeters;
     this.baseSalary = calculation.baseSalary;
@@ -243,10 +257,16 @@ export class PaySalary implements OnInit, OnDestroy {
     const salary = this.salaryForm.get('salary')?.value || 0;
     const leaveDays = this.salaryForm.get('leaveDays')?.value || 0;
     const leaveDeductionPerDay = this.salaryForm.get('leaveDeductionPerDay')?.value || 0;
-    const bonus = this.salaryForm.get('bonus')?.value || 0;
     const advanceDeducted = this.salaryForm.get('advanceDeductedThisTime')?.value || 0;
 
-    const calculation = this.salaryService.calculateMonthlySalary(salary, leaveDays, leaveDeductionPerDay, bonus, advanceDeducted);
+    // Auto-calculate bonus for isBonused employees; zero for others (year-end bonus only)
+    this.autoBonus = this.isBonusedEmployee
+      ? this.salaryService.calculatePerSalaryBonus(salary)
+      : 0;
+
+    const calculation = this.salaryService.calculateMonthlySalary(
+      salary, leaveDays, leaveDeductionPerDay, this.autoBonus, advanceDeducted
+    );
 
     this.leaveDeductionTotal = calculation.leaveDeductionTotal;
     this.finalPay = calculation.finalPay;
@@ -296,7 +316,7 @@ export class PaySalary implements OnInit, OnDestroy {
       ratePerMeter: formValue.ratePerMeter,
       totalMeters: this.totalMeters,
       baseSalary: this.baseSalary,
-      bonus: formValue.bonus,
+      bonus: this.autoBonus,
       leaveDeductionTotal: this.leaveDeductionTotal,
       advanceTakenTotal: this.employee.advanceAmount,
       advanceDeductedThisTime: advanceDeducted,
@@ -337,7 +357,7 @@ export class PaySalary implements OnInit, OnDestroy {
       leaveDays: formValue.leaveDays,
       leaveDeductionPerDay: formValue.leaveDeductionPerDay,
       leaveDeductionTotal: this.leaveDeductionTotal,
-      bonus: formValue.bonus,
+      bonus: this.autoBonus,
       advanceTakenTotal: this.employee.advanceAmount,
       advanceDeductedThisTime: advanceDeducted,
       advanceRemaining: this.employee.advanceRemaining - advanceDeducted,
@@ -377,6 +397,7 @@ export class PaySalary implements OnInit, OnDestroy {
     this.baseSalary = 0;
     this.leaveDeductionTotal = 0;
     this.finalPay = 0;
+    this.autoBonus = 0;
   }
 
   cancel(): void {

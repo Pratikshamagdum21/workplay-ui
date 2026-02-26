@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { BonusOption, Employee, FabricType } from '../app/landing-page/employee-details/model/employee.model';
 import { environment } from '../environments/environment';
+import { BranchService } from './branch.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,12 +27,22 @@ export class EmployeeService {
     { label: 'Without Bonus', value: false }
   ];
 
-  constructor(private http: HttpClient) {
-    this.loadEmployees();
+  constructor(
+    private http: HttpClient,
+    private branchService: BranchService
+  ) {
+    // Reload employees whenever selected branch changes
+    this.branchService.getSelectedBranch().subscribe(branch => {
+      this.loadEmployees(branch.id);
+    });
   }
 
-  private loadEmployees(): void {
-    this.http.get<Employee[]>(`${this.baseUrl}/getAllEmployees`).subscribe({
+  private loadEmployees(branchId?: number): void {
+    let params = new HttpParams();
+    if (branchId != null) {
+      params = params.set('branchId', branchId.toString());
+    }
+    this.http.get<Employee[]>(`${this.baseUrl}/getAllEmployees`, { params }).subscribe({
       next: (employees) => this.employeesSubject.next(employees),
       error: () => {}
     });
@@ -55,7 +66,8 @@ export class EmployeeService {
 
   addEmployee(employee: Omit<Employee, 'id'>): Observable<Employee> {
     const id = Math.floor(Date.now() / 1000) % 2000000000;
-    const params = this.buildEmployeeParams({ id, ...employee } as Employee);
+    const branchId = this.branchService.getSelectedBranchSnapshot().id;
+    const params = this.buildEmployeeParams({ id, branchId, ...employee } as Employee);
     return this.http.post<Employee>(`${this.baseUrl}/saveEmp`, null, { params }).pipe(
       tap((saved) => {
         if (saved) {
@@ -96,7 +108,8 @@ export class EmployeeService {
   }
 
   refreshEmployees(): void {
-    this.loadEmployees();
+    const branch = this.branchService.getSelectedBranchSnapshot();
+    this.loadEmployees(branch.id);
   }
 
   private buildEmployeeParams(employee: Employee): HttpParams {
@@ -112,6 +125,9 @@ export class EmployeeService {
       .set('salaryType', employee.salaryType)
       .set('rate', employee.rate.toString())
       .set('clothDoneInMeter', employee.clothDoneInMeter.toString());
+    if (employee.branchId != null) {
+      params = params.set('branchId', employee.branchId.toString());
+    }
     return params;
   }
 }

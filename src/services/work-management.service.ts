@@ -1,169 +1,147 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { WorkEntry, Employee, WorkType, Shift } from '../app/landing-page/daily-work-mangement/model/work-entry.model';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { WorkEntry, WorkType, Shift } from '../app/landing-page/daily-work-mangement/model/work-entry.model';
+import { environment } from '../environments/environment';
+import { BranchService } from './branch.service';
+import { EmployeeService } from './employee.service';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class WorkManagementService {
-    private workEntriesSubject = new BehaviorSubject<WorkEntry[]>([]);
-    public workEntries$: Observable<WorkEntry[]> = this.workEntriesSubject.asObservable();
+  private readonly baseUrl = `${environment.apiUrl}/work`;
 
-    // Dummy master data
-    private employees: Employee[] = [
-        { id: '1', name: 'John Doe' },
-        { id: '2', name: 'Jane Smith' },
-        { id: '3', name: 'Mike Johnson' },
-        { id: '4', name: 'Sarah Williams' },
-        { id: '5', name: 'David Brown' },
-        { id: '6', name: 'Emily Davis' },
-        { id: '7', name: 'Robert Miller' },
-        { id: '8', name: 'Lisa Anderson' },
-        { id: '9', name: 'James Wilson' },
-        { id: '10', name: 'Maria Garcia' }
-    ];
+  private workEntriesSubject = new BehaviorSubject<WorkEntry[]>([]);
+  public workEntries$: Observable<WorkEntry[]> = this.workEntriesSubject.asObservable();
 
-    private workTypes: WorkType[] = [
-        { id: '1', name: 'Stitching' },
-        { id: '2', name: 'Cutting' },
-        { id: '3', name: 'Packing' },
-        { id: '4', name: 'Finishing' },
-        { id: '5', name: 'Checking' }
-    ];
+  private readonly workTypes: WorkType[] = [
+    { id: '1', name: 'Stitching' },
+    { id: '2', name: 'Cutting' },
+    { id: '3', name: 'Packing' },
+    { id: '4', name: 'Finishing' },
+    { id: '5', name: 'Checking' }
+  ];
 
-    private shifts: Shift[] = [
-        { id: '1', name: 'Morning', timeRange: '6:00 AM - 2:00 PM' },
-        { id: '2', name: 'Afternoon', timeRange: '2:00 PM - 10:00 PM' },
-        { id: '3', name: 'Night', timeRange: '10:00 PM - 6:00 AM' }
-    ];
+  private readonly shifts: Shift[] = [
+    { id: '1', name: 'Morning', timeRange: '6:00 AM - 2:00 PM' },
+    { id: '2', name: 'Afternoon', timeRange: '2:00 PM - 10:00 PM' },
+    { id: '3', name: 'Night', timeRange: '10:00 PM - 6:00 AM' }
+  ];
 
-    constructor() {
-        this.initializeDummyData();
+  constructor(
+    private http: HttpClient,
+    private branchService: BranchService,
+    private employeeService: EmployeeService
+  ) {
+    // Reload work entries whenever selected branch changes
+    this.branchService.getSelectedBranch().subscribe(branch => {
+      this.loadEntries(branch.id);
+    });
+  }
+
+  private loadEntries(branchId?: number): void {
+    let params = new HttpParams();
+    if (branchId != null) {
+      params = params.set('branchId', branchId.toString());
     }
+    this.http.get<WorkEntry[]>(`${this.baseUrl}/getAllWork`, { params }).subscribe({
+      next: (entries) => {
+        const sorted = this.sortByDateDesc(entries.map(e => ({
+          ...e,
+          date: new Date(e.date),
+          createdAt: new Date(e.createdAt)
+        })));
+        this.workEntriesSubject.next(sorted);
+      },
+      error: () => {
+        // Keep the current entries on error
+      }
+    });
+  }
 
-    private initializeDummyData(): void {
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const twoDaysAgo = new Date(today);
-        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+  // Expose employee list from EmployeeService so AddWorkForm doesn't need hardcoded names
+  getEmployeeNames(): Observable<{ id: string; name: string }[]> {
+    return new Observable(observer => {
+      this.employeeService.getEmployees().subscribe(employees => {
+        observer.next(employees.map(e => ({ id: e.id.toString(), name: e.name })));
+      });
+    });
+  }
 
-        const dummyEntries: WorkEntry[] = [
-            {
-                id: this.generateId(),
-                employeeName: 'John Doe',
-                employeeType: 'Stitching',
-                shift: 'Morning',
-                fabricMeters: 150,
-                date: today,
-                createdAt: today
-            },
-            {
-                id: this.generateId(),
-                employeeName: 'Jane Smith',
-                employeeType: 'Cutting',
-                shift: 'Afternoon',
-                fabricMeters: 200,
-                date: yesterday,
-                createdAt: yesterday
-            },
-            {
-                id: this.generateId(),
-                employeeName: 'Mike Johnson',
-                employeeType: 'Packing',
-                shift: 'Night',
-                fabricMeters: 180,
-                date: twoDaysAgo,
-                createdAt: twoDaysAgo
-            },
-            {
-                id: this.generateId(),
-                employeeName: 'Sarah Williams',
-                employeeType: 'Finishing',
-                shift: 'Morning',
-                fabricMeters: 165,
-                date: today,
-                createdAt: today
-            }
-        ];
+  getWorkTypes(): WorkType[] {
+    return [...this.workTypes];
+  }
 
-        this.workEntriesSubject.next(this.sortByDateDesc(dummyEntries));
-    }
+  getShifts(): Shift[] {
+    return [...this.shifts];
+  }
 
-    // Master data getters
-    getEmployees(): Employee[] {
-        return [...this.employees];
-    }
-
-    getWorkTypes(): WorkType[] {
-        return [...this.workTypes];
-    }
-
-    getShifts(): Shift[] {
-        return [...this.shifts];
-    }
-
-    // CRUD operations
-    addEntry(entry: Omit<WorkEntry, 'id' | 'createdAt'>): void {
-        const newEntry: WorkEntry = {
-            ...entry,
-            id: this.generateId(),
-            createdAt: new Date()
-        };
-
-        const currentEntries = this.workEntriesSubject.value;
-        const updatedEntries = [newEntry, ...currentEntries];
-        this.workEntriesSubject.next(this.sortByDateDesc(updatedEntries));
-    }
-
-    getEntries(): Observable<WorkEntry[]> {
-        return this.workEntries$;
-    }
-
-    getAllEntries(): WorkEntry[] {
-        return this.workEntriesSubject.value;
-    }
-
-    // Filter methods
-    filterEntries(fromDate: Date | null, toDate: Date | null): WorkEntry[] {
-        const allEntries = this.workEntriesSubject.value;
-
-        if (!fromDate && !toDate) {
-            return allEntries;
+  addEntry(entry: Omit<WorkEntry, 'id' | 'createdAt'>): Observable<WorkEntry> {
+    const branchId = this.branchService.getSelectedBranchSnapshot().id;
+    const payload = { ...entry, branchId, date: entry.date };
+    return this.http.post<WorkEntry>(`${this.baseUrl}/saveWork`, payload).pipe(
+      tap((saved) => {
+        if (saved) {
+          const newEntry: WorkEntry = {
+            ...saved,
+            date: new Date(saved.date),
+            createdAt: new Date(saved.createdAt)
+          };
+          const current = this.workEntriesSubject.value;
+          this.workEntriesSubject.next(this.sortByDateDesc([newEntry, ...current]));
         }
+      })
+    );
+  }
 
-        return allEntries.filter(entry => {
-            const entryDate = new Date(entry.date);
-            entryDate.setHours(0, 0, 0, 0);
+  getEntries(): Observable<WorkEntry[]> {
+    return this.workEntries$;
+  }
 
-            if (fromDate && toDate) {
-                const from = new Date(fromDate);
-                from.setHours(0, 0, 0, 0);
-                const to = new Date(toDate);
-                to.setHours(23, 59, 59, 999);
-                return entryDate >= from && entryDate <= to;
-            } else if (fromDate) {
-                const from = new Date(fromDate);
-                from.setHours(0, 0, 0, 0);
-                return entryDate >= from;
-            } else if (toDate) {
-                const to = new Date(toDate);
-                to.setHours(23, 59, 59, 999);
-                return entryDate <= to;
-            }
+  getAllEntries(): WorkEntry[] {
+    return this.workEntriesSubject.value;
+  }
 
-            return true;
-        });
+  refreshEntries(): void {
+    const branch = this.branchService.getSelectedBranchSnapshot();
+    this.loadEntries(branch.id);
+  }
+
+  filterEntries(fromDate: Date | null, toDate: Date | null): WorkEntry[] {
+    const allEntries = this.workEntriesSubject.value;
+
+    if (!fromDate && !toDate) {
+      return allEntries;
     }
 
-    // Utility methods
-    private sortByDateDesc(entries: WorkEntry[]): WorkEntry[] {
-        return entries.sort((a, b) => {
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        });
-    }
+    return allEntries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      entryDate.setHours(0, 0, 0, 0);
 
-    private generateId(): string {
-        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    }
+      if (fromDate && toDate) {
+        const from = new Date(fromDate);
+        from.setHours(0, 0, 0, 0);
+        const to = new Date(toDate);
+        to.setHours(23, 59, 59, 999);
+        return entryDate >= from && entryDate <= to;
+      } else if (fromDate) {
+        const from = new Date(fromDate);
+        from.setHours(0, 0, 0, 0);
+        return entryDate >= from;
+      } else if (toDate) {
+        const to = new Date(toDate);
+        to.setHours(23, 59, 59, 999);
+        return entryDate <= to;
+      }
+
+      return true;
+    });
+  }
+
+  private sortByDateDesc(entries: WorkEntry[]): WorkEntry[] {
+    return entries.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }
 }
