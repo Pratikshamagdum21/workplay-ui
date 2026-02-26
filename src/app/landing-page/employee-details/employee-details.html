@@ -1,5 +1,6 @@
 <div class="employee-list-container">
     <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
 
     <!-- Page Header -->
     <div class="page-header">
@@ -73,6 +74,8 @@
                             <p-button icon="pi pi-eye" severity="info" [text]="true" [rounded]="true" pTooltip="View Details" tooltipPosition="top" (onClick)="openViewDialog(employee)">
                             </p-button>
                             <p-button icon="pi pi-pencil" severity="success" [text]="true" [rounded]="true" pTooltip="Edit Employee" tooltipPosition="top" (onClick)="openEditDialog(employee)">
+                            </p-button>
+                            <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" pTooltip="Delete Employee" tooltipPosition="top" (onClick)="confirmDelete(employee)">
                             </p-button>
                         </div>
                     </td>

@@ -103,6 +103,15 @@ export class WorkManagementService {
     return this.workEntriesSubject.value;
   }
 
+  deleteEntry(id: string): Observable<void> {
+    const params = new HttpParams().set('id', id.toString());
+    return this.http.delete<void>(`${this.baseUrl}/deleteWork`, { params }).pipe(
+      tap(() => {
+        this.workEntriesSubject.next(this.workEntriesSubject.value.filter(e => e.id !== id));
+      })
+    );
+  }
+
   refreshEntries(): void {
     const branch = this.branchService.getSelectedBranchSnapshot();
     this.loadEntries(branch.id);

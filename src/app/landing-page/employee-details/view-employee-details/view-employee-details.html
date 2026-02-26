@@ -105,14 +105,40 @@
                 </div>
             </div>
 
+            <!-- With Bonus: show total bonus paid till date -->
             <div class="col-12 md:col-6" *ngIf="employee.isBonused">
                 <div class="financial-item">
                     <div class="financial-icon">
                         <i class="pi pi-star"></i>
                     </div>
                     <div class="financial-details">
-                        <span class="financial-label">Bonus Amount</span>
+                        <span class="financial-label">Bonus Per Payout (16.66%)</span>
                         <span class="financial-value">{{ formatCurrency(employee.bonusAmount) }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 md:col-6" *ngIf="employee.isBonused">
+                <div class="financial-item">
+                    <div class="financial-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                        <i class="pi pi-gift"></i>
+                    </div>
+                    <div class="financial-details">
+                        <span class="financial-label">Total Bonus Paid Till Date</span>
+                        <span class="financial-value" style="color: #22c55e;">{{ formatCurrency(totalBonusPaid) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Without Bonus: show estimated year-end bonus -->
+            <div class="col-12 md:col-6" *ngIf="!employee.isBonused">
+                <div class="financial-item">
+                    <div class="financial-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                        <i class="pi pi-calendar-plus"></i>
+                    </div>
+                    <div class="financial-details">
+                        <span class="financial-label">Estimated Year-End Bonus ({{ currentYear }})</span>
+                        <span class="financial-value" style="color: #f59e0b;">{{ formatCurrency(yearEndBonusAmount) }}</span>
+                        <small style="color: #94a3b8; font-size: 0.75rem;">Based on YTD salary × 16.66%</small>
                     </div>
                 </div>
             </div>

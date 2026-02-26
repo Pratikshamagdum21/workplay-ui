@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../environments/environment';
 
 export interface ExpenditureId {
@@ -20,13 +20,48 @@ export interface Expenditure {
 export class ExpenditureService {
   private readonly baseUrl = `${environment.apiUrl}/expenditure`;
 
-  constructor(private http: HttpClient) {}
+  private expendituresSubject = new BehaviorSubject<Expenditure[]>([]);
+  public expenditures$: Observable<Expenditure[]> = this.expendituresSubject.asObservable();
+
+  constructor(private http: HttpClient) {
+    this.loadExpenditures();
+  }
+
+  loadExpenditures(): void {
+    this.http.get<Expenditure[]>(`${this.baseUrl}/getAllExpenditure`).subscribe({
+      next: (expenditures) => this.expendituresSubject.next(expenditures),
+      error: () => {}
+    });
+  }
 
   saveExpenditure(expenditure: Expenditure): Observable<Expenditure> {
-    return this.http.post<Expenditure>(`${this.baseUrl}/save`, expenditure);
+    return this.http.post<Expenditure>(`${this.baseUrl}/save`, expenditure).pipe(
+      tap((saved) => {
+        if (saved) {
+          this.expendituresSubject.next([...this.expendituresSubject.value, saved]);
+        } else {
+          this.loadExpenditures();
+        }
+      })
+    );
+  }
+
+  deleteExpenditure(date: string, expenseType: string): Observable<void> {
+    const params = new HttpParams()
+      .set('date', date)
+      .set('expenseType', expenseType);
+    return this.http.delete<void>(`${this.baseUrl}/delete`, { params }).pipe(
+      tap(() => {
+        this.expendituresSubject.next(
+          this.expendituresSubject.value.filter(
+            e => !(e.id.date === date && e.id.expenseType === expenseType)
+          )
+        );
+      })
+    );
   }
 
   getAllExpenditures(): Observable<Expenditure[]> {
-    return this.http.get<Expenditure[]>(`${this.baseUrl}/getAllExpenditure`);
+    return this.expenditures$;
   }
 }

@@ -12,6 +12,7 @@ import {
 } from '../salary.model';
 import { SalaryService } from '../../../../services/salary.service';
 import { Employee } from '../../employee-details/model/employee.model';
+import { WorkManagementService } from '../../../../services/work-management.service';
 
 @Component({
   selector: 'app-pay-salary',
@@ -44,6 +45,7 @@ export class PaySalary implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private router: Router,
     private salaryService: SalaryService,
+    private workService: WorkManagementService,
     private messageService: MessageService
   ) {
     this.minDate.setMonth(this.minDate.getMonth() - 3);
@@ -172,7 +174,24 @@ export class PaySalary implements OnInit, OnDestroy {
     this.salaryService.getWeeklyData(this.employee.id, weekRange)
       .pipe(takeUntil(this.destroy$))
       .subscribe((dailyMeters) => {
-        this.setMeterDetails(dailyMeters);
+        // Pre-populate meters from actual work records for this employee in the selected week
+        const workEntries = this.workService.filterEntries(startDate, endDate)
+          .filter(e => e.employeeName === this.employee?.name);
+
+        // Build a map of date → total fabric meters from work entries
+        const metersMap = new Map<string, number>();
+        for (const entry of workEntries) {
+          const dateKey = new Date(entry.date).toISOString().split('T')[0];
+          metersMap.set(dateKey, (metersMap.get(dateKey) || 0) + entry.fabricMeters);
+        }
+
+        // Apply real meter values to the daily meter entries
+        const populated = dailyMeters.map(day => ({
+          ...day,
+          meter: metersMap.get(day.date) || 0
+        }));
+
+        this.setMeterDetails(populated);
         this.calculateWeeklySalary();
       });
   }
