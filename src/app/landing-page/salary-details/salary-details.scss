@@ -154,3 +154,81 @@
 .mb-4 {
     margin-bottom: 2rem;
 }
+
+// Year-end bonus column cells
+.year-end-na {
+    font-size: 0.875rem;
+    color: #22c55e;
+    font-weight: 500;
+}
+
+.year-end-bonus-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    .year-end-bonus-amount {
+        font-weight: 700;
+        color: #f59e0b;
+        font-size: 1rem;
+    }
+    .year-end-ytd {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+}
+
+// Year-end summary card
+.year-end-summary-card {
+    .year-end-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+        color: #1e293b;
+        i { color: #f59e0b; font-size: 1.1rem; }
+        .formula-badge { margin-left: auto; }
+    }
+    .year-end-summary-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 0.5rem 0;
+        .year-end-emp-card {
+            flex: 1 1 220px;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-left: 4px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1rem;
+            .emp-card-name {
+                font-weight: 600;
+                color: #1e293b;
+                margin-bottom: 0.75rem;
+                font-size: 0.95rem;
+                i { color: #6366f1; margin-right: 6px; }
+            }
+            .emp-card-stats {
+                display: flex;
+                justify-content: space-between;
+                gap: 0.5rem;
+                .emp-stat {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    .stat-lbl { font-size: 0.75rem; color: #64748b; }
+                    .stat-val { font-weight: 700; color: #374151; font-size: 0.95rem; }
+                    &.bonus-stat .bonus-val { color: #f59e0b; }
+                }
+            }
+        }
+        .no-year-end {
+            color: #64748b;
+            font-style: italic;
+            padding: 1rem;
+            i { margin-right: 6px; }
+        }
+    }
+}

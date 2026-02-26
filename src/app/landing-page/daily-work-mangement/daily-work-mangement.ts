@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { WorkEntry } from './model/work-entry.model';
 import { Subject, takeUntil } from 'rxjs';
 import { WorkManagementService } from '../../../services/work-management.service';
+import { BranchService } from '../../../services/branch.service';
 import { MessageService } from 'primeng/api';
 import { SHARED_IMPORTS } from '../../shared-imports';
 import { AddWorkForm } from './add-work-form/add-work-form';
@@ -9,12 +10,12 @@ import { AddExpense } from '../salary-details/add-expense/add-expense';
 
 @Component({
   selector: 'app-daily-work-mangement',
-  imports: [SHARED_IMPORTS, AddWorkForm,AddExpense],
+  imports: [SHARED_IMPORTS, AddWorkForm, AddExpense],
   providers: [MessageService],
   templateUrl: './daily-work-mangement.html',
   styleUrl: './daily-work-mangement.scss',
 })
-export class DailyWorkMangement {
+export class DailyWorkMangement implements OnInit, OnDestroy {
   workEntries: WorkEntry[] = [];
   filteredEntries: WorkEntry[] = [];
 
@@ -28,16 +29,25 @@ export class DailyWorkMangement {
   rows: number = 10;
   totalRecords: number = 0;
   displayAddWorkDialog: boolean = false;
-  private destroy$ = new Subject<void>();
   displayExpenseViewDialog: boolean = false;
+
+  private destroy$ = new Subject<void>();
 
   constructor(
     private workService: WorkManagementService,
+    private branchService: BranchService,
     private messageService: MessageService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.loadWorkEntries();
+
+    // Reload when branch changes
+    this.branchService.getSelectedBranch()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.clearFilters(false);
+      });
   }
 
   ngOnDestroy(): void {
@@ -45,12 +55,16 @@ export class DailyWorkMangement {
     this.destroy$.complete();
   }
 
-  openAddWorkDialog() {
-    this.displayAddWorkDialog = true
+  openAddWorkDialog(): void {
+    this.displayAddWorkDialog = true;
   }
 
   openAddExpensesDialog(): void {
     this.displayExpenseViewDialog = true;
+  }
+
+  onWorkEntrySaved(): void {
+    this.displayAddWorkDialog = false;
   }
 
   private loadWorkEntries(): void {
@@ -58,12 +72,15 @@ export class DailyWorkMangement {
       .pipe(takeUntil(this.destroy$))
       .subscribe(entries => {
         this.workEntries = entries;
-        this.filteredEntries = entries;
-        this.totalRecords = entries.length;
+        if (this.fromDate || this.toDate) {
+          this.applyFilter();
+        } else {
+          this.filteredEntries = entries;
+          this.totalRecords = entries.length;
+        }
       });
   }
 
-  // Quick filter methods
   filterThisWeek(): void {
     this.activeFilter = 'week';
     const today = new Date();
@@ -113,10 +130,10 @@ export class DailyWorkMangement {
   private applyFilter(): void {
     this.filteredEntries = this.workService.filterEntries(this.fromDate, this.toDate);
     this.totalRecords = this.filteredEntries.length;
-    this.first = 0; // Reset to first page
+    this.first = 0;
   }
 
-  clearFilters(): void {
+  clearFilters(showToast: boolean = true): void {
     this.fromDate = null;
     this.toDate = null;
     this.activeFilter = null;
@@ -124,15 +141,16 @@ export class DailyWorkMangement {
     this.totalRecords = this.workEntries.length;
     this.first = 0;
 
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Filters Cleared',
-      detail: 'All filters have been reset',
-      life: 2000
-    });
+    if (showToast) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Filters Cleared',
+        detail: 'All filters have been reset',
+        life: 2000
+      });
+    }
   }
 
-  // Utility methods
   formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',

@@ -7,14 +7,14 @@
             <div class="col-12 md:col-8">
                 <div class="field">
                     <label for="employeeSelect" class="required-label">
-          <i class="pi pi-users"></i> Select Employee
-        </label>
+                        <i class="pi pi-users"></i> Select Employee
+                    </label>
                     <p-select id="employeeSelect" [(ngModel)]="selectedEmployeeId" [options]="employees" optionLabel="name" optionValue="id" placeholder="Choose an employee to process salary" [filter]="true" filterBy="name" [showClear]="true" styleClass="w-full" (onChange)="onEmployeeSelect($event)">
                         <ng-template pTemplate="item" let-emp>
                             <div class="employee-option">
                                 <div class="emp-name">{{ emp.name }}</div>
                                 <div class="emp-details">
-                                    <p-tag [value]="emp.salaryType === 'weekly' ? 'Weekly' : 'Monthly'" [severity]="emp.salaryType === 'weekly' ? 'success' : 'info'" styleClass="emp-type-tag">
+                                    <p-tag [value]="emp.salaryType === 'WEEKLY' ? 'Weekly' : 'Monthly'" [severity]="emp.salaryType === 'WEEKLY' ? 'success' : 'info'" styleClass="emp-type-tag">
                                     </p-tag>
                                     <span class="emp-advance">Advance: {{ formatCurrency(emp.advanceRemaining) }}</span>
                                 </div>
@@ -27,8 +27,8 @@
             <div class="col-12 md:col-4" *ngIf="selectedEmployeeId && employee">
                 <div class="field">
                     <label class="info-label">
-          <i class="pi pi-briefcase"></i> Salary Type
-        </label>
+                        <i class="pi pi-briefcase"></i> Salary Type
+                    </label>
                     <div class="salary-type-display">
                         <p-tag [value]="employee.salaryType === 'WEEKLY' ? 'Weekly (Meter-based)' : 'Monthly (Fixed)'" [severity]="employee.salaryType === 'WEEKLY' ? 'success' : 'info'" styleClass="salary-type-tag-large">
                         </p-tag>
@@ -38,7 +38,6 @@
         </div>
     </p-card>
 
-
     <!-- Loading State -->
     <div *ngIf="loading && selectedEmployeeId" class="loading-state">
         <p-progressSpinner></p-progressSpinner>
@@ -47,6 +46,24 @@
 
     <!-- Main Content -->
     <div *ngIf="!loading && employee && salaryForm">
+        <!-- Bonus Info Banner -->
+        <p-card styleClass="section-card bonus-info-card">
+            <div class="bonus-banner" [ngClass]="isBonusedEmployee ? 'bonus-active' : 'bonus-yearly'">
+                <i class="pi pi-gift bonus-icon"></i>
+                <div class="bonus-text">
+                    <strong *ngIf="isBonusedEmployee">With Bonus — auto-calculated per payout</strong>
+                    <strong *ngIf="!isBonusedEmployee">Without Per-Payout Bonus — year-end bonus applies</strong>
+                    <span *ngIf="isBonusedEmployee">
+                        Bonus = (Base Salary / 100) × 16.66&nbsp;&nbsp;→&nbsp;&nbsp;
+                        <span class="bonus-amount">{{ formatCurrency(autoBonus) }}</span> this cycle
+                    </span>
+                    <span *ngIf="!isBonusedEmployee">
+                        This employee receives a lump-sum year-end bonus: (Total Year Salary / 100) × 16.66
+                    </span>
+                </div>
+            </div>
+        </p-card>
+
         <form [formGroup]="salaryForm" (ngSubmit)="onSubmit()">
             <div class="grid">
                 <!-- WEEKLY WORKER FORM -->
@@ -56,8 +73,8 @@
                         <p-card header="Select Week Range" styleClass="section-card">
                             <div class="field">
                                 <label for="weekRange" class="required-label">
-                  <i class="pi pi-calendar"></i> Week Range
-                </label>
+                                    <i class="pi pi-calendar"></i> Week Range
+                                </label>
                                 <p-datepicker id="weekRange" formControlName="weekRange" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [minDate]="minDate" [maxDate]="maxDate" placeholder="Select week start and end date" styleClass="w-full">
                                 </p-datepicker>
                                 <small class="p-info">Select the start and end date of the week</small>
@@ -70,26 +87,31 @@
                         <p-card header="Rate Configuration" styleClass="section-card">
                             <div class="field">
                                 <label for="ratePerMeter" class="required-label">
-                  <i class="pi pi-money-bill"></i> Rate Per Meter
-                </label>
+                                    <i class="pi pi-money-bill"></i> Rate Per Meter
+                                </label>
                                 <p-inputNumber id="ratePerMeter" formControlName="ratePerMeter" mode="currency" currency="INR" locale="en-IN" [min]="1" [showButtons]="true" styleClass="w-full">
                                 </p-inputNumber>
                             </div>
                         </p-card>
                     </div>
 
-                    <!-- Bonus -->
+                    <!-- Bonus (read-only, auto-calculated) -->
                     <div class="col-12 md:col-6">
                         <p-card header="Bonus" styleClass="section-card">
                             <div class="field">
-                                <label for="bonus" class="required-label">
-                  <i class="pi pi-gift"></i> Bonus Amount
-                </label>
-                                <p-inputNumber id="bonus" formControlName="bonus" mode="currency" currency="INR" locale="en-IN" [min]="0" [showButtons]="true" [disabled]="!employee.bonusEligible" styleClass="w-full">
-                                </p-inputNumber>
-                                <small class="p-info" *ngIf="!employee.bonusEligible">
-                  Employee is not eligible for bonus
-                </small>
+                                <label class="info-label">
+                                    <i class="pi pi-gift"></i> Bonus Amount
+                                </label>
+                                <div class="bonus-readonly-display">
+                                    <span class="bonus-calculated-value">{{ formatCurrency(autoBonus) }}</span>
+                                    <small class="p-info" *ngIf="isBonusedEmployee">
+                                        Auto-calculated: (Base Salary / 100) × 16.66
+                                    </small>
+                                    <small class="p-info bonus-info-yearly" *ngIf="!isBonusedEmployee">
+                                        <i class="pi pi-info-circle"></i>
+                                        No per-payout bonus — year-end lump sum applies
+                                    </small>
+                                </div>
                             </div>
                         </p-card>
                     </div>
@@ -98,17 +120,13 @@
                     <div class="col-12" *ngIf="meterDetailsArray && meterDetailsArray.length > 0">
                         <p-card header="Daily Meter Details" styleClass="section-card">
                             <p-table [value]="meterDetailsArray.controls" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="400px">
-
                                 <ng-template pTemplate="header">
                                     <tr>
                                         <th style="width: 20%">Date</th>
                                         <th style="width: 15%">Meter</th>
-                                        <!-- <th style="width: 15%">Is Leave</th>
-                                        <th style="width: 20%">Leave Deduction</th> -->
                                         <th style="width: 30%">Note</th>
                                     </tr>
                                 </ng-template>
-
                                 <ng-template pTemplate="body" let-control let-i="rowIndex">
                                     <tr [formGroup]="control">
                                         <td>
@@ -118,14 +136,6 @@
                                             <p-inputNumber formControlName="meter" [min]="0" [showButtons]="true" styleClass="w-full meter-input">
                                             </p-inputNumber>
                                         </td>
-                                        <!-- <td>
-                                            <p-checkbox formControlName="isLeave" [binary]="true" [disabled]="control.get('meter')?.value > 0">
-                                            </p-checkbox>
-                                        </td>
-                                        <td>
-                                            <p-inputNumber formControlName="leaveDeduction" mode="currency" currency="INR" locale="en-IN" [min]="0" [disabled]="!control.get('isLeave')?.value" styleClass="w-full">
-                                            </p-inputNumber>
-                                        </td> -->
                                         <td>
                                             <input pInputText formControlName="note" placeholder="Add note" class="w-full" />
                                         </td>
@@ -143,10 +153,6 @@
                                     <span class="summary-label">Base Salary:</span>
                                     <span class="summary-value">{{ formatCurrency(baseSalary) }}</span>
                                 </div>
-                                <!-- <div class="summary-item">
-                                    <span class="summary-label">Leave Deduction:</span>
-                                    <span class="summary-value negative">{{ formatCurrency(leaveDeductionTotal) }}</span>
-                                </div> -->
                             </div>
                         </p-card>
                     </div>
@@ -159,8 +165,8 @@
                         <p-card header="Monthly Salary" styleClass="section-card">
                             <div class="field">
                                 <label for="salary">
-                  <i class="pi pi-money-bill"></i> Fixed Monthly Salary
-                </label>
+                                    <i class="pi pi-money-bill"></i> Fixed Monthly Salary
+                                </label>
                                 <p-inputNumber id="salary" formControlName="salary" mode="currency" currency="INR" locale="en-IN" [disabled]="true" styleClass="w-full">
                                 </p-inputNumber>
                                 <small class="p-info">This is a fixed monthly salary</small>
@@ -168,18 +174,23 @@
                         </p-card>
                     </div>
 
-                    <!-- Bonus -->
+                    <!-- Bonus (read-only, auto-calculated) -->
                     <div class="col-12 md:col-6">
                         <p-card header="Bonus" styleClass="section-card">
                             <div class="field">
-                                <label for="bonus" class="required-label">
-                  <i class="pi pi-gift"></i> Bonus Amount
-                </label>
-                                <p-inputNumber id="bonus" formControlName="bonus" mode="currency" currency="INR" locale="en-IN" [min]="0" [showButtons]="true" [disabled]="!employee.bonusEligible" styleClass="w-full">
-                                </p-inputNumber>
-                                <small class="p-info" *ngIf="!employee.bonusEligible">
-                  Employee is not eligible for bonus
-                </small>
+                                <label class="info-label">
+                                    <i class="pi pi-gift"></i> Bonus Amount
+                                </label>
+                                <div class="bonus-readonly-display">
+                                    <span class="bonus-calculated-value">{{ formatCurrency(autoBonus) }}</span>
+                                    <small class="p-info" *ngIf="isBonusedEmployee">
+                                        Auto-calculated: (Monthly Salary / 100) × 16.66
+                                    </small>
+                                    <small class="p-info bonus-info-yearly" *ngIf="!isBonusedEmployee">
+                                        <i class="pi pi-info-circle"></i>
+                                        No per-payout bonus — year-end lump sum applies
+                                    </small>
+                                </div>
                             </div>
                         </p-card>
                     </div>
@@ -191,8 +202,8 @@
                                 <div class="col-12 md:col-6">
                                     <div class="field">
                                         <label for="leaveDays" class="required-label">
-                      <i class="pi pi-calendar-times"></i> Number of Leave Days
-                    </label>
+                                            <i class="pi pi-calendar-times"></i> Number of Leave Days
+                                        </label>
                                         <p-inputNumber id="leaveDays" formControlName="leaveDays" [min]="0" [max]="31" [showButtons]="true" styleClass="w-full">
                                         </p-inputNumber>
                                     </div>
@@ -201,8 +212,8 @@
                                 <div class="col-12 md:col-6">
                                     <div class="field">
                                         <label for="leaveDeductionPerDay" class="required-label">
-                      <i class="pi pi-money-bill"></i> Leave Deduction Per Day
-                    </label>
+                                            <i class="pi pi-money-bill"></i> Leave Deduction Per Day
+                                        </label>
                                         <p-inputNumber id="leaveDeductionPerDay" formControlName="leaveDeductionPerDay" mode="currency" currency="INR" locale="en-IN" [min]="0" [showButtons]="true" styleClass="w-full">
                                         </p-inputNumber>
                                     </div>
@@ -240,13 +251,13 @@
                             <div class="col-12 md:col-4">
                                 <div class="field">
                                     <label for="advanceDeductedThisTime" class="required-label">
-                    <i class="pi pi-wallet"></i> Deduct This Time
-                  </label>
+                                        <i class="pi pi-wallet"></i> Deduct This Time
+                                    </label>
                                     <p-inputNumber id="advanceDeductedThisTime" formControlName="advanceDeductedThisTime" mode="currency" currency="INR" locale="en-IN" [min]="0" [max]="employee.advanceRemaining" [showButtons]="true" styleClass="w-full">
                                     </p-inputNumber>
                                     <small class="p-info">
-                    Maximum: {{ formatCurrency(employee.advanceRemaining) }}
-                  </small>
+                                        Maximum: {{ formatCurrency(employee.advanceRemaining) }}
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -267,9 +278,20 @@
                                 <span class="calc-value positive">{{ formatCurrency(salaryForm.get('salary')?.value || 0) }}</span>
                             </div>
 
-                            <div class="calc-row">
-                                <span class="calc-label">Bonus:</span>
-                                <span class="calc-value positive">+ {{ formatCurrency(salaryForm.get('bonus')?.value || 0) }}</span>
+                            <div class="calc-row" *ngIf="isBonusedEmployee">
+                                <span class="calc-label">
+                                    <i class="pi pi-gift" style="color: #22c55e; margin-right: 4px;"></i>
+                                    Bonus (16.66%):
+                                </span>
+                                <span class="calc-value positive">+ {{ formatCurrency(autoBonus) }}</span>
+                            </div>
+
+                            <div class="calc-row" *ngIf="!isBonusedEmployee">
+                                <span class="calc-label" style="color: #94a3b8; font-style: italic;">
+                                    <i class="pi pi-calendar" style="margin-right: 4px;"></i>
+                                    Bonus (year-end only):
+                                </span>
+                                <span class="calc-value" style="color: #94a3b8;">₹0 (paid at year end)</span>
                             </div>
 
                             <div class="calc-row">

@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared-imports';
 import { SalaryService } from '../../../services/salary.service';
+import { BranchService } from '../../../services/branch.service';
 import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { PaySalary } from './pay-salary/pay-salary';
@@ -27,6 +28,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
   displayViewDialog = false;
   displayExpenseViewDialog = false;
   totalSalary: number = 0;
+
   filterOptions: FilterOption[] = [
     { label: 'All Time', value: 'all' },
     { label: 'This Week', value: 'week' },
@@ -39,15 +41,23 @@ export class SalaryDetails implements OnInit, OnDestroy {
   customDateRange: Date[] = [];
   showCustomDatePicker: boolean = false;
 
+  currentYear = new Date().getFullYear();
+
   private destroy$ = new Subject<void>();
 
   constructor(
     private salaryService: SalaryService,
+    private branchService: BranchService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadEmployees();
+
+    // Reload when branch changes
+    this.branchService.getSelectedBranch()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadEmployees());
   }
 
   ngOnDestroy(): void {
@@ -87,12 +97,10 @@ export class SalaryDetails implements OnInit, OnDestroy {
   }
 
   getTotalFabricMeters(): number {
-    // return this.filteredEmployees.reduce((sum, emp) => sum + (emp.fabricMeters || 0), 0);
     return 1000;
   }
 
   private applyFilter(): void {
-    // Date-based filtering can be extended once backend supports it
     this.filteredEmployees = this.employees;
   }
 
@@ -101,6 +109,22 @@ export class SalaryDetails implements OnInit, OnDestroy {
     this.customDateRange = [];
     this.showCustomDatePicker = false;
     this.filteredEmployees = this.employees;
+  }
+
+  /**
+   * Year-end bonus for employees WITHOUT per-salary bonus (isBonused = false).
+   * (totalYearSalary / 100) * 16.66
+   */
+  getYearEndBonus(employee: Employee): number {
+    const yearTotal = this.salaryService.getEmployeeYearSalary(employee.id, this.currentYear);
+    return this.salaryService.calculateYearEndBonus(yearTotal);
+  }
+
+  /**
+   * Year-to-date salary total for a non-bonus employee
+   */
+  getYearToDateSalary(employee: Employee): number {
+    return this.salaryService.getEmployeeYearSalary(employee.id, this.currentYear);
   }
 
   generatePDFReport(): void {
@@ -113,6 +137,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
     doc.setFontSize(11);
     doc.setTextColor(100, 100, 100);
     doc.text(`Generated on: ${new Date().toLocaleDateString('en-IN')}`, 14, 30);
+    doc.text(`Branch: ${this.branchService.getSelectedBranchSnapshot().name}`, 14, 37);
 
     const tableData = this.filteredEmployees.map(emp => [
       emp.name,
@@ -122,13 +147,13 @@ export class SalaryDetails implements OnInit, OnDestroy {
         : this.formatCurrency(emp.salary || 0) + '/month',
       this.formatCurrency(emp.advanceAmount),
       this.formatCurrency(emp.advanceRemaining),
-      this.getBonusLabel(emp.isBonused)
+      emp.isBonused ? 'Per Salary (16.66%)' : 'Year-End (16.66%)'
     ]);
 
     autoTable(doc, {
       head: [['Employee Name', 'Salary Type', 'Rate/Salary', 'Advance Taken', 'Advance Remaining', 'Bonus']],
       body: tableData,
-      startY: 45,
+      startY: 50,
       theme: 'grid',
       headStyles: { fillColor: [99, 102, 241], textColor: 255, fontStyle: 'bold', halign: 'center' },
       bodyStyles: { textColor: 50 },
@@ -137,13 +162,13 @@ export class SalaryDetails implements OnInit, OnDestroy {
         0: { cellWidth: 40 },
         1: { cellWidth: 30, halign: 'center' },
         2: { cellWidth: 35, halign: 'center' },
-        3: { cellWidth: 30, halign: 'center' },
-        4: { cellWidth: 30, halign: 'center' },
-        5: { cellWidth: 25, halign: 'center' }
+        3: { cellWidth: 25, halign: 'center' },
+        4: { cellWidth: 25, halign: 'center' },
+        5: { cellWidth: 30, halign: 'center' }
       }
     });
 
-    const finalY = (doc as any).lastAutoTable.finalY || 45;
+    const finalY = (doc as any).lastAutoTable.finalY || 50;
     doc.setFontSize(12);
     doc.setTextColor(40, 40, 40);
     doc.text('Summary', 14, finalY + 15);
@@ -152,10 +177,14 @@ export class SalaryDetails implements OnInit, OnDestroy {
     doc.setTextColor(100, 100, 100);
     const totalAdvanceTaken = this.filteredEmployees.reduce((sum, emp) => sum + emp.advanceAmount, 0);
     const totalAdvanceRemaining = this.filteredEmployees.reduce((sum, emp) => sum + emp.advanceRemaining, 0);
+    const totalYearEndBonus = this.filteredEmployees
+      .filter(emp => !emp.isBonused)
+      .reduce((sum, emp) => sum + this.getYearEndBonus(emp), 0);
 
     doc.text(`Total Records: ${this.filteredEmployees.length}`, 14, finalY + 25);
     doc.text(`Total Advance Taken: ${this.formatCurrency(totalAdvanceTaken)}`, 14, finalY + 32);
     doc.text(`Total Advance Remaining: ${this.formatCurrency(totalAdvanceRemaining)}`, 14, finalY + 39);
+    doc.text(`Projected Year-End Bonus (non-bonus employees): ${this.formatCurrency(totalYearEndBonus)}`, 14, finalY + 46);
 
     const pageCount = (doc as any).internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
@@ -182,7 +211,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
   }
 
   getBonusLabel(isBonused: boolean): string {
-    return isBonused ? 'Eligible' : 'Not Eligible';
+    return isBonused ? 'Per Salary (16.66%)' : 'Year-End (16.66%)';
   }
 
   getBonusSeverity(isBonused: boolean): 'success' | 'warn' {
@@ -197,8 +226,19 @@ export class SalaryDetails implements OnInit, OnDestroy {
     }).format(amount);
   }
 
-  paySalary(employee: any): void {
+  getBonusedCount(): number {
+    return this.filteredEmployees.filter(e => e.isBonused).length;
   }
+
+  getNonBonusedCount(): number {
+    return this.filteredEmployees.filter(e => !e.isBonused).length;
+  }
+
+  getNonBonusedEmployees(): Employee[] {
+    return this.filteredEmployees.filter(e => !e.isBonused);
+  }
+
+  paySalary(employee: any): void {}
 
   openPaySalaryDialog(): void {
     this.displayViewDialog = true;

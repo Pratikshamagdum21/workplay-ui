@@ -23,7 +23,7 @@
 
     <!-- Add Work Form Section -->
     <p-dialog header="Add Daily Work Entry" [(visible)]="displayAddWorkDialog" [modal]="true" [style]="{ width: '50vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="add-work-dialog">
-        <app-add-work-form></app-add-work-form>
+        <app-add-work-form (entrySaved)="onWorkEntrySaved()"></app-add-work-form>
     </p-dialog>
 
     <!-- Filters Section -->

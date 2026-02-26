@@ -260,6 +260,58 @@
             }
         }
     }
+    // Bonus info banner
+    .bonus-info-card {
+        margin-bottom: 1.5rem;
+        .bonus-banner {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            border-left: 4px solid;
+            &.bonus-active {
+                background: #f0fdf4;
+                border-color: #22c55e;
+                .bonus-icon { color: #22c55e; }
+            }
+            &.bonus-yearly {
+                background: #fef9ec;
+                border-color: #f59e0b;
+                .bonus-icon { color: #f59e0b; }
+            }
+            .bonus-icon {
+                font-size: 1.5rem;
+                margin-top: 2px;
+            }
+            .bonus-text {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+                strong { font-size: 0.95rem; color: #1e293b; }
+                span { font-size: 0.875rem; color: #475569; }
+                .bonus-amount { font-weight: 700; color: #22c55e; }
+            }
+        }
+    }
+    // Read-only bonus display
+    .bonus-readonly-display {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        .bonus-calculated-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #22c55e;
+        }
+        .bonus-info-yearly {
+            color: #f59e0b;
+        }
+    }
     .action-buttons {
         display: flex;
         gap: 1rem;
