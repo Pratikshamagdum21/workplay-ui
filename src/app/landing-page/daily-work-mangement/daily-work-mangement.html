@@ -105,10 +105,10 @@
             <div class="col-12 md:col-4">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
-                        <i class="pi pi-percentage stat-icon"></i>
+                        <i class="pi pi-wallet stat-icon"></i>
                         <div class="stat-details">
-                            <span class="stat-label">Average (m)</span>
-                            <span class="stat-value">{{ getAverageFabricMeters() | number:'1.0-2' }}</span>
+                            <span class="stat-label">Total Expenses</span>
+                            <span class="stat-value">{{ formatCurrency(totalExpenses) }}</span>
                         </div>
                     </div>
                 </p-card>
@@ -118,7 +118,7 @@
 
     <!-- Work Records Table -->
     <p-card header="Work Records" styleClass="table-card">
-        <p-table [value]="filteredEntries" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(first)]="first" [totalRecords]="totalRecords"
+        <p-table [value]="filteredEntries" [loading]="loading" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(first)]="first" [totalRecords]="totalRecords"
             [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="500px">
 
             <ng-template pTemplate="header">
@@ -183,7 +183,47 @@
             </ng-template>
         </p-table>
     </p-card>
+
+    <!-- Expenses List -->
+    <p-card header="Expenses" styleClass="table-card mt-3">
+        <p-table [value]="expenditures" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} expenses" styleClass="p-datatable-striped" [tableStyle]="{ 'min-width': '40rem' }">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="id.date">Date <p-sortIcon field="id.date"></p-sortIcon></th>
+                    <th pSortableColumn="id.expenseType">Type <p-sortIcon field="id.expenseType"></p-sortIcon></th>
+                    <th class="text-right" pSortableColumn="amount">Amount <p-sortIcon field="amount"></p-sortIcon></th>
+                    <th>Note</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-exp>
+                <tr>
+                    <td>{{ exp.id.date }}</td>
+                    <td><p-tag [value]="getExpenseTypeLabel(exp.id.expenseType)" severity="info"></p-tag></td>
+                    <td class="text-right">{{ formatCurrency(exp.amount) }}</td>
+                    <td>{{ exp.note || '-' }}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4" class="text-center">
+                        <div class="empty-message">
+                            <i class="pi pi-inbox"></i>
+                            <p>No expenses recorded</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="2" class="text-right font-bold">Total Expenses:</td>
+                    <td class="text-right font-bold">{{ formatCurrency(totalExpenses) }}</td>
+                    <td></td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
 </div>
+
 <p-dialog header="Process Expenses" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
-    <app-add-expense></app-add-expense>
+    <app-add-expense (saved)="onExpenseSaved()"></app-add-expense>
 </p-dialog>

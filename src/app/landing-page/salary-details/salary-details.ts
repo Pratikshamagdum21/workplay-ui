@@ -8,6 +8,7 @@ import { AddExpense } from './add-expense/add-expense';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Employee } from '../employee-details/model/employee.model';
+import { ExpenditureService, Expenditure } from '../../../services/expenditure.service';
 
 interface FilterOption {
   label: string;
@@ -27,6 +28,9 @@ export class SalaryDetails implements OnInit, OnDestroy {
   displayViewDialog = false;
   displayExpenseViewDialog = false;
   totalSalary: number = 0;
+  totalExpenses: number = 0;
+  expenditures: Expenditure[] = [];
+
   filterOptions: FilterOption[] = [
     { label: 'All Time', value: 'all' },
     { label: 'This Week', value: 'week' },
@@ -43,11 +47,14 @@ export class SalaryDetails implements OnInit, OnDestroy {
 
   constructor(
     private salaryService: SalaryService,
+    private expenditureService: ExpenditureService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadEmployees();
+    this.loadExpenditures();
+    this.loadSalaryTotals();
   }
 
   ngOnDestroy(): void {
@@ -71,6 +78,26 @@ export class SalaryDetails implements OnInit, OnDestroy {
       });
   }
 
+  private loadExpenditures(): void {
+    this.expenditureService.getAllExpenditures()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (expenditures) => {
+          this.expenditures = expenditures;
+          this.totalExpenses = expenditures.reduce((sum, e) => sum + e.amount, 0);
+        },
+        error: () => {}
+      });
+  }
+
+  private loadSalaryTotals(): void {
+    this.salaryService.salaryHistory$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(history => {
+        this.totalSalary = history.reduce((sum, payload) => sum + payload.finalPay, 0);
+      });
+  }
+
   onFilterChange(event: any): void {
     this.selectedFilter = event.value;
     this.showCustomDatePicker = this.selectedFilter === 'custom';
@@ -86,13 +113,16 @@ export class SalaryDetails implements OnInit, OnDestroy {
     }
   }
 
+  onExpenseSaved(): void {
+    this.displayExpenseViewDialog = false;
+    this.loadExpenditures();
+  }
+
   getTotalFabricMeters(): number {
-    // return this.filteredEmployees.reduce((sum, emp) => sum + (emp.fabricMeters || 0), 0);
     return 1000;
   }
 
   private applyFilter(): void {
-    // Date-based filtering can be extended once backend supports it
     this.filteredEmployees = this.employees;
   }
 
@@ -156,6 +186,8 @@ export class SalaryDetails implements OnInit, OnDestroy {
     doc.text(`Total Records: ${this.filteredEmployees.length}`, 14, finalY + 25);
     doc.text(`Total Advance Taken: ${this.formatCurrency(totalAdvanceTaken)}`, 14, finalY + 32);
     doc.text(`Total Advance Remaining: ${this.formatCurrency(totalAdvanceRemaining)}`, 14, finalY + 39);
+    doc.text(`Total Salary Paid: ${this.formatCurrency(this.totalSalary)}`, 14, finalY + 46);
+    doc.text(`Total Expenses: ${this.formatCurrency(this.totalExpenses)}`, 14, finalY + 53);
 
     const pageCount = (doc as any).internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
@@ -171,6 +203,18 @@ export class SalaryDetails implements OnInit, OnDestroy {
     }
 
     doc.save(`Salary_Report_${new Date().getTime()}.pdf`);
+  }
+
+  getExpenseTypeLabel(type: string): string {
+    const labels: { [key: string]: string } = {
+      ELECTRICITY: 'Electricity',
+      MAINTENANCE: 'Maintenance',
+      WORKER: 'Worker Payment',
+      MATERIAL: 'Material Purchase',
+      TRANSPORT: 'Transport',
+      OTHER: 'Other'
+    };
+    return labels[type] || type;
   }
 
   getSalaryTypeLabel(type: string): string {

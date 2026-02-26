@@ -105,14 +105,40 @@
                 </div>
             </div>
 
+            <!-- Without bonus: show configured bonus amount (what they would receive if eligible) -->
+            <div class="col-12 md:col-6" *ngIf="!employee.isBonused">
+                <div class="financial-item">
+                    <div class="financial-icon">
+                        <i class="pi pi-star-fill"></i>
+                    </div>
+                    <div class="financial-details">
+                        <span class="financial-label">Configured Bonus Amount</span>
+                        <span class="financial-value">{{ formatCurrency(employee.bonusAmount) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- With bonus: show configured bonus amount and total paid till date -->
             <div class="col-12 md:col-6" *ngIf="employee.isBonused">
                 <div class="financial-item">
                     <div class="financial-icon">
                         <i class="pi pi-star"></i>
                     </div>
                     <div class="financial-details">
-                        <span class="financial-label">Bonus Amount</span>
+                        <span class="financial-label">Bonus Amount (Per Payment)</span>
                         <span class="financial-value">{{ formatCurrency(employee.bonusAmount) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-6" *ngIf="employee.isBonused">
+                <div class="financial-item">
+                    <div class="financial-icon">
+                        <i class="pi pi-chart-bar"></i>
+                    </div>
+                    <div class="financial-details">
+                        <span class="financial-label">Total Bonus Paid Till Date</span>
+                        <span class="financial-value salary">{{ formatCurrency(totalBonusPaid) }}</span>
                     </div>
                 </div>
             </div>

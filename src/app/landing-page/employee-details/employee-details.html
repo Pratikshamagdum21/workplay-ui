@@ -1,5 +1,6 @@
 <div class="employee-list-container">
     <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
 
     <!-- Page Header -->
     <div class="page-header">
@@ -19,7 +20,7 @@
 
     <!-- Employee Table -->
     <p-card header="Employee List" styleClass="employee-table-card">
-        <p-table [value]="employees" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} employees" [(first)]="first" [totalRecords]="totalRecords"
+        <p-table [value]="employees" [loading]="loading" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} employees" [(first)]="first" [totalRecords]="totalRecords"
             [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="600px">
 
             <ng-template pTemplate="header">
@@ -73,6 +74,8 @@
                             <p-button icon="pi pi-eye" severity="info" [text]="true" [rounded]="true" pTooltip="View Details" tooltipPosition="top" (onClick)="openViewDialog(employee)">
                             </p-button>
                             <p-button icon="pi pi-pencil" severity="success" [text]="true" [rounded]="true" pTooltip="Edit Employee" tooltipPosition="top" (onClick)="openEditDialog(employee)">
+                            </p-button>
+                            <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" pTooltip="Delete Employee" tooltipPosition="top" (onClick)="confirmDelete(employee)">
                             </p-button>
                         </div>
                     </td>

@@ -52,16 +52,17 @@
             <span>{{ filteredEmployees.length }} records found</span>
         </div>
     </p-card>
- <!-- Statistics Cards -->
+
+    <!-- Statistics Cards -->
     <div class="statistics-section">
         <div class="grid">
             <div class="col-12 md:col-4">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
-                        <i class="pi pi-list stat-icon"></i>
+                        <i class="pi pi-money-bill stat-icon"></i>
                         <div class="stat-details">
-                            <span class="stat-label">Total Salary</span>
-                            <span class="stat-value">{{ totalSalary }}</span>
+                            <span class="stat-label">Total Salary Paid</span>
+                            <span class="stat-value">{{ formatCurrency(totalSalary) }}</span>
                         </div>
                     </div>
                 </p-card>
@@ -80,16 +81,17 @@
             <div class="col-12 md:col-4">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
-                        <i class="pi pi-percentage stat-icon"></i>
+                        <i class="pi pi-wallet stat-icon"></i>
                         <div class="stat-details">
-                            <span class="stat-label">Total expenses</span>
-                            <span class="stat-value">{{ getTotalFabricMeters()  }}</span>
+                            <span class="stat-label">Total Expenses</span>
+                            <span class="stat-value">{{ formatCurrency(totalExpenses) }}</span>
                         </div>
                     </div>
                 </p-card>
             </div>
         </div>
     </div>
+
     <!-- Employee Table -->
     <p-card header="Salary History" styleClass="employee-card">
         <p-table [value]="filteredEmployees" [loading]="loading" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records" styleClass="p-datatable-striped"
@@ -114,9 +116,9 @@
                         Advance Remaining
                         <p-sortIcon field="advanceRemaining"></p-sortIcon>
                     </th>
-                    <th pSortableColumn="bonusEligible">
+                    <th pSortableColumn="isBonused">
                         Bonus
-                        <p-sortIcon field="bonusEligible"></p-sortIcon>
+                        <p-sortIcon field="isBonused"></p-sortIcon>
                     </th>
                     <th class="text-center">Action</th>
                 </tr>
@@ -134,11 +136,11 @@
                         </p-tag>
                     </td>
                     <td>
-                        <span *ngIf="employee.salaryType === 'weekly'" class="rate-info">
-              {{ formatCurrency(employee.ratePerMeter || 0) }}/meter
+                        <span *ngIf="employee.salaryType === 'WEEKLY'" class="rate-info">
+              {{ formatCurrency(employee.rate || 0) }}/meter
             </span>
-                        <span *ngIf="employee.salaryType === 'monthly'" class="salary-info">
-              {{ formatCurrency(employee.monthlySalary || 0) }}/month
+                        <span *ngIf="employee.salaryType !== 'WEEKLY'" class="salary-info">
+              {{ formatCurrency(employee.salary || 0) }}/month
             </span>
                     </td>
                     <td class="text-right">
@@ -148,11 +150,11 @@
                         <span class="advance-remaining">{{ formatCurrency(employee.advanceRemaining) }}</span>
                     </td>
                     <td>
-                        <p-tag [value]="getBonusLabel(employee.bonusEligible)" [severity]="getBonusSeverity(employee.bonusEligible)">
+                        <p-tag [value]="getBonusLabel(employee.isBonused)" [severity]="getBonusSeverity(employee.isBonused)">
                         </p-tag>
                     </td>
                     <td class="text-center">
-                        <p-button label="Edit" icon="pi pi-pencil" severity="success" size="small" (onClick)="paySalary(employee)">
+                        <p-button label="Pay" icon="pi pi-money-bill" severity="success" size="small" (onClick)="paySalary(employee)">
                         </p-button>
                     </td>
                 </tr>
@@ -170,6 +172,45 @@
             </ng-template>
         </p-table>
     </p-card>
+
+    <!-- Expenses List -->
+    <p-card header="Expenses" styleClass="employee-card mt-3">
+        <p-table [value]="expenditures" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} expenses" styleClass="p-datatable-striped" [tableStyle]="{ 'min-width': '40rem' }">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="id.date">Date <p-sortIcon field="id.date"></p-sortIcon></th>
+                    <th pSortableColumn="id.expenseType">Type <p-sortIcon field="id.expenseType"></p-sortIcon></th>
+                    <th class="text-right" pSortableColumn="amount">Amount <p-sortIcon field="amount"></p-sortIcon></th>
+                    <th>Note</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-exp>
+                <tr>
+                    <td>{{ exp.id.date }}</td>
+                    <td><p-tag [value]="getExpenseTypeLabel(exp.id.expenseType)" severity="info"></p-tag></td>
+                    <td class="text-right">{{ formatCurrency(exp.amount) }}</td>
+                    <td>{{ exp.note || '-' }}</td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4" class="text-center">
+                        <div class="empty-state">
+                            <i class="pi pi-inbox"></i>
+                            <p>No expenses recorded</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="2" class="text-right font-bold">Total Expenses:</td>
+                    <td class="text-right font-bold">{{ formatCurrency(totalExpenses) }}</td>
+                    <td></td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
 </div>
 
 <p-dialog header="Process Salary" [(visible)]="displayViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
@@ -177,5 +218,5 @@
 </p-dialog>
 
 <p-dialog header="Process Expenses" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
-    <app-add-expense></app-add-expense>
+    <app-add-expense (saved)="onExpenseSaved()"></app-add-expense>
 </p-dialog>

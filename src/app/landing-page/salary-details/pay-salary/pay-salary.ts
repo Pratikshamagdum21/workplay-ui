@@ -165,7 +165,7 @@ export class PaySalary implements OnInit, OnDestroy {
     if (!this.employee) return;
 
     const weekRange: WeekRange = { startDate, endDate };
-    this.salaryService.getWeeklyData(this.employee.id, weekRange)
+    this.salaryService.getWeeklyData(this.employee.id, weekRange, this.employee.name)
       .pipe(takeUntil(this.destroy$))
       .subscribe((dailyMeters) => {
         this.setMeterDetails(dailyMeters);

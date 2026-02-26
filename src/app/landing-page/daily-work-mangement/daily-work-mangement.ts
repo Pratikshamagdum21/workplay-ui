@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { WorkEntry } from './model/work-entry.model';
 import { Subject, takeUntil } from 'rxjs';
 import { WorkManagementService } from '../../../services/work-management.service';
@@ -6,17 +6,21 @@ import { MessageService } from 'primeng/api';
 import { SHARED_IMPORTS } from '../../shared-imports';
 import { AddWorkForm } from './add-work-form/add-work-form';
 import { AddExpense } from '../salary-details/add-expense/add-expense';
+import { ExpenditureService, Expenditure } from '../../../services/expenditure.service';
 
 @Component({
   selector: 'app-daily-work-mangement',
-  imports: [SHARED_IMPORTS, AddWorkForm,AddExpense],
+  imports: [SHARED_IMPORTS, AddWorkForm, AddExpense],
   providers: [MessageService],
   templateUrl: './daily-work-mangement.html',
   styleUrl: './daily-work-mangement.scss',
 })
-export class DailyWorkMangement {
+export class DailyWorkMangement implements OnInit, OnDestroy {
   workEntries: WorkEntry[] = [];
   filteredEntries: WorkEntry[] = [];
+  loading: boolean = false;
+  expenditures: Expenditure[] = [];
+  totalExpenses: number = 0;
 
   // Filter properties
   fromDate: Date | null = null;
@@ -33,11 +37,13 @@ export class DailyWorkMangement {
 
   constructor(
     private workService: WorkManagementService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private expenditureService: ExpenditureService
   ) { }
 
   ngOnInit(): void {
     this.loadWorkEntries();
+    this.loadExpenditures();
   }
 
   ngOnDestroy(): void {
@@ -46,20 +52,48 @@ export class DailyWorkMangement {
   }
 
   openAddWorkDialog() {
-    this.displayAddWorkDialog = true
+    this.displayAddWorkDialog = true;
   }
 
   openAddExpensesDialog(): void {
     this.displayExpenseViewDialog = true;
   }
 
+  onExpenseSaved(): void {
+    this.displayExpenseViewDialog = false;
+    this.loadExpenditures();
+  }
+
   private loadWorkEntries(): void {
+    this.loading = true;
     this.workService.getEntries()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(entries => {
-        this.workEntries = entries;
-        this.filteredEntries = entries;
-        this.totalRecords = entries.length;
+      .subscribe({
+        next: (entries) => {
+          this.workEntries = entries;
+          if (this.activeFilter) {
+            this.filteredEntries = this.workService.filterEntries(this.fromDate, this.toDate);
+          } else {
+            this.filteredEntries = entries;
+          }
+          this.totalRecords = this.filteredEntries.length;
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
+  }
+
+  private loadExpenditures(): void {
+    this.expenditureService.getAllExpenditures()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (expenditures) => {
+          this.expenditures = expenditures;
+          this.totalExpenses = expenditures.reduce((sum, e) => sum + e.amount, 0);
+        },
+        error: () => {}
       });
   }
 
@@ -113,7 +147,7 @@ export class DailyWorkMangement {
   private applyFilter(): void {
     this.filteredEntries = this.workService.filterEntries(this.fromDate, this.toDate);
     this.totalRecords = this.filteredEntries.length;
-    this.first = 0; // Reset to first page
+    this.first = 0;
   }
 
   clearFilters(): void {
@@ -139,6 +173,26 @@ export class DailyWorkMangement {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  formatCurrency(amount: number): string {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0
+    }).format(amount);
+  }
+
+  getExpenseTypeLabel(type: string): string {
+    const labels: { [key: string]: string } = {
+      ELECTRICITY: 'Electricity',
+      MAINTENANCE: 'Maintenance',
+      WORKER: 'Worker Payment',
+      MATERIAL: 'Material Purchase',
+      TRANSPORT: 'Transport',
+      OTHER: 'Other'
+    };
+    return labels[type] || type;
   }
 
   getTotalFabricMeters(): number {

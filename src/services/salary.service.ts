@@ -11,6 +11,7 @@ import {
 import { environment } from '../environments/environment';
 import { EmployeeService } from './employee.service';
 import { Employee } from '../app/landing-page/employee-details/model/employee.model';
+import { WorkManagementService } from './work-management.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,8 @@ export class SalaryService {
 
   constructor(
     private http: HttpClient,
-    private employeeService: EmployeeService
+    private employeeService: EmployeeService,
+    private workManagementService: WorkManagementService
   ) {}
 
   getEmployees(): Observable<Employee[]> {
@@ -34,18 +36,28 @@ export class SalaryService {
     return this.employeeService.getEmployeeById(id);
   }
 
-  getWeeklyData(employeeId: number, weekRange: WeekRange): Observable<DailyMeter[]> {
+  getWeeklyData(employeeId: number, weekRange: WeekRange, employeeName: string): Observable<DailyMeter[]> {
+    const allEntries = this.workManagementService.getAllEntries();
     const dailyMeters: DailyMeter[] = [];
     const currentDate = new Date(weekRange.startDate);
 
     while (currentDate <= weekRange.endDate) {
+      const dateStr = currentDate.toISOString().split('T')[0];
+
+      const matchingEntry = allEntries.find(entry => {
+        const entryDate = new Date(entry.date);
+        const entryDateStr = entryDate.toISOString().split('T')[0];
+        return entryDateStr === dateStr && entry.employeeName === employeeName;
+      });
+
       dailyMeters.push({
-        date: currentDate.toISOString().split('T')[0],
-        meter: 0,
+        date: dateStr,
+        meter: matchingEntry ? matchingEntry.fabricMeters : 0,
         isLeave: false,
         leaveDeduction: 0,
         note: ''
       });
+
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
