@@ -13,6 +13,12 @@ body {
   line-height: 1.5;
 }
 
+@media (max-width: 640px) {
+  body {
+    font-size: 15px; // match Android mobile.scss
+  }
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -187,6 +193,12 @@ body {
 .p-datatable-wrapper {
   overflow-x: auto !important;
   -webkit-overflow-scrolling: touch;
+}
+
+// Ensure all tables have a minimum width so horizontal scroll activates
+// (matches mobile.scss line 174)
+.p-datatable table {
+  min-width: 480px;
 }
 
 @media (max-width: 640px) {
