@@ -1,8 +1,11 @@
-<div class="side-menu">
+<div class="side-menu" [class.mobile-open]="menuOpen">
     <div class="logo-container">
         <div class="logo-section">
             <i class="pi pi-building"></i>
             <span class="logo-text">Company Portal</span>
+            <button class="menu-close-btn" (click)="close()" aria-label="Close menu">
+                <i class="pi pi-times"></i>
+            </button>
         </div>
 
         <div class="branch-dropdown">
@@ -28,7 +31,7 @@
 
     <p-panelMenu [model]="menuItems" [multiple]="false" styleClass="custom-panel-menu">
         <ng-template pTemplate="item" let-item>
-            <a [routerLink]="item.routerLink" class="menu-item" routerLinkActive="active-item">
+            <a [routerLink]="item.routerLink" class="menu-item" routerLinkActive="active-item" (click)="close()">
                 <i [class]="item.icon"></i>
                 <span class="menu-label">{{ item.label }}</span>
             </a>

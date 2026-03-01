@@ -1,9 +1,16 @@
 <!-- app.component.html -->
 <p-toast position="top-right" key="global"></p-toast>
-<div class="app-container">
-    <app-side-menu></app-side-menu>
+<div class="app-container" [class.menu-open]="sideMenuOpen">
+    <div class="menu-backdrop" (click)="closeSideMenu()"></div>
+    <app-side-menu [menuOpen]="sideMenuOpen" (menuClose)="closeSideMenu()"></app-side-menu>
 
     <div class="main-content">
+        <div class="mobile-topbar">
+            <button class="hamburger-btn" (click)="toggleSideMenu()" aria-label="Open menu">
+                <i class="pi pi-bars"></i>
+            </button>
+            <span class="mobile-topbar-title">WorkPay</span>
+        </div>
         <router-outlet></router-outlet>
     </div>
 </div>

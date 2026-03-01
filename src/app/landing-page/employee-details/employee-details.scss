@@ -95,6 +95,18 @@
             }
         }
     }
+
+    @media (max-width: 480px) {
+        padding: 0;
+
+        .page-header h1 {
+            font-size: 1.15rem;
+        }
+
+        .page-header .subtitle {
+            font-size: 0.82rem;
+        }
+    }
      :host ::ng-deep {
         .p-datatable {
             .p-datatable-thead>tr>th {

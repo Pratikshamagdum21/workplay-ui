@@ -21,7 +21,7 @@
     <!-- Employee Table -->
     <p-card header="Employee List" styleClass="employee-table-card">
         <p-table [value]="employees" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} employees" [(first)]="first" [totalRecords]="totalRecords"
-            [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="600px">
+            [tableStyle]="{ 'min-width': '480px' }" styleClass="p-datatable-striped" [scrollable]="true">
 
             <ng-template pTemplate="header">
                 <tr>
@@ -97,19 +97,19 @@
     </p-card>
 
     <!-- Add Employee Dialog -->
-    <p-dialog header="Add New Employee" [(visible)]="displayAddDialog" [modal]="true" [style]="{ width: '50vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="add-employee-dialog">
+    <p-dialog header="Add New Employee" [(visible)]="displayAddDialog" [modal]="true" [style]="{ width: '50vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="add-employee-dialog">
         <app-add-employee [isEditMode]="false" (employeeSaved)="onEmployeeAdded()" (cancelled)="closeAddDialog()">
         </app-add-employee>
     </p-dialog>
 
     <!-- Edit Employee Dialog -->
-    <p-dialog header="Edit Employee" [(visible)]="displayEditDialog" [modal]="true" [style]="{ width: '50vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="edit-employee-dialog">
+    <p-dialog header="Edit Employee" [(visible)]="displayEditDialog" [modal]="true" [style]="{ width: '50vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="edit-employee-dialog">
         <app-add-employee [isEditMode]="true" [employeeData]="selectedEmployee!" (employeeSaved)="onEmployeeUpdated()" (cancelled)="closeEditDialog()">
         </app-add-employee>
     </p-dialog>
 
     <!-- View Employee Dialog -->
-    <p-dialog header="Employee Details" [(visible)]="displayViewDialog" [modal]="true" [style]="{ width: '50vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
+    <p-dialog header="Employee Details" [(visible)]="displayViewDialog" [modal]="true" [style]="{ width: '50vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
         <app-view-employee-details [employee]="selectedEmployee" (closed)="closeViewDialog()">
         </app-view-employee-details>
     </p-dialog>

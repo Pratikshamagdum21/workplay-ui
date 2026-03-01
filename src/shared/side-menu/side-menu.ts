@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -15,6 +15,9 @@ import { Branch, BranchService } from '../../services/branch.service';
 })
 export class SideMenuComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+
+  @Input() menuOpen = false;
+  @Output() menuClose = new EventEmitter<void>();
 
   menuItems: MenuItem[] = [
     {
@@ -72,5 +75,9 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     if (event.value) {
       this.branchService.setSelectedBranch(event.value);
     }
+  }
+
+  close(): void {
+    this.menuClose.emit();
   }
 }

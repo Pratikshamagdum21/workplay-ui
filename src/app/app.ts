@@ -12,10 +12,19 @@ import { PrimeNG } from 'primeng/config';
 })
 export class App implements OnInit {
   protected readonly title = signal('WorkPay');
-  constructor(private primeng: PrimeNG) {
+  sideMenuOpen = false;
 
-  }
+  constructor(private primeng: PrimeNG) {}
+
   ngOnInit(): void {
     this.primeng.ripple.set(true);
+  }
+
+  toggleSideMenu(): void {
+    this.sideMenuOpen = !this.sideMenuOpen;
+  }
+
+  closeSideMenu(): void {
+    this.sideMenuOpen = false;
   }
 }

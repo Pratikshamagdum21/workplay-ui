@@ -108,7 +108,7 @@
     <!-- Employee Table -->
     <p-card header="Employee Salary Overview" styleClass="employee-card">
         <p-table [value]="filteredEmployees" [loading]="loading" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records" styleClass="p-datatable-striped"
-            [tableStyle]="{ 'min-width': '70rem' }">
+            [tableStyle]="{ 'min-width': '480px' }" [scrollable]="true">
 
             <ng-template pTemplate="header">
                 <tr>
@@ -286,10 +286,10 @@
     </p-card>
 </div>
 
-<p-dialog header="Process Salary" [(visible)]="displayViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
+<p-dialog header="Process Salary" [(visible)]="displayViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
     <app-pay-salary></app-pay-salary>
 </p-dialog>
 
-<p-dialog header="Process Expenses" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
+<p-dialog header="Process Expenses" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
     <app-add-expense (saved)="onExpenseSaved()"></app-add-expense>
 </p-dialog>
