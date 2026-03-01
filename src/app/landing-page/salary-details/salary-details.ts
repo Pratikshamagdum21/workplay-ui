@@ -27,6 +27,7 @@ interface FilterOption {
 export class SalaryDetails implements OnInit, OnDestroy {
   employees: Employee[] = [];
   filteredEmployees: Employee[] = [];
+  filteredsalary: Employee[] = [];
   loading: boolean = false;
   displayViewDialog = false;
   displayExpenseViewDialog = false;
@@ -95,6 +96,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
     this.salaryService.getSalaryHistory()
       .pipe(takeUntil(this.destroy$))
       .subscribe(history => {
+        this.filteredsalary = history as any[];
         this.totalSalaryPaid = history.reduce((sum, p) => sum + p.finalPay, 0);
       });
   }
@@ -202,7 +204,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
     doc.text(`Generated on: ${new Date().toLocaleDateString('en-IN')}`, 14, 30);
     doc.text(`Branch: ${this.branchService.getSelectedBranchSnapshot().name}`, 14, 37);
 
-    const tableData = this.filteredEmployees.map(emp => [
+    const tableData = this.filteredsalary.map(emp => [
       emp.name,
       this.getSalaryTypeLabel(emp.salaryType),
       emp.salaryType === 'WEEKLY'
@@ -238,13 +240,13 @@ export class SalaryDetails implements OnInit, OnDestroy {
 
     doc.setFontSize(10);
     doc.setTextColor(100, 100, 100);
-    const totalAdvanceTaken = this.filteredEmployees.reduce((sum, emp) => sum + emp.advanceAmount, 0);
-    const totalAdvanceRemaining = this.filteredEmployees.reduce((sum, emp) => sum + emp.advanceRemaining, 0);
-    const totalYearEndBonus = this.filteredEmployees
+    const totalAdvanceTaken = this.filteredsalary.reduce((sum, emp) => sum + emp.advanceAmount, 0);
+    const totalAdvanceRemaining = this.filteredsalary.reduce((sum, emp) => sum + emp.advanceRemaining, 0);
+    const totalYearEndBonus = this.filteredsalary
       .filter(emp => !emp.isBonused)
       .reduce((sum, emp) => sum + this.getYearEndBonus(emp), 0);
 
-    doc.text(`Total Records: ${this.filteredEmployees.length}`, 14, finalY + 25);
+    doc.text(`Total Records: ${this.filteredsalary.length}`, 14, finalY + 25);
     doc.text(`Total Advance Taken: ${this.formatCurrency(totalAdvanceTaken)}`, 14, finalY + 32);
     doc.text(`Total Advance Remaining: ${this.formatCurrency(totalAdvanceRemaining)}`, 14, finalY + 39);
     doc.text(`Projected Year-End Bonus (non-bonus employees): ${this.formatCurrency(totalYearEndBonus)}`, 14, finalY + 46);

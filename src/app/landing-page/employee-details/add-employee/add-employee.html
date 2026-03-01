@@ -24,7 +24,7 @@
                     <label for="salaryType" class="required-label">
                         <i class="pi pi-gift"></i> Salary Type
                     </label>
-                    <p-select id="salaryType" formControlName="salaryType" [options]="salaryTypes"
+                    <p-select id="salaryType" [ngModel]="employeeData?.salaryType" formControlName="salaryType" [options]="salaryTypes"
                         optionLabel="label" optionValue="value" styleClass="w-full"
                         [class.ng-invalid]="isFieldInvalid('salaryType')"
                         [class.ng-dirty]="isFieldInvalid('salaryType')">
@@ -44,6 +44,7 @@
                     <p-select id="fabricType" formControlName="fabricType" [options]="fabricTypes"
                         optionLabel="name" optionValue="name" placeholder="Select Fabric Type"
                         [showClear]="true" styleClass="w-full"
+                        [ngModel]="employeeData?.fabricType"
                         [class.ng-invalid]="isFieldInvalid('fabricType')"
                         [class.ng-dirty]="isFieldInvalid('fabricType')">
                     </p-select>
@@ -60,7 +61,8 @@
                         <i class="pi pi-gift"></i> Bonus Eligibility
                     </label>
                     <p-select id="isBonused" formControlName="isBonused" [options]="bonusOptions"
-                        optionLabel="label" optionValue="value" styleClass="w-full"
+                        optionLabel="label" optionValue="value" 
+                        styleClass="w-full" [ngModel]="employeeData?.isBonused"
                         [class.ng-invalid]="isFieldInvalid('isBonused')"
                         [class.ng-dirty]="isFieldInvalid('isBonused')">
                     </p-select>
@@ -95,7 +97,8 @@
                     <label for="advanceAmount" class="required-label">
                         <i class="pi pi-wallet"></i> Advance Amount
                     </label>
-                    <p-inputNumber id="advanceAmount" formControlName="advanceAmount" mode="currency"
+                    <p-inputNumber id="advanceAmount" [ngModel]="employeeData?.advanceAmount"
+                    formControlName="advanceAmount" mode="currency"
                         currency="INR" locale="en-IN" [min]="0" [showButtons]="true"
                         buttonLayout="horizontal" incrementButtonIcon="pi pi-plus"
                         decrementButtonIcon="pi pi-minus" placeholder="Enter advance amount"
@@ -114,7 +117,8 @@
                     <label for="salary" class="required-label">
                         <i class="pi pi-dollar"></i> Monthly Salary
                     </label>
-                    <p-inputNumber id="salary" formControlName="salary" mode="currency" currency="INR"
+                    <p-inputNumber id="salary" [ngModel]="employeeData?.salary"
+                     formControlName="salary" mode="currency" currency="INR"
                         locale="en-IN" [min]="0" [showButtons]="true" buttonLayout="horizontal"
                         incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
                         placeholder="Enter monthly salary" styleClass="w-full"
@@ -133,7 +137,8 @@
                     <label for="rate" class="required-label">
                         <i class="pi pi-dollar"></i> Rate Per Meter (₹)
                     </label>
-                    <p-inputNumber id="rate" formControlName="rate" mode="currency" currency="INR"
+                    <p-inputNumber id="rate" [ngModel]="employeeData?.rate"
+                     formControlName="rate" mode="currency" currency="INR"
                         locale="en-IN" [min]="0" [showButtons]="true" buttonLayout="horizontal"
                         incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
                         placeholder="Enter rate per meter" styleClass="w-full"
@@ -151,7 +156,8 @@
                     <label for="salary" class="required-label">
                         <i class="pi pi-dollar"></i> Weekly Salary
                     </label>
-                    <p-inputNumber id="salary" formControlName="salary" mode="currency" currency="INR"
+                    <p-inputNumber id="salary" [ngModel]="employeeData?.salary"
+                     formControlName="salary" mode="currency" currency="INR"
                         locale="en-IN" [min]="0" [showButtons]="true" buttonLayout="horizontal"
                         incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
                         placeholder="Enter monthly salary" styleClass="w-full"

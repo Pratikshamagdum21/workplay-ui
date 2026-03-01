@@ -30,7 +30,7 @@
                         <p-sortIcon field="employeeName"></p-sortIcon>
                     </th>
                     <th pSortableColumn="fabricType" style="width: 15%">
-                        Fabric Type
+                        Salary Type
                         <p-sortIcon field="fabricType"></p-sortIcon>
                     </th>
                     <th pSortableColumn="bonusEligible" style="width: 15%">
@@ -57,7 +57,7 @@
                         </div>
                     </td>
                     <td>
-                        <p-tag [value]="employee.fabricType" severity="info"></p-tag>
+                        <p-tag [value]="employee.salaryType" severity="info"></p-tag>
                     </td>
                     <td>
                         <p-tag [value]="employee.bonusEligible" [severity]="employee.bonusEligible === 'With Bonus' ? 'success' : 'warn'">

@@ -2,7 +2,7 @@
     <p-toast></p-toast>
     <p-confirmDialog></p-confirmDialog>
     <!-- Page Header -->
-    <div class="flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-content-between align-items-center">
         <div class="page-header">
             <h1>
                 <i class="pi pi-money-bill"></i> Salary Management
@@ -58,29 +58,18 @@
     <!-- Statistics Cards -->
     <div class="statistics-section">
         <div class="grid">
-            <div class="col-12 md:col-3">
-                <p-card styleClass="stat-card">
-                    <div class="stat-content">
-                        <i class="pi pi-list stat-icon"></i>
-                        <div class="stat-details">
-                            <span class="stat-label">Total Employees</span>
-                            <span class="stat-value">{{ filteredEmployees.length }}</span>
-                        </div>
-                    </div>
-                </p-card>
-            </div>
-            <div class="col-12 md:col-3">
+            <div class="col-12 md:col-4">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-gift stat-icon" style="color: #22c55e;"></i>
                         <div class="stat-details">
-                            <span class="stat-label">With Per-Salary Bonus</span>
+                            <span class="stat-label">Total Year End Bonus Amount</span>
                             <span class="stat-value">{{ getBonusedCount() }}</span>
                         </div>
                     </div>
                 </p-card>
             </div>
-            <div class="col-12 md:col-3">
+            <div class="col-12 md:col-4">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-money-bill stat-icon" style="color: #6366f1;"></i>
@@ -91,7 +80,7 @@
                     </div>
                 </p-card>
             </div>
-            <div class="col-12 md:col-3">
+            <div class="col-12 md:col-4">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-wallet stat-icon" style="color: #ef4444;"></i>
@@ -107,7 +96,7 @@
 
     <!-- Employee Table -->
     <p-card header="Employee Salary Overview" styleClass="employee-card">
-        <p-table [value]="filteredEmployees" [loading]="loading" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records" styleClass="p-datatable-striped"
+        <p-table [value]="filteredsalary" [loading]="loading" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records" styleClass="p-datatable-striped"
             [tableStyle]="{ 'min-width': '480px' }" [scrollable]="true">
 
             <ng-template pTemplate="header">
@@ -120,19 +109,10 @@
                         Salary Type
                         <p-sortIcon field="salaryType"></p-sortIcon>
                     </th>
-                    <th>Rate / Salary</th>
+                    <th>Salary Paid</th>
                     <th pSortableColumn="advanceTaken" class="text-right">
-                        Advance Taken
+                        Advance Deducted This Time
                         <p-sortIcon field="advanceTaken"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="advanceRemaining" class="text-right">
-                        Advance Remaining
-                        <p-sortIcon field="advanceRemaining"></p-sortIcon>
-                    </th>
-                    <th>Bonus Type</th>
-                    <th class="text-right">
-                        Year-End Bonus ({{ currentYear }})
-                        <!-- <p-tooltip value="For 'Without Bonus' employees: (Total {{ currentYear }} Salary / 100) × 16.66. For 'With Bonus' employees, bonus is paid each salary cycle." tooltipPosition="top"></p-tooltip> -->
                     </th>
                     <th class="text-center">Action</th>
                 </tr>
@@ -142,7 +122,7 @@
                 <tr>
                     <td>
                         <div class="employee-name">
-                            <i class="pi pi-user"></i> {{ employee.name }}
+                            <i class="pi pi-user"></i> {{ employee.employeeName }}
                         </div>
                     </td>
                     <td>
@@ -150,38 +130,15 @@
                         </p-tag>
                     </td>
                     <td>
-                        <span *ngIf="employee.salaryType === 'WEEKLY'" class="rate-info">
-                            {{ formatCurrency(employee.rate || 0) }}/meter
-                        </span>
-                        <span *ngIf="employee.salaryType === 'MONTHLY'" class="salary-info">
-                            {{ formatCurrency(employee.salary || 0) }}/month
+                        <span  class="rate-info">
+                            {{ formatCurrency(employee.finalPay) }}
                         </span>
                     </td>
                     <td class="text-right">
-                        <span class="advance-taken">{{ formatCurrency(employee.advanceTaken) }}</span>
-                    </td>
-                    <td class="text-right">
-                        <span class="advance-remaining">{{ formatCurrency(employee.advanceRemaining) }}</span>
-                    </td>
-                    <td>
-                        <p-tag [value]="getBonusLabel(employee.isBonused)" [severity]="getBonusSeverity(employee.isBonused)">
-                        </p-tag>
-                    </td>
-                    <td class="text-right">
-                        <!-- isBonused = true: paid each salary cycle, show "-" in year-end column -->
-                        <span *ngIf="employee.isBonused" class="year-end-na" title="Bonus is paid each salary cycle (16.66% per payout)">
-                            <i class="pi pi-check-circle" style="color:#22c55e; margin-right:4px;"></i>Per cycle
-                        </span>
-                        <!-- isBonused = false: show year-end bonus calculation -->
-                        <ng-container *ngIf="!employee.isBonused">
-                            <div class="year-end-bonus-cell">
-                                <span class="year-end-bonus-amount">{{ formatCurrency(getYearEndBonus(employee)) }}</span>
-                                <small class="year-end-ytd">YTD: {{ formatCurrency(getYearToDateSalary(employee)) }}</small>
-                            </div>
-                        </ng-container>
+                        <span class="advance-taken">{{ formatCurrency(employee.advanceDeductedThisTime) }}</span>
                     </td>
                     <td class="text-center">
-                        <p-button label="Pay" icon="pi pi-money-bill" severity="success" size="small" (onClick)="openPaySalaryDialog()">
+                        <p-button label="Edit" icon="pi pi-money-bill" severity="success" size="small" (onClick)="openPaySalaryDialog()">
                         </p-button>
                     </td>
                 </tr>
