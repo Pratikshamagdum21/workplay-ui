@@ -252,16 +252,6 @@ body {
   .p-dialog-header {
     border-radius: 20px 20px 0 0 !important;
     padding: 0.5rem 1.25rem 0.75rem !important;
-
-    &::before {
-      content: '';
-      display: block;
-      width: 36px;
-      height: 4px;
-      background: #cbd5e1;
-      border-radius: 2px;
-      margin: 0 auto 0.625rem;
-    }
   }
 
   .p-dialog-content {
@@ -296,15 +286,6 @@ body {
 
     .field {
       margin-bottom: 1rem;
-    }
-
-    .button-group {
-      flex-direction: column;
-      gap: 0.5rem;
-
-      p-button {
-        width: 100%;
-      }
     }
   }
 }
@@ -379,7 +360,9 @@ body {
     .p-inputnumber {
       display: flex;
       align-items: center;
-
+      button{
+        height: -webkit-fill-available;
+      }
       input {
         flex: 1;
         min-width: 0;

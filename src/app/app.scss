@@ -81,7 +81,7 @@
         display: none;
     }
 
-    &.menu-open .menu-backdrop {
+    .menu-open .menu-backdrop {
         display: block;
     }
 }
