@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SHARED_IMPORTS } from '../../shared-imports';
 import { SalaryService } from '../../../services/salary.service';
 import { BranchService } from '../../../services/branch.service';
+import { ExpenditureService, Expenditure } from '../../../services/expenditure.service';
 import { Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { PaySalary } from './pay-salary/pay-salary';
@@ -9,6 +10,7 @@ import { AddExpense } from './add-expense/add-expense';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Employee } from '../employee-details/model/employee.model';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 interface FilterOption {
   label: string;
@@ -18,6 +20,7 @@ interface FilterOption {
 @Component({
   selector: 'app-salary-details',
   imports: [[...SHARED_IMPORTS], PaySalary, AddExpense],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './salary-details.html',
   styleUrl: './salary-details.scss',
 })
@@ -28,6 +31,8 @@ export class SalaryDetails implements OnInit, OnDestroy {
   displayViewDialog = false;
   displayExpenseViewDialog = false;
   totalSalary: number = 0;
+  expenditures: Expenditure[] = [];
+  totalSalaryPaid: number = 0;
 
   filterOptions: FilterOption[] = [
     { label: 'All Time', value: 'all' },
@@ -48,11 +53,16 @@ export class SalaryDetails implements OnInit, OnDestroy {
   constructor(
     private salaryService: SalaryService,
     private branchService: BranchService,
+    private expenditureService: ExpenditureService,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadEmployees();
+    this.loadSalaryHistory();
+    this.loadExpenditures();
 
     // Reload when branch changes
     this.branchService.getSelectedBranch()
@@ -79,6 +89,59 @@ export class SalaryDetails implements OnInit, OnDestroy {
           this.loading = false;
         }
       });
+  }
+
+  private loadSalaryHistory(): void {
+    this.salaryService.getSalaryHistory()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(history => {
+        this.totalSalaryPaid = history.reduce((sum, p) => sum + p.finalPay, 0);
+      });
+  }
+
+  private loadExpenditures(): void {
+    this.expenditureService.getAllExpenditures()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(expenditures => {
+        this.expenditures = expenditures;
+      });
+  }
+
+  getTotalExpenses(): number {
+    return this.expenditures.reduce((sum, e) => sum + e.amount, 0);
+  }
+
+  onExpenseSaved(): void {
+    this.displayExpenseViewDialog = false;
+    this.expenditureService.loadExpenditures();
+  }
+
+  confirmDeleteExpenditure(exp: Expenditure): void {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete this ${exp.id.expenseType} expense?`,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.expenditureService.deleteExpenditure(exp.id.date, exp.id.expenseType).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Deleted',
+              detail: 'Expense deleted successfully',
+              life: 3000
+            });
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete expense',
+              life: 3000
+            });
+          }
+        });
+      }
+    });
   }
 
   onFilterChange(event: any): void {
@@ -248,3 +311,4 @@ export class SalaryDetails implements OnInit, OnDestroy {
     this.displayExpenseViewDialog = true;
   }
 }
+

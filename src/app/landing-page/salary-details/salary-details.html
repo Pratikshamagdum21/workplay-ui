@@ -1,4 +1,6 @@
 <div class="employee-list-container">
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
     <!-- Page Header -->
     <div class="flex justify-content-between align-items-center mb-4">
         <div class="page-header">
@@ -56,7 +58,7 @@
     <!-- Statistics Cards -->
     <div class="statistics-section">
         <div class="grid">
-            <div class="col-12 md:col-4">
+            <div class="col-12 md:col-3">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-list stat-icon"></i>
@@ -67,7 +69,7 @@
                     </div>
                 </p-card>
             </div>
-            <div class="col-12 md:col-4">
+            <div class="col-12 md:col-3">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-gift stat-icon" style="color: #22c55e;"></i>
@@ -78,13 +80,24 @@
                     </div>
                 </p-card>
             </div>
-            <div class="col-12 md:col-4">
+            <div class="col-12 md:col-3">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
-                        <i class="pi pi-calendar-plus stat-icon" style="color: #f59e0b;"></i>
+                        <i class="pi pi-money-bill stat-icon" style="color: #6366f1;"></i>
                         <div class="stat-details">
-                            <span class="stat-label">Year-End Bonus Employees</span>
-                            <span class="stat-value">{{ getNonBonusedCount() }}</span>
+                            <span class="stat-label">Total Salary Paid</span>
+                            <span class="stat-value" style="font-size: 1rem;">{{ formatCurrency(totalSalaryPaid) }}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 md:col-3">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <i class="pi pi-wallet stat-icon" style="color: #ef4444;"></i>
+                        <div class="stat-details">
+                            <span class="stat-label">Total Expenses</span>
+                            <span class="stat-value" style="font-size: 1rem;">{{ formatCurrency(getTotalExpenses()) }}</span>
                         </div>
                     </div>
                 </p-card>
@@ -187,6 +200,58 @@
         </p-table>
     </p-card>
 
+    <!-- Expense Records -->
+    <p-card styleClass="year-end-summary-card mt-3" *ngIf="true">
+        <ng-template pTemplate="header">
+            <div class="flex justify-content-between align-items-center px-3 pt-3">
+                <span class="font-semibold text-lg"><i class="pi pi-wallet mr-2"></i>Expense Records</span>
+                <span class="font-bold text-primary">Total: {{ formatCurrency(getTotalExpenses()) }}</span>
+            </div>
+        </ng-template>
+        <p-table [value]="expenditures" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} expenses" [tableStyle]="{ 'min-width': '40rem' }" styleClass="p-datatable-striped">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 20%">Date</th>
+                    <th style="width: 25%">Expense Type</th>
+                    <th style="width: 25%" class="text-right">Amount</th>
+                    <th style="width: 20%">Note</th>
+                    <th style="width: 10%" class="text-center">Actions</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-exp>
+                <tr>
+                    <td>{{ exp.id.date }}</td>
+                    <td>
+                        <p-tag [value]="exp.id.expenseType" severity="warn"></p-tag>
+                    </td>
+                    <td class="text-right font-bold">{{ formatCurrency(exp.amount) }}</td>
+                    <td>{{ exp.note || '—' }}</td>
+                    <td class="text-center">
+                        <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" pTooltip="Delete Expense" tooltipPosition="top" (onClick)="confirmDeleteExpenditure(exp)">
+                        </p-button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <div class="empty-state">
+                            <i class="pi pi-inbox"></i>
+                            <p>No expense records found</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="2" class="font-bold">Total Expenses</td>
+                    <td class="text-right font-bold text-primary">{{ formatCurrency(getTotalExpenses()) }}</td>
+                    <td colspan="2"></td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+
     <!-- Year-End Bonus Summary for non-bonus employees -->
     <p-card styleClass="year-end-summary-card mt-3" *ngIf="filteredEmployees.length > 0">
         <ng-template pTemplate="header">
@@ -226,5 +291,5 @@
 </p-dialog>
 
 <p-dialog header="Process Expenses" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '95vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
-    <app-add-expense></app-add-expense>
+    <app-add-expense (saved)="onExpenseSaved()"></app-add-expense>
 </p-dialog>
