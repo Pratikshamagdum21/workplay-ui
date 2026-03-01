@@ -324,14 +324,17 @@ body {
 
 // ─────────────────────────────────────────────
 // 11. TOUCH TARGETS — 44px minimum (Material Design / Apple HIG)
+//     Only on mobile; desktop buttons use their natural PrimeNG height
 // ─────────────────────────────────────────────
-.p-button {
-  min-height: 44px;
-}
+@media (max-width: 640px) {
+  .p-button {
+    min-height: 44px;
+  }
 
-.p-select,
-.p-datepicker-input {
-  min-height: 44px;
+  .p-select,
+  .p-datepicker-input {
+    min-height: 44px;
+  }
 }
 
 // ─────────────────────────────────────────────
