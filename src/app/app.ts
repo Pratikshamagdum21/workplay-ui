@@ -1,12 +1,13 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SideMenuComponent } from '../shared/side-menu/side-menu';
+import { LoaderComponent } from '../shared/loader/loader';
 import { SHARED_IMPORTS } from './shared-imports';
 import { PrimeNG } from 'primeng/config';
 
 @Component({
   selector: 'app-root',
-  imports: [[...SHARED_IMPORTS], RouterOutlet, SideMenuComponent],
+  imports: [[...SHARED_IMPORTS], RouterOutlet, SideMenuComponent, LoaderComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
