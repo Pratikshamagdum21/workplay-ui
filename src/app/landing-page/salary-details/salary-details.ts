@@ -31,6 +31,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
   loading: boolean = false;
   displayViewDialog = false;
   displayExpenseViewDialog = false;
+  selectedSalary: any = null;
   totalSalary: number = 0;
   expenditures: Expenditure[] = [];
   totalSalaryPaid: number = 0;
@@ -306,7 +307,20 @@ export class SalaryDetails implements OnInit, OnDestroy {
   paySalary(employee: any): void {}
 
   openPaySalaryDialog(): void {
+    this.selectedSalary = null;
     this.displayViewDialog = true;
+  }
+
+  editSalary(salary: any): void {
+    this.selectedSalary = salary;
+    this.displayViewDialog = true;
+  }
+
+  onSalarySaved(): void {
+    this.displayViewDialog = false;
+    this.selectedSalary = null;
+    this.loadSalaryHistory();
+    this.loadEmployees();
   }
 
   openAddExpensesDialog(): void {

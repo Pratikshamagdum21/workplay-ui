@@ -9,7 +9,7 @@
                     <label for="employeeSelect" class="required-label">
                         <i class="pi pi-users"></i> Select Employee
                     </label>
-                    <p-select id="employeeSelect" [(ngModel)]="selectedEmployeeId" [options]="employees" optionLabel="name" optionValue="id" placeholder="Choose an employee to process salary" [filter]="true" filterBy="name" [showClear]="true" styleClass="w-full" (onChange)="onEmployeeSelect($event)">
+                    <p-select id="employeeSelect" [(ngModel)]="selectedEmployeeId" [options]="employees" optionLabel="name" optionValue="id" placeholder="Choose an employee to process salary" [filter]="true" filterBy="name" [showClear]="true" [disabled]="isEditMode" styleClass="w-full" (onChange)="onEmployeeSelect($event)">
                         <ng-template pTemplate="item" let-emp>
                             <div class="employee-option">
                                 <div class="emp-name">{{ emp.name }}</div>
@@ -319,7 +319,7 @@
                     <div class="action-buttons">
                         <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="cancel()">
                         </p-button>
-                        <p-button label="Save Salary" icon="pi pi-check" severity="success" type="submit" [loading]="saving" [disabled]="salaryForm.invalid">
+                        <p-button [label]="isEditMode ? 'Update Salary' : 'Save Salary'" icon="pi pi-check" severity="success" type="submit" [loading]="saving" [disabled]="salaryForm.invalid">
                         </p-button>
                     </div>
                 </div>

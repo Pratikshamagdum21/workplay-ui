@@ -1,9 +1,10 @@
 import { SHARED_IMPORTS } from '../../../shared-imports';
 import { MessageService } from 'primeng/api';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { SalaryPayload } from '../salary.model';
 import {
   DailyMeter,
   WeeklySalaryPayload,
@@ -21,13 +22,19 @@ import { WorkManagementService } from '../../../../services/work-management.serv
   templateUrl: './pay-salary.html',
   styleUrl: './pay-salary.scss',
 })
-export class PaySalary implements OnInit, OnDestroy {
+export class PaySalary implements OnInit, OnDestroy, OnChanges {
+  @Input() salaryData: any = null;
+  @Output() saved = new EventEmitter<void>();
+
   employees: Employee[] = [];
   selectedEmployeeId: number | null = null;
   employee: Employee | null = null;
   salaryForm!: FormGroup;
   loading: boolean = false;
   saving: boolean = false;
+
+  isEditMode: boolean = false;
+  editSalaryId: number | null = null;
 
   weekRange: Date[] = [];
   minDate: Date = new Date();
@@ -54,6 +61,75 @@ export class PaySalary implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadEmployees();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['salaryData'] && this.salaryData) {
+      this.isEditMode = true;
+      this.editSalaryId = this.salaryData.id || null;
+      this.selectedEmployeeId = this.salaryData.employeeId;
+      this.loadEmployeeForEdit(this.salaryData.employeeId);
+    } else if (changes['salaryData'] && !this.salaryData) {
+      this.isEditMode = false;
+      this.editSalaryId = null;
+      this.resetForm();
+      this.selectedEmployeeId = null;
+      this.employee = null;
+    }
+  }
+
+  private loadEmployeeForEdit(employeeId: number): void {
+    this.loading = true;
+    this.salaryService.getEmployeeById(employeeId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (employee) => {
+          if (employee) {
+            this.employee = employee;
+            this.initializeForm();
+            this.prefillFormWithSalaryData();
+          }
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
+  }
+
+  private prefillFormWithSalaryData(): void {
+    if (!this.salaryData || !this.salaryForm) return;
+
+    const data = this.salaryData;
+
+    if (this.employee?.salaryType === 'WEEKLY') {
+      this.salaryForm.patchValue({
+        ratePerMeter: data.ratePerMeter || this.employee?.rate || 0,
+        advanceDeductedThisTime: data.advanceDeductedThisTime || 0
+      });
+
+      // If meterDetails exist from the salary record, populate them
+      if (data.meterDetails && data.meterDetails.length > 0) {
+        this.setMeterDetails(data.meterDetails);
+        this.calculateWeeklySalary();
+      }
+
+      // If week range can be derived from meterDetails
+      if (data.meterDetails && data.meterDetails.length > 0) {
+        const dates = data.meterDetails.map((d: any) => new Date(d.date));
+        const startDate = new Date(Math.min(...dates.map((d: Date) => d.getTime())));
+        const endDate = new Date(Math.max(...dates.map((d: Date) => d.getTime())));
+        this.salaryForm.patchValue({ weekRange: [startDate, endDate] }, { emitEvent: false });
+      }
+    } else {
+      this.salaryForm.patchValue({
+        salary: data.salary || this.employee?.salary || 0,
+        leaveDays: data.leaveDays || 0,
+        leaveDeductionPerDay: data.leaveDeductionPerDay || 0,
+        advanceDeductedThisTime: data.advanceDeductedThisTime || 0
+      });
+      this.calculateMonthlySalary();
+    }
   }
 
   ngOnDestroy(): void {
@@ -341,8 +417,12 @@ export class PaySalary implements OnInit, OnDestroy {
       advanceDeductedThisTime: advanceDeducted,
       advanceRemaining: this.employee.advanceRemaining - advanceDeducted,
       finalPay: this.finalPay,
-      createdAt: new Date()
+      createdAt: this.isEditMode ? this.salaryData.createdAt : new Date()
     };
+
+    if (this.isEditMode && this.editSalaryId) {
+      payload.id = this.editSalaryId;
+    }
 
     this.salaryService.saveWeeklySalary(payload)
       .pipe(takeUntil(this.destroy$))
@@ -351,10 +431,11 @@ export class PaySalary implements OnInit, OnDestroy {
           this.messageService.add({
             severity: 'success',
             summary: 'Success',
-            detail: 'Weekly salary saved successfully',
+            detail: this.isEditMode ? 'Weekly salary updated successfully' : 'Weekly salary saved successfully',
             life: 3000
           });
           this.saving = false;
+          this.saved.emit();
           this.resetAfterSave();
         },
         error: () => {
@@ -381,8 +462,12 @@ export class PaySalary implements OnInit, OnDestroy {
       advanceDeductedThisTime: advanceDeducted,
       advanceRemaining: this.employee.advanceRemaining - advanceDeducted,
       finalPay: this.finalPay,
-      createdAt: new Date()
+      createdAt: this.isEditMode ? this.salaryData.createdAt : new Date()
     };
+
+    if (this.isEditMode && this.editSalaryId) {
+      payload.id = this.editSalaryId;
+    }
 
     this.salaryService.saveMonthlySalary(payload)
       .pipe(takeUntil(this.destroy$))
@@ -391,10 +476,11 @@ export class PaySalary implements OnInit, OnDestroy {
           this.messageService.add({
             severity: 'success',
             summary: 'Success',
-            detail: 'Monthly salary saved successfully',
+            detail: this.isEditMode ? 'Monthly salary updated successfully' : 'Monthly salary saved successfully',
             life: 3000
           });
           this.saving = false;
+          this.saved.emit();
           this.resetAfterSave();
         },
         error: () => {

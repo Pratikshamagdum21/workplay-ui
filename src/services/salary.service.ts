@@ -102,9 +102,18 @@ export class SalaryService {
 
   saveWeeklySalary(payload: WeeklySalaryPayload): Observable<any> {
     const branchId = this.branchService.getSelectedBranchSnapshot().id;
+    const isEdit = !!payload.id;
     return this.http.post(`${this.baseUrl}/saveSalary`, { ...payload, branchId }).pipe(
       tap(() => {
-        this.salaryHistorySubject.next([...this.salaryHistorySubject.value, payload]);
+        if (isEdit) {
+          // Replace the existing record in history
+          const updated = this.salaryHistorySubject.value.map(s =>
+            s.id === payload.id ? payload : s
+          );
+          this.salaryHistorySubject.next(updated);
+        } else {
+          this.salaryHistorySubject.next([...this.salaryHistorySubject.value, payload]);
+        }
         // Update employee advance balance
         this.employeeService.updateAdvance(
           payload.employeeId,
@@ -116,9 +125,17 @@ export class SalaryService {
 
   saveMonthlySalary(payload: MonthlySalaryPayload): Observable<any> {
     const branchId = this.branchService.getSelectedBranchSnapshot().id;
+    const isEdit = !!payload.id;
     return this.http.post(`${this.baseUrl}/saveSalary`, { ...payload, branchId }).pipe(
       tap(() => {
-        this.salaryHistorySubject.next([...this.salaryHistorySubject.value, payload]);
+        if (isEdit) {
+          const updated = this.salaryHistorySubject.value.map(s =>
+            s.id === payload.id ? payload : s
+          );
+          this.salaryHistorySubject.next(updated);
+        } else {
+          this.salaryHistorySubject.next([...this.salaryHistorySubject.value, payload]);
+        }
         // Update employee advance balance
         this.employeeService.updateAdvance(
           payload.employeeId,
