@@ -114,6 +114,7 @@
                         Advance Deducted This Time
                         <p-sortIcon field="advanceTaken"></p-sortIcon>
                     </th>
+                    <th>Created Date</th>
                     <th class="text-center">Action</th>
                 </tr>
             </ng-template>
@@ -137,6 +138,7 @@
                     <td class="text-right">
                         <span class="advance-taken">{{ formatCurrency(employee.advanceDeductedThisTime) }}</span>
                     </td>
+                    <td>{{ employee.createdAt | date: 'dd/MM/yyyy' }}</td>
                     <td class="text-center">
                         <p-button label="Edit" icon="pi pi-pencil" severity="success" size="small" (onClick)="editSalary(employee)">
                         </p-button>
