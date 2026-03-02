@@ -37,15 +37,50 @@
     flex: 1;
   }
 
-  .mobile-header-badge {
-    font-size: 0.7rem;
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 0.2rem 0.6rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    white-space: nowrap;
+  .mobile-branch-selector {
+    margin-left: auto;
+
+    ::ng-deep .mobile-branch-dropdown {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      min-width: 140px;
+      max-width: 180px;
+
+      .p-select-label {
+        color: #ffffff;
+        font-size: 0.8rem;
+        padding: 0.35rem 0.5rem;
+      }
+
+      .p-select-dropdown {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
+    }
+
+    .mobile-branch-selected {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: #ffffff;
+
+      i {
+        font-size: 0.75rem;
+      }
+    }
+
+    .mobile-branch-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      padding: 0.25rem 0;
+    }
   }
 }
 
