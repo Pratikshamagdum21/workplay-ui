@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../environments/environment';
+import { BranchService } from './branch.service';
 
 export interface ExpenditureId {
   date: string;
@@ -9,8 +10,11 @@ export interface ExpenditureId {
 }
 
 export interface Expenditure {
-  id: ExpenditureId;
+  date: string;
+  expenseType: string;
   amount: number;
+  id?:string;
+  branchId?:number;
   note: string;
 }
 
@@ -23,12 +27,18 @@ export class ExpenditureService {
   private expendituresSubject = new BehaviorSubject<Expenditure[]>([]);
   public expenditures$: Observable<Expenditure[]> = this.expendituresSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    this.loadExpenditures();
+  constructor(private http: HttpClient,private branchService: BranchService,) {
+     this.branchService.getSelectedBranch().subscribe(branch => {
+      this.loadExpenditures(branch.id);
+    });
   }
 
-  loadExpenditures(): void {
-    this.http.get<Expenditure[]>(`${this.baseUrl}/getAllExpenditure`).subscribe({
+  loadExpenditures(branchId?: number): void {
+    let params = new HttpParams();
+        if (branchId != null) {
+          params = params.set('branchId', branchId.toString());
+        }
+    this.http.get<Expenditure[]>(`${this.baseUrl}/getAllExpenditure`, { params }).subscribe({
       next: (expenditures) => this.expendituresSubject.next(expenditures),
       error: () => {}
     });
@@ -46,20 +56,24 @@ export class ExpenditureService {
     );
   }
 
-  deleteExpenditure(date: string, expenseType: string): Observable<void> {
-    const params = new HttpParams()
-      .set('date', date)
-      .set('expenseType', expenseType);
-    return this.http.delete<void>(`${this.baseUrl}/delete`, { params }).pipe(
-      tap(() => {
-        this.expendituresSubject.next(
-          this.expendituresSubject.value.filter(
-            e => !(e.id.date === date && e.id.expenseType === expenseType)
-          )
-        );
-      })
-    );
-  }
+ deleteExpenditure(id: string, expenseType: string): Observable<string> {
+  const params = new HttpParams()
+    .set('id', id)
+    .set('expenseType', expenseType);
+
+  return this.http.delete<string>(`${this.baseUrl}/delete`, {
+    params,
+    responseType: 'text' as 'json' 
+  }).pipe(
+    tap(() => {
+      this.expendituresSubject.next(
+        this.expendituresSubject.value.filter(
+          e => !(e.id === id && e.expenseType === expenseType)
+        )
+      );
+    })
+  );
+}
 
   getAllExpenditures(): Observable<Expenditure[]> {
     return this.expenditures$;

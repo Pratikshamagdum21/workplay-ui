@@ -75,7 +75,8 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
 
   onExpenseSaved(): void {
     this.displayExpenseViewDialog = false;
-    this.expenditureService.loadExpenditures();
+    const branchId = this.branchService.getSelectedBranchSnapshot().id;
+    this.expenditureService.loadExpenditures(branchId);
   }
 
   private loadWorkEntries(): void {
@@ -216,7 +217,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
 
   confirmDeleteExpenditure(expenditure: Expenditure): void {
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete this ${expenditure.id.expenseType} expense?`,
+      message: `Are you sure you want to delete this ${expenditure.expenseType} expense?`,
       header: 'Confirm Delete',
       icon: 'pi pi-exclamation-triangle',
       accept: () => this.deleteExpenditure(expenditure)
@@ -224,7 +225,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   }
 
   private deleteExpenditure(expenditure: Expenditure): void {
-    this.expenditureService.deleteExpenditure(expenditure.id.date, expenditure.id.expenseType).subscribe({
+    this.expenditureService.deleteExpenditure(expenditure.id || '', expenditure.expenseType).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',

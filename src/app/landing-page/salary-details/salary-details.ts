@@ -122,33 +122,37 @@ export class SalaryDetails implements OnInit, OnDestroy {
 
   onExpenseSaved(): void {
     this.displayExpenseViewDialog = false;
-    this.expenditureService.loadExpenditures();
+   const branchId:number =  this.branchService.getSelectedBranchSnapshot().id;
+    this.expenditureService.loadExpenditures(branchId);
   }
 
   confirmDeleteExpenditure(exp: Expenditure): void {
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete this ${exp.id.expenseType} expense?`,
+      message: `Are you sure you want to delete this ${exp.expenseType} expense?`,
       header: 'Confirm Delete',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.expenditureService.deleteExpenditure(exp.id.date, exp.id.expenseType).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Deleted',
-              detail: 'Expense deleted successfully',
-              life: 3000
-            });
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete expense',
-              life: 3000
-            });
-          }
-        });
+        this.expenditureService
+  .deleteExpenditure(exp.id!, exp.expenseType)
+  .subscribe({
+    next: (msg) => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Deleted',
+        detail: msg,   // backend string
+        life: 3000
+      });
+      this.loadExpenditures();
+    },
+    error: () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to delete expense',
+        life: 3000
+      });
+    }
+  });
       }
     });
   }
@@ -233,7 +237,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
 
       // Filter expenditures by id.date
       this.filteredExpenditures = this.allExpenditures.filter(exp => {
-        const expDate = new Date(exp.id.date);
+        const expDate = new Date(exp.date);
         return expDate >= range.start && expDate <= range.end;
       });
 

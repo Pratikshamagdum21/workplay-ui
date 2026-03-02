@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { SHARED_IMPORTS } from '../../../shared-imports';
 import { ExpenditureService } from '../../../../services/expenditure.service';
+import { BranchService } from '../../../../services/branch.service';
 
 @Component({
   selector: 'app-add-expense',
@@ -36,8 +37,11 @@ export class AddExpense implements OnInit {
   constructor(
     private fb: FormBuilder,
     private expenditureService: ExpenditureService,
-    private messageService: MessageService
-  ) {}
+    private messageService: MessageService,
+    private branchService: BranchService
+  ) { 
+      
+  }
 
   ngOnInit(): void {
     this.expenseForm = this.fb.group({
@@ -58,14 +62,13 @@ export class AddExpense implements OnInit {
     const date = formValue.date instanceof Date
       ? formValue.date.toISOString().split('T')[0]
       : formValue.date;
-
-    const expenditure = {
-      id: {
-        date,
-        expenseType: formValue.expenseType
-      },
-      amount: formValue.amount,
-      note: formValue.note || ''
+    const branch = this.branchService.getSelectedBranchSnapshot();
+          const expenditure = {
+            branchId: branch.id,
+            date: date,
+            expenseType: formValue.expenseType,
+            amount: formValue.amount,
+            note: formValue.note || ''
     };
 
     this.saving = true;

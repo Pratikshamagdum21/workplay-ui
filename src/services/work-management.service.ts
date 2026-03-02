@@ -103,9 +103,12 @@ export class WorkManagementService {
     return this.workEntriesSubject.value;
   }
 
-  deleteEntry(id: string): Observable<void> {
+  deleteEntry(id: string): Observable<string> {
     const params = new HttpParams().set('id', id.toString());
-    return this.http.delete<void>(`${this.baseUrl}/deleteWork`, { params }).pipe(
+    return this.http.delete<string>(`${this.baseUrl}/deleteWork`, { 
+      params,
+      responseType: 'text' as 'json'
+    }).pipe(
       tap(() => {
         this.workEntriesSubject.next(this.workEntriesSubject.value.filter(e => e.id !== id));
       })
