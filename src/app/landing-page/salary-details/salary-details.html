@@ -41,6 +41,8 @@
             </div>
 
             <div class="col-12 md:col-3 flex align-items-end gap-2">
+                <p-button label="Apply" icon="pi pi-check" severity="primary" styleClass="w-full" (onClick)="onApplyFilter()">
+                </p-button>
                 <p-button label="Clear Filter" icon="pi pi-filter-slash" severity="secondary" [outlined]="true" styleClass="w-full" (onClick)="clearFilter()">
                 </p-button>
                 <p-button label="Generate PDF" icon="pi pi-file-pdf" severity="danger" styleClass="w-full" (onClick)="generatePDFReport()">
@@ -51,7 +53,7 @@
         <!-- Filter Summary -->
         <div class="filter-summary mt-3" *ngIf="selectedFilter !== 'all'">
             <i class="pi pi-info-circle"></i>
-            <span>{{ filteredEmployees.length }} records found</span>
+            <span>{{ filteredsalary.length }} salary records, {{ filteredExpenditures.length }} expense records found</span>
         </div>
     </p-card>
 
@@ -165,7 +167,7 @@
                 <span class="font-bold text-primary">Total: {{ formatCurrency(getTotalExpenses()) }}</span>
             </div>
         </ng-template>
-        <p-table [value]="expenditures" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} expenses" [tableStyle]="{ 'min-width': '40rem' }" styleClass="p-datatable-striped">
+        <p-table [value]="filteredExpenditures" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} expenses" [tableStyle]="{ 'min-width': '40rem' }" styleClass="p-datatable-striped">
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width: 20%">Date</th>
