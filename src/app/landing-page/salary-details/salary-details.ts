@@ -269,7 +269,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
   }
 
   getSalaryTypeLabel(type: string): string {
-    return type === 'WEEKLY' ? 'Weekly (Meter-based)' : 'Monthly (Fixed)';
+    return type;
   }
 
   getSalaryTypeSeverity(type: string): 'success' | 'info' {
