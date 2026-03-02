@@ -135,10 +135,6 @@
                         Work Type
                         <p-sortIcon field="employeeType"></p-sortIcon>
                     </th>
-                    <th pSortableColumn="shift" style="width: 18%">
-                        Shift
-                        <p-sortIcon field="shift"></p-sortIcon>
-                    </th>
                     <th pSortableColumn="fabricMeters" style="width: 16%" class="text-right">
                         Fabric (meters)
                         <p-sortIcon field="fabricMeters"></p-sortIcon>
@@ -161,9 +157,6 @@
                     </td>
                     <td>
                         <p-tag [value]="entry.employeeType" severity="info"></p-tag>
-                    </td>
-                    <td>
-                        <p-chip [label]="entry.shift" styleClass="shift-chip"></p-chip>
                     </td>
                     <td class="text-right">
                         <span class="fabric-value">{{ entry.fabricMeters }} m</span>

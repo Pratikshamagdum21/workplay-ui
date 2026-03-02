@@ -18,10 +18,17 @@ export class AddExpense implements OnInit {
   saving: boolean = false;
 
   expenseTypes = [
-    { label: 'Electricity', value: 'ELECTRICITY' },
-    { label: 'Maintenance', value: 'MAINTENANCE' },
+    { label: 'Light Bill', value: 'Light Bill' },
+    { label: 'Vaifani', value: 'Vaifani' },
+    { label: 'Welding', value: 'Welding' },
+    { label: 'Friday Extra', value: 'Friday Extra' },
+    { label: 'Worker Beam', value: 'Worker Beam' },
+    { label: 'Electrician', value: 'Electrician' },
+    { label: 'Checker', value: 'Checker' },
+    { label: 'Petrol', value: 'Petrol' },
+    { label: 'Sutar', value: 'Sutar' },
     { label: 'Worker Payment', value: 'WORKER' },
-    { label: 'Material Purchase', value: 'MATERIAL' },
+    { label: 'Mill Store', value: 'MATERIAL' },
     { label: 'Transport', value: 'TRANSPORT' },
     { label: 'Other', value: 'OTHER' }
   ];

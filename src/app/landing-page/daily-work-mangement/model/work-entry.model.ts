@@ -2,7 +2,6 @@ export interface WorkEntry {
     id: string;
     employeeName: string;
     employeeType: string;
-    shift: string;
     fabricMeters: number;
     date: Date;
     createdAt: Date;

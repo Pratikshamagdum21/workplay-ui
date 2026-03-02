@@ -44,7 +44,6 @@ export class AddWorkForm implements OnInit, OnDestroy {
     this.workForm = this.fb.group({
       employeeName: ['', Validators.required],
       employeeType: ['', Validators.required],
-      shift: ['', Validators.required],
       fabricMeters: [null, [Validators.required, Validators.min(1)]],
       date: [new Date(), Validators.required]
     });
@@ -79,9 +78,8 @@ export class AddWorkForm implements OnInit, OnDestroy {
     const workEntry = {
       employeeName: formValue.employeeName,
       employeeType: formValue.employeeType,
-      shift: formValue.shift,
       fabricMeters: formValue.fabricMeters,
-      date: formValue.date
+      date: formValue.date  
     };
 
     this.workService.addEntry(workEntry)

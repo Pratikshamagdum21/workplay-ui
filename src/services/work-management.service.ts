@@ -16,11 +16,11 @@ export class WorkManagementService {
   public workEntries$: Observable<WorkEntry[]> = this.workEntriesSubject.asObservable();
 
   private readonly workTypes: WorkType[] = [
-    { id: '1', name: 'Stitching' },
-    { id: '2', name: 'Cutting' },
-    { id: '3', name: 'Packing' },
-    { id: '4', name: 'Finishing' },
-    { id: '5', name: 'Checking' }
+    { id: '1', name: 'Diwanji' },
+    { id: '2', name: 'Weaver' },
+    { id: '3', name: 'Jober' },
+    { id: '4', name: 'Kandi' },
+    { id: '5', name: 'Mending' }
   ];
 
   private readonly shifts: Shift[] = [
