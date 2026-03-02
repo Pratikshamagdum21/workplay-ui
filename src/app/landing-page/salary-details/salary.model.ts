@@ -8,7 +8,9 @@ export interface DailyMeter {
 }
 
 export interface WeeklySalaryPayload {
+  id?: number;
   employeeId: number;
+  employeeName?: string;
   type: 'weekly';
   meterDetails: DailyMeter[];
   ratePerMeter: number;
@@ -24,7 +26,9 @@ export interface WeeklySalaryPayload {
 }
 
 export interface MonthlySalaryPayload {
+  id?: number;
   employeeId: number;
+  employeeName?: string;
   type: 'monthly';
   salary: number;
   leaveDays: number;

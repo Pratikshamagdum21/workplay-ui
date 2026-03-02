@@ -126,7 +126,7 @@
                         </div>
                     </td>
                     <td>
-                        <p-tag [value]="getSalaryTypeLabel(employee.salaryType)" [severity]="getSalaryTypeSeverity(employee.salaryType)">
+                        <p-tag [value]="getSalaryTypeLabel(employee.type)" [severity]="getSalaryTypeSeverity(employee.type)">
                         </p-tag>
                     </td>
                     <td>
@@ -138,7 +138,7 @@
                         <span class="advance-taken">{{ formatCurrency(employee.advanceDeductedThisTime) }}</span>
                     </td>
                     <td class="text-center">
-                        <p-button label="Edit" icon="pi pi-money-bill" severity="success" size="small" (onClick)="openPaySalaryDialog()">
+                        <p-button label="Edit" icon="pi pi-pencil" severity="success" size="small" (onClick)="editSalary(employee)">
                         </p-button>
                     </td>
                 </tr>
@@ -243,8 +243,8 @@
     </p-card>
 </div>
 
-<p-dialog header="Process Salary" [(visible)]="displayViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
-    <app-pay-salary></app-pay-salary>
+<p-dialog [header]="selectedSalary ? 'Edit Salary' : 'Process Salary'" [(visible)]="displayViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog" (onHide)="onDialogHide()">
+    <app-pay-salary [salaryData]="selectedSalary" (saved)="onSalarySaved()"></app-pay-salary>
 </p-dialog>
 
 <p-dialog header="Process Expenses" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">

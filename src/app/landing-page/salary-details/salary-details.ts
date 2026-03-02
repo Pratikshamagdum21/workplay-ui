@@ -31,6 +31,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
   loading: boolean = false;
   displayViewDialog = false;
   displayExpenseViewDialog = false;
+  selectedSalary: any = null;
   totalSalary: number = 0;
   expenditures: Expenditure[] = [];
   totalSalaryPaid: number = 0;
@@ -268,7 +269,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
   }
 
   getSalaryTypeLabel(type: string): string {
-    return type === 'WEEKLY' ? 'Weekly (Meter-based)' : 'Monthly (Fixed)';
+    return type;
   }
 
   getSalaryTypeSeverity(type: string): 'success' | 'info' {
@@ -306,7 +307,22 @@ export class SalaryDetails implements OnInit, OnDestroy {
   paySalary(employee: any): void {}
 
   openPaySalaryDialog(): void {
+    this.selectedSalary = null;
     this.displayViewDialog = true;
+  }
+
+  editSalary(salary: any): void {
+    this.selectedSalary = salary;
+    this.displayViewDialog = true;
+  }
+
+  onSalarySaved(): void {
+    this.displayViewDialog = false;
+    this.selectedSalary = null;
+  }
+
+  onDialogHide(): void {
+    this.selectedSalary = null;
   }
 
   openAddExpensesDialog(): void {
