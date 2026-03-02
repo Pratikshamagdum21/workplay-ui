@@ -60,7 +60,7 @@
                         <p-tag [value]="employee.salaryType" severity="info"></p-tag>
                     </td>
                     <td>
-                        <p-tag [value]="employee.bonusEligible" [severity]="employee.bonusEligible === 'With Bonus' ? 'success' : 'warn'">
+                        <p-tag [value]="employee.isBonused ? 'With Bonus':'Without Bonus'" [severity]="employee.isBonused === 'true' ? 'success' : 'warn'">
                         </p-tag>
                     </td>
                     <td class="text-right">
