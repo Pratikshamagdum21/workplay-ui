@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.workpay.mobile',
-  appName: 'WorkPay Daily Work',
+  appName: 'Shivai Textile',
   webDir: 'dist/work-pay-mobile/browser',
   server: {
     androidScheme: 'https',

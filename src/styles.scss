@@ -6,11 +6,14 @@
 html {
   -webkit-text-size-adjust: 100%; // prevent Android auto-scaling
   scroll-behavior: smooth;
+    font-size: 80%; // ~12.8px base instead of 16px
+
 }
 
 body {
   overflow-x: hidden;
   line-height: 1.5;
+  margin:0 ;
 }
 
 @media (max-width: 640px) {
