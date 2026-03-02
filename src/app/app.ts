@@ -12,7 +12,7 @@ import { PrimeNG } from 'primeng/config';
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
-  protected readonly title = signal('WorkPay');
+  protected readonly title = signal('Shivai Textile');
   sideMenuOpen = false;
 
   constructor(private primeng: PrimeNG) {}

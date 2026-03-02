@@ -17,11 +17,9 @@ export class BranchService {
   private readonly baseUrl = `${environment.apiUrl}/branch`;
 
   private readonly fallbackBranches: Branch[] = [
-    { id: 1, name: 'Main Branch', code: 'MB-001', location: 'Main' },
-    { id: 2, name: 'North Branch', code: 'NB-002', location: 'North' },
-    { id: 3, name: 'South Branch', code: 'SB-003', location: 'South' },
-    { id: 4, name: 'West Branch', code: 'WB-004', location: 'West' },
-    { id: 5, name: 'East Branch', code: 'EB-005', location: 'East' }
+    { id: 1, name: 'Unit 1', code: 'MB-001', location: 'Main' },
+    { id: 2, name: 'Unit 2', code: 'NB-002', location: 'North' },
+    { id: 3, name: 'Unit 3', code: 'SB-003', location: 'South' },
   ];
 
   private branchesSubject = new BehaviorSubject<Branch[]>(this.fallbackBranches);

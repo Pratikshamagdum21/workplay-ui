@@ -181,9 +181,9 @@
             </ng-template>
             <ng-template pTemplate="body" let-exp>
                 <tr>
-                    <td>{{ exp.id.date }}</td>
+                    <td>{{ exp.date }}</td>
                     <td>
-                        <p-tag [value]="exp.id.expenseType" severity="warn"></p-tag>
+                        <p-tag [value]="exp.expenseType" severity="warn"></p-tag>
                     </td>
                     <td class="text-right font-bold">{{ formatCurrency(exp.amount) }}</td>
                     <td>{{ exp.note || '—' }}</td>
