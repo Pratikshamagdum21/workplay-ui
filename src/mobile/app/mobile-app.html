@@ -7,7 +7,28 @@
         <i class="pi pi-building"></i>
       </span>
       <span class="mobile-app-title">WorkPay</span>
-      <span class="mobile-header-badge">Daily Work</span>
+      <div class="mobile-branch-selector">
+        <p-select
+          [options]="branches"
+          [(ngModel)]="selectedBranch"
+          optionLabel="name"
+          placeholder="Select Branch"
+          (onChange)="onBranchChange($event)"
+          styleClass="mobile-branch-dropdown">
+          <ng-template pTemplate="selectedItem" let-branch>
+            <div class="mobile-branch-selected" *ngIf="branch">
+              <i class="pi pi-map-marker"></i>
+              <span>{{ branch.name }}</span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="item" let-branch>
+            <div class="mobile-branch-option">
+              <i class="pi pi-map-marker"></i>
+              <span>{{ branch.name }}</span>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
     </div>
   </header>
 

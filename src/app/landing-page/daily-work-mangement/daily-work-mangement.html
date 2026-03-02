@@ -53,7 +53,7 @@
                 <i class="pi pi-sliders-h"></i> Custom Date Range
             </h3>
             <div class="grid">
-                <div class="col-12 md:col-5">
+                <div class="col-12 md:col-3">
                     <div class="field">
                         <label for="fromDate">From Date</label>
                         <p-datepicker id="fromDate" [(ngModel)]="fromDate" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="Select From Date" styleClass="w-full" (ngModelChange)="onFromDateChange($event)">
@@ -61,7 +61,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 md:col-5">
+                <div class="col-12 md:col-3">
                     <div class="field">
                         <label for="toDate">To Date</label>
                         <p-datepicker id="toDate" [(ngModel)]="toDate" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="Select To Date" styleClass="w-full" [minDate]="fromDate || undefined" (ngModelChange)="onToDateChange($event)">
@@ -69,7 +69,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 md:col-2 flex align-items-center">
+                <div class="col-12 md:col-2 flex align-items-end mb-3">
                     <p-button label="Apply" icon="pi pi-check" severity="success" styleClass="w-full" (onClick)="onCustomDateFilter()">
                     </p-button>
                 </div>

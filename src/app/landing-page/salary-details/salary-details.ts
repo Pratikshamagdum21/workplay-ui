@@ -27,13 +27,16 @@ interface FilterOption {
 export class SalaryDetails implements OnInit, OnDestroy {
   employees: Employee[] = [];
   filteredEmployees: Employee[] = [];
-  filteredsalary: Employee[] = [];
+  filteredsalary: any[] = [];
+  allSalaryHistory: any[] = [];
   loading: boolean = false;
   displayViewDialog = false;
   displayExpenseViewDialog = false;
   selectedSalary: any = null;
   totalSalary: number = 0;
   expenditures: Expenditure[] = [];
+  allExpenditures: Expenditure[] = [];
+  filteredExpenditures: Expenditure[] = [];
   totalSalaryPaid: number = 0;
 
   filterOptions: FilterOption[] = [
@@ -97,8 +100,9 @@ export class SalaryDetails implements OnInit, OnDestroy {
     this.salaryService.getSalaryHistory()
       .pipe(takeUntil(this.destroy$))
       .subscribe(history => {
-        this.filteredsalary = history as any[];
-        this.totalSalaryPaid = history.reduce((sum, p) => sum + p.finalPay, 0);
+        this.allSalaryHistory = history as any[];
+        this.filteredsalary = [...this.allSalaryHistory];
+        this.totalSalaryPaid = this.filteredsalary.reduce((sum, p) => sum + p.finalPay, 0);
       });
   }
 
@@ -106,12 +110,14 @@ export class SalaryDetails implements OnInit, OnDestroy {
     this.expenditureService.getAllExpenditures()
       .pipe(takeUntil(this.destroy$))
       .subscribe(expenditures => {
+        this.allExpenditures = expenditures;
         this.expenditures = expenditures;
+        this.filteredExpenditures = [...expenditures];
       });
   }
 
   getTotalExpenses(): number {
-    return this.expenditures.reduce((sum, e) => sum + e.amount, 0);
+    return this.filteredExpenditures.reduce((sum, e) => sum + e.amount, 0);
   }
 
   onExpenseSaved(): void {
@@ -152,29 +158,100 @@ export class SalaryDetails implements OnInit, OnDestroy {
     this.showCustomDatePicker = this.selectedFilter === 'custom';
     if (this.selectedFilter !== 'custom') {
       this.customDateRange = [];
-      this.applyFilter();
     }
   }
 
   onCustomDateChange(): void {
-    if (this.customDateRange && this.customDateRange.length === 2) {
-      this.applyFilter();
-    }
+    // No-op; user must click Apply
+  }
+
+  onApplyFilter(): void {
+    this.applyFilter();
   }
 
   getTotalFabricMeters(): number {
     return 1000;
   }
 
+  private getFilterDateRange(): { start: Date; end: Date } | null {
+    const now = new Date();
+
+    switch (this.selectedFilter) {
+      case 'all':
+        return null;
+      case 'week': {
+        const start = new Date(now);
+        start.setDate(now.getDate() - now.getDay());
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(now);
+        end.setHours(23, 59, 59, 999);
+        return { start, end };
+      }
+      case 'month': {
+        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(now);
+        end.setHours(23, 59, 59, 999);
+        return { start, end };
+      }
+      case 'year': {
+        const start = new Date(now.getFullYear(), 0, 1);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(now);
+        end.setHours(23, 59, 59, 999);
+        return { start, end };
+      }
+      case 'custom': {
+        if (this.customDateRange && this.customDateRange.length === 2 && this.customDateRange[1]) {
+          const start = new Date(this.customDateRange[0]);
+          start.setHours(0, 0, 0, 0);
+          const end = new Date(this.customDateRange[1]);
+          end.setHours(23, 59, 59, 999);
+          return { start, end };
+        }
+        return null;
+      }
+      default:
+        return null;
+    }
+  }
+
   private applyFilter(): void {
-    this.filteredEmployees = this.employees;
+    const range = this.getFilterDateRange();
+
+    if (!range) {
+      // 'all' or incomplete custom range — show everything
+      this.filteredsalary = [...this.allSalaryHistory];
+      this.filteredExpenditures = [...this.allExpenditures];
+      this.filteredEmployees = this.employees;
+    } else {
+      // Filter salary history by createdAt
+      this.filteredsalary = this.allSalaryHistory.filter(record => {
+        const recordDate = new Date(record.createdAt);
+        return recordDate >= range.start && recordDate <= range.end;
+      });
+
+      // Filter expenditures by id.date
+      this.filteredExpenditures = this.allExpenditures.filter(exp => {
+        const expDate = new Date(exp.id.date);
+        return expDate >= range.start && expDate <= range.end;
+      });
+
+      this.filteredEmployees = this.employees;
+    }
+
+    // Recalculate totals based on filtered data
+    this.totalSalaryPaid = this.filteredsalary.reduce((sum, p) => sum + p.finalPay, 0);
   }
 
   clearFilter(): void {
     this.selectedFilter = 'all';
     this.customDateRange = [];
     this.showCustomDatePicker = false;
+    this.filteredsalary = [...this.allSalaryHistory];
+    this.filteredExpenditures = [...this.allExpenditures];
     this.filteredEmployees = this.employees;
+    this.totalSalaryPaid = this.allSalaryHistory.reduce((sum, p) => sum + p.finalPay, 0);
   }
 
   /**
