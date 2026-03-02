@@ -406,6 +406,7 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
 
     const payload: WeeklySalaryPayload = {
       employeeId: this.employee.id,
+      employeeName: this.employee.name,
       type: 'weekly',
       meterDetails: formValue.meterDetails,
       ratePerMeter: formValue.ratePerMeter,
@@ -452,6 +453,7 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
 
     const payload: MonthlySalaryPayload = {
       employeeId: this.employee.id,
+      employeeName: this.employee.name,
       type: 'monthly',
       salary: formValue.salary,
       leaveDays: formValue.leaveDays,
@@ -490,6 +492,8 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
   }
 
   private resetAfterSave(): void {
+    this.isEditMode = false;
+    this.editSalaryId = null;
     this.selectedEmployeeId = null;
     this.employee = null;
     this.resetForm();

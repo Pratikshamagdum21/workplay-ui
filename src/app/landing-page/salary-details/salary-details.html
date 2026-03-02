@@ -243,7 +243,7 @@
     </p-card>
 </div>
 
-<p-dialog [header]="selectedSalary ? 'Edit Salary' : 'Process Salary'" [(visible)]="displayViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
+<p-dialog [header]="selectedSalary ? 'Edit Salary' : 'Process Salary'" [(visible)]="displayViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog" (onHide)="onDialogHide()">
     <app-pay-salary [salaryData]="selectedSalary" (saved)="onSalarySaved()"></app-pay-salary>
 </p-dialog>
 

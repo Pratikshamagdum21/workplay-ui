@@ -319,8 +319,10 @@ export class SalaryDetails implements OnInit, OnDestroy {
   onSalarySaved(): void {
     this.displayViewDialog = false;
     this.selectedSalary = null;
-    this.loadSalaryHistory();
-    this.loadEmployees();
+  }
+
+  onDialogHide(): void {
+    this.selectedSalary = null;
   }
 
   openAddExpensesDialog(): void {
