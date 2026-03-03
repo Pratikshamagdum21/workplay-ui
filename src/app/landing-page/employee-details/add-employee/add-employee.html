@@ -54,6 +54,19 @@
                 </div>
             </div>
 
+                            <!-- Work Type -->
+            <div class="col">
+                    <div class="field">
+                        <label for="workType" class="required-label">
+              <i class="pi pi-briefcase"></i> Work Type
+            </label>
+                        <p-select id="workType" appendTo="body" formControlName="workType" [options]="workTypes" optionLabel="name" optionValue="name" placeholder="Select Work Type" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('workType')" [class.ng-dirty]="isFieldInvalid('workType')">
+                        </p-select>
+                        <small class="p-error" *ngIf="isFieldInvalid('workType')">
+              {{ getErrorMessage('workType') }}
+            </small>
+                    </div>
+                </div>
             <!-- Bonus Eligibility -->
             <div class="col-12 md:col-6">
                 <div class="field">

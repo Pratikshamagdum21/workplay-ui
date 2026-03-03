@@ -121,6 +121,14 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
         const endDate = new Date(Math.max(...dates.map((d: Date) => d.getTime())));
         this.salaryForm.patchValue({ weekRange: [startDate, endDate] }, { emitEvent: false });
       }
+    } else if (this.employee?.salaryType === 'WEEKLY_F') {
+      this.salaryForm.patchValue({
+        salary: data.salary || this.employee?.salary || 0,
+        leaveDays: data.leaveDays || 0,
+        leaveDeductionPerDay: data.leaveDeductionPerDay || 0,
+        advanceDeductedThisTime: data.advanceDeductedThisTime || 0
+      });
+      this.calculateWeeklyFixedSalary();
     } else {
       this.salaryForm.patchValue({
         salary: data.salary || this.employee?.salary || 0,
@@ -167,9 +175,10 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     const employeeId = event.value;
     if (employeeId) {
       this.loadEmployeeDetails(employeeId);
+      this.resetForm();
     } else {
       this.employee = null;
-      this.resetForm();
+  
     }
   }
 
@@ -256,9 +265,9 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
 
     this.salaryForm.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.calculateMonthlySalary());
+      .subscribe(() => this.calculateWeeklyFixedSalary());
 
-    this.calculateMonthlySalary();
+    this.calculateWeeklyFixedSalary();
   }
 
   private loadWeeklyData(startDate: Date, endDate: Date): void {
@@ -366,6 +375,27 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
 
   private calculateMonthlySalary(): void {
     if (!this.employee || this.employee.salaryType !== 'MONTHLY' || !this.salaryForm) return;
+
+    const salary = this.salaryForm.get('salary')?.value || 0;
+    const leaveDays = this.salaryForm.get('leaveDays')?.value || 0;
+    const leaveDeductionPerDay = this.salaryForm.get('leaveDeductionPerDay')?.value || 0;
+    const advanceDeducted = this.salaryForm.get('advanceDeductedThisTime')?.value || 0;
+
+    // Auto-calculate bonus for isBonused employees; zero for others (year-end bonus only)
+    this.autoBonus = this.isBonusedEmployee
+      ? this.salaryService.calculatePerSalaryBonus(salary)
+      : 0;
+
+    const calculation = this.salaryService.calculateMonthlySalary(
+      salary, leaveDays, leaveDeductionPerDay, this.autoBonus, advanceDeducted
+    );
+
+    this.leaveDeductionTotal = calculation.leaveDeductionTotal;
+    this.finalPay = calculation.finalPay;
+  }
+
+  private calculateWeeklyFixedSalary(): void {
+    if (!this.employee || this.employee.salaryType !== 'WEEKLY_F' || !this.salaryForm) return;
 
     const salary = this.salaryForm.get('salary')?.value || 0;
     const leaveDays = this.salaryForm.get('leaveDays')?.value || 0;

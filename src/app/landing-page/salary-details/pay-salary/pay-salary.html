@@ -237,7 +237,7 @@
                             <div class="col-12 md:col-4">
                                 <div class="advance-info-box">
                                     <span class="info-label">Total Advance Taken</span>
-                                    <span class="info-value">{{ formatCurrency(employee.advanceTaken) }}</span>
+                                    <span class="info-value">{{ formatCurrency(employee.advanceAmount) }}</span>
                                 </div>
                             </div>
 
@@ -296,7 +296,8 @@
                                     <i class="pi pi-calendar" style="margin-right: 4px;"></i>
                                     Bonus (year-end only):
                                 </span>
-                                <span class="calc-value" style="color: #94a3b8;">₹{{formatCurrency(baseSalary*16.66/100)}} (paid at year end)</span>
+                                                                <span class="calc-value" style="color: #94a3b8;" *ngIf="employee.salaryType === 'WEEKLY'" >₹{{formatCurrency(baseSalary*16.66/100)}} (paid at year end)</span>
+                                <span class="calc-value" style="color: #94a3b8;" *ngIf="employee.salaryType !== 'WEEKLY'" >₹{{formatCurrency(employee.salary*16.66/100)}} (paid at year end)</span>
                             </div>
 
                             <div class="calc-row">

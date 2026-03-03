@@ -4,6 +4,8 @@ import { BonusOption, Employee, FabricType } from '../model/employee.model';
 import { MessageService } from 'primeng/api';
 import { EmployeeService } from '../../../../services/employee.service';
 import { SHARED_IMPORTS } from '../../../shared-imports';
+import { WorkManagementService } from '../../../../services/work-management.service';
+import { WorkType } from '../../daily-work-mangement/model/work-entry.model';
 
 @Component({
   selector: 'app-add-employee',
@@ -17,7 +19,7 @@ export class AddEmployee implements OnInit {
   @Input() employeeData: Employee = {} as Employee;
   @Output() employeeSaved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
-
+workTypes: WorkType[] = [];
   employeeForm!: FormGroup;
   saving: boolean = false;
 
@@ -32,14 +34,15 @@ export class AddEmployee implements OnInit {
   constructor(
     private fb: FormBuilder,
     private employeeService: EmployeeService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private workService: WorkManagementService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.fabricTypes = this.employeeService.getFabricTypes();
     this.bonusOptions = this.employeeService.getBonusOptions();
-
+    this.workTypes = this.workService.getWorkTypes();
     if (this.isEditMode && this.employeeData) {
       this.populateForm();
     }
@@ -50,6 +53,7 @@ export class AddEmployee implements OnInit {
       name: ['', Validators.required],
       salaryType: ['', Validators.required],
       fabricType: ['', Validators.required],
+      workType: ['', Validators.required],
       isBonused: [, Validators.required],
       advanceAmount: [0, [Validators.required, Validators.min(0)]],
       salary: [0, [Validators.min(0)]],
@@ -111,6 +115,7 @@ export class AddEmployee implements OnInit {
         name: formValue.name,
         salaryType: formValue.salaryType,
         fabricType: formValue.fabricType,
+        workType: formValue.workType,
         isBonused: formValue.isBonused,
         bonusAmount: formValue.bonusAmount ?? 0,
         advanceAmount: formValue.advanceAmount ?? 0,

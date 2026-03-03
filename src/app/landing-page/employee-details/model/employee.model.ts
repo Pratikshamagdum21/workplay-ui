@@ -9,6 +9,7 @@ export interface Employee {
   advanceRemaining: number;
   salaryType: 'WEEKLY' | 'MONTHLY' | 'WEEKLY_F';
   rate: number;
+  workType:string;
   advanceTaken: number;
   bonusEligible: boolean;
   clothDoneInMeter: number;
