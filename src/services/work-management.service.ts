@@ -79,7 +79,10 @@ export class WorkManagementService {
 
   addEntry(entry: Omit<WorkEntry, 'id' | 'createdAt'>): Observable<WorkEntry> {
     const branchId = this.branchService.getSelectedBranchSnapshot().id;
-    const payload = { ...entry, branchId, date: entry.date };
+    const date = entry.date instanceof Date
+      ? entry.date.toLocaleDateString('en-CA')
+      : entry.date;
+    const payload = { ...entry, branchId, date };
     return this.http.post<WorkEntry>(`${this.baseUrl}/saveWork`, payload).pipe(
       tap((saved) => {
         if (saved) {
