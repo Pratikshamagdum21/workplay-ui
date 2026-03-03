@@ -75,11 +75,15 @@ export class AddWorkForm implements OnInit, OnDestroy {
     this.saving = true;
     const formValue = this.workForm.value;
 
+    const date = formValue.date instanceof Date
+      ? formValue.date.toLocaleDateString('en-CA')
+      : formValue.date;
+
     const workEntry = {
       employeeName: formValue.employeeName,
       employeeType: formValue.employeeType,
       fabricMeters: formValue.fabricMeters,
-      date: formValue.date  
+      date: date
     };
 
     this.workService.addEntry(workEntry)
