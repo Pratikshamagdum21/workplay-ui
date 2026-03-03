@@ -7,11 +7,12 @@ import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { Subject, takeUntil } from 'rxjs';
 import { BranchService, Branch } from '../../services/branch.service';
+import { LoaderComponent } from '../../shared/loader/loader';
 
 @Component({
   selector: 'app-mobile-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, Toast, FormsModule, Select],
+  imports: [CommonModule, RouterOutlet, Toast, FormsModule, Select, LoaderComponent],
   templateUrl: './mobile-app.html',
   styleUrl: './mobile-app.scss',
 })

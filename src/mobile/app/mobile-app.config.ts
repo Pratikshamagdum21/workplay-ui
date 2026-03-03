@@ -11,6 +11,7 @@ import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { mobileRoutes } from './mobile-app.routes';
 import { httpErrorInterceptor } from '../../app/core/interceptors/http-error.interceptor';
+import { loadingInterceptor } from '../../app/core/interceptors/loading.interceptor';
 
 export const mobileAppConfig: ApplicationConfig = {
   providers: [
@@ -18,7 +19,7 @@ export const mobileAppConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(mobileRoutes),
-    provideHttpClient(withInterceptors([httpErrorInterceptor])),
+    provideHttpClient(withInterceptors([loadingInterceptor, httpErrorInterceptor])),
     MessageService,
     providePrimeNG({
       theme: {

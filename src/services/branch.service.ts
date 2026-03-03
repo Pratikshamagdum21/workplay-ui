@@ -37,12 +37,10 @@ export class BranchService {
       next: (branches) => {
         if (branches && branches.length > 0) {
           this.branchesSubject.next(branches);
-          // Keep the first branch as default if no branch was already selected
+          // Update selected branch reference to match the new branch list
           const current = this.selectedBranchSubject.value;
           const stillExists = branches.find(b => b.id === current.id);
-          if (!stillExists) {
-            this.selectedBranchSubject.next(branches[0]);
-          }
+          this.selectedBranchSubject.next(stillExists || branches[0]);
         }
       },
       error: () => {

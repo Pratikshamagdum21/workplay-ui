@@ -1,4 +1,5 @@
 <p-toast position="top-center" key="global"></p-toast>
+<app-loader></app-loader>
 
 <div class="mobile-app-container">
   <header class="mobile-header">
@@ -12,6 +13,7 @@
           [options]="branches"
           [(ngModel)]="selectedBranch"
           optionLabel="name"
+          dataKey="id"
           placeholder="Select Branch"
           (onChange)="onBranchChange($event)"
           styleClass="mobile-branch-dropdown">
