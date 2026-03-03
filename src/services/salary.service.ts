@@ -107,10 +107,10 @@ export class SalaryService {
         // Reload salary history from API to get complete data with all fields
         this.loadSalaryHistory(branchId);
         // Update employee advance balance
-        this.employeeService.updateAdvance(
-          payload.employeeId,
-          payload.advanceDeductedThisTime
-        ).subscribe();
+        // this.employeeService.updateAdvance(
+        //   payload.employeeId,
+        //   payload.advanceDeductedThisTime
+        // ).subscribe();
       })
     );
   }
@@ -122,10 +122,10 @@ export class SalaryService {
         // Reload salary history from API to get complete data with all fields
         this.loadSalaryHistory(branchId);
         // Update employee advance balance
-        this.employeeService.updateAdvance(
-          payload.employeeId,
-          payload.advanceDeductedThisTime
-        ).subscribe();
+        // this.employeeService.updateAdvance(
+        //   payload.employeeId,
+        //   payload.advanceDeductedThisTime
+        // ).subscribe();
       })
     );
   }

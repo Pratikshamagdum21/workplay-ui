@@ -78,7 +78,7 @@ export class EmployeeService {
   }
 
   updateEmployee(id: number, updates: Partial<Employee>): Observable<Employee> {
-    return this.http.patch<Employee>(`${this.baseUrl}/updateEmp/${id}`, updates).pipe(
+    return this.http.post<Employee>(`${this.baseUrl}/updateEmp/${id}`, updates).pipe(
       tap((updated) => {
         const employees = this.employeesSubject.value.map(e => e.id === id ? updated : e);
         this.employeesSubject.next(employees);

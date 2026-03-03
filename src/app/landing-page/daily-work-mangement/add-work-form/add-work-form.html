@@ -9,7 +9,7 @@
                     <label for="employeeName" class="required-label">
               <i class="pi pi-user"></i> Employee Name
             </label>
-                    <p-select id="employeeName" formControlName="employeeName" [options]="employees" optionLabel="name" optionValue="name" placeholder="Select Employee" [filter]="true" filterBy="name" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('employeeName')"
+                    <p-select id="employeeName" formControlName="employeeName" appendTo="body" [options]="employees" optionLabel="name" optionValue="name" placeholder="Select Employee" [filter]="true" filterBy="name" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('employeeName')"
                         [class.ng-dirty]="isFieldInvalid('employeeName')">
                     </p-select>
                     <small class="p-error" *ngIf="isFieldInvalid('employeeName')">
@@ -23,7 +23,7 @@
                         <label for="employeeType" class="required-label">
               <i class="pi pi-briefcase"></i> Work Type
             </label>
-                        <p-select id="employeeType" formControlName="employeeType" [options]="workTypes" optionLabel="name" optionValue="name" placeholder="Select Work Type" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('employeeType')" [class.ng-dirty]="isFieldInvalid('employeeType')">
+                        <p-select id="employeeType" appendTo="body" formControlName="employeeType" [options]="workTypes" optionLabel="name" optionValue="name" placeholder="Select Work Type" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('employeeType')" [class.ng-dirty]="isFieldInvalid('employeeType')">
                         </p-select>
                         <small class="p-error" *ngIf="isFieldInvalid('employeeType')">
               {{ getErrorMessage('employeeType') }}
@@ -36,7 +36,7 @@
                         <label for="employeeType" class="required-label">
               <i class="pi pi-briefcase"></i> Febric Type
             </label>
-                        <p-select id="fabricType" formControlName="fabricType" [options]="workTypes" optionLabel="name" optionValue="name" placeholder="Select Fabric Type" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('fabricType')" [class.ng-dirty]="isFieldInvalid('fabricType')">
+                        <p-select id="fabricType" appendTo="body" formControlName="fabricType" [options]="fabricTypes" optionLabel="name" optionValue="name" placeholder="Select Fabric Type" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('fabricType')" [class.ng-dirty]="isFieldInvalid('fabricType')">
                         </p-select>
                         <small class="p-error" *ngIf="isFieldInvalid('fabricType')">
               {{ getErrorMessage('fabricType') }}
@@ -51,7 +51,7 @@
                         <label for="fabricMeters" class="required-label">
               <i class="pi pi-chart-line"></i> Fabric (Meters)
             </label>
-                        <p-inputnumber id="fabricMeters" formControlName="fabricMeters" [min]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" placeholder="Enter meters" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('fabricMeters')"
+                        <p-inputnumber id="fabricMeters" formControlName="fabricMeters" appendTo="body" [min]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" placeholder="Enter meters" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('fabricMeters')"
                             [class.ng-dirty]="isFieldInvalid('fabricMeters')">
                         </p-inputnumber>
                         <small class="p-error" *ngIf="isFieldInvalid('fabricMeters')">
@@ -66,7 +66,7 @@
                         <label for="date" class="required-label">
               <i class="pi pi-calendar"></i> Date
             </label>
-                        <p-datepicker id="date" formControlName="date" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
+                        <p-datepicker id="date" formControlName="date" appendTo="body" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
                         </p-datepicker>
                         <small class="p-error" *ngIf="isFieldInvalid('date')">
               {{ getErrorMessage('date') }}

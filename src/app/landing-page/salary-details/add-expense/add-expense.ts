@@ -89,4 +89,8 @@ export class AddExpense implements OnInit {
       }
     });
   }
+
+  cancel(){
+    this.saved.emit();
+  }
 }

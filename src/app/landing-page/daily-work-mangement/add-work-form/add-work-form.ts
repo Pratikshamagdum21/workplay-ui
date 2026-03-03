@@ -5,6 +5,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { WorkManagementService } from '../../../../services/work-management.service';
 import { WorkType, Shift } from '../model/work-entry.model';
 import { SHARED_IMPORTS } from '../../../shared-imports';
+import { FabricType } from '../../employee-details/model/employee.model';
+import { EmployeeService } from '../../../../services/employee.service';
 
 @Component({
   selector: 'app-add-work-form',
@@ -19,6 +21,7 @@ export class AddWorkForm implements OnInit, OnDestroy {
   workForm!: FormGroup;
   employees: { id: string; name: string }[] = [];
   workTypes: WorkType[] = [];
+  fabricTypes: FabricType[] = [];
   shifts: Shift[] = [];
   saving = false;
 
@@ -27,7 +30,8 @@ export class AddWorkForm implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private workService: WorkManagementService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private employeeService: EmployeeService
   ) {}
 
   ngOnInit(): void {
@@ -51,6 +55,8 @@ export class AddWorkForm implements OnInit, OnDestroy {
 
   private loadMasterData(): void {
     // Load employees from the real EmployeeService via WorkManagementService
+    this.fabricTypes = this.employeeService.getFabricTypes();
+
     this.workService.getEmployeeNames()
       .pipe(takeUntil(this.destroy$))
       .subscribe(employees => {
