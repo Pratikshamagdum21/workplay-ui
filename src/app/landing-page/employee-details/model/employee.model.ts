@@ -7,7 +7,7 @@ export interface Employee {
   bonusAmount: number;
   advanceAmount: number;
   advanceRemaining: number;
-  salaryType: 'WEEKLY' | 'MONTHLY';
+  salaryType: 'WEEKLY' | 'MONTHLY' | 'WEEKLY_F';
   rate: number;
   advanceTaken: number;
   bonusEligible: boolean;

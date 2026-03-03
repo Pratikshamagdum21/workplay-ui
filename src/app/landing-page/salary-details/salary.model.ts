@@ -29,7 +29,7 @@ export interface MonthlySalaryPayload {
   id?: number;
   employeeId: number;
   employeeName?: string;
-  type: 'monthly';
+  type: 'monthly' | 'weekly_fixed' | 'weekly';
   salary: number;
   leaveDays: number;
   leaveDeductionPerDay: number;

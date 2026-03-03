@@ -202,7 +202,9 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
 
     if (this.employee.salaryType === 'WEEKLY') {
       this.initializeWeeklyForm();
-    } else {
+    } else if (this.employee.salaryType === 'WEEKLY_F') {
+        this.initializeWeeklyFixedForm();
+    }else{
       this.initializeMonthlyForm();
     }
   }
@@ -232,6 +234,22 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     this.salaryForm = this.fb.group({
       salary: [this.employee?.salary || 0, [Validators.required, Validators.min(1)]],
       leaveDays: [0, [Validators.required, Validators.min(0)]],
+      leaveDeductionPerDay: [0, [Validators.required, Validators.min(0)]],
+      advanceDeductedThisTime: [0, [Validators.required, Validators.min(0)]]
+    });
+
+    this.salaryForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.calculateMonthlySalary());
+
+    this.calculateMonthlySalary();
+  }
+
+  private initializeWeeklyFixedForm(): void {
+    this.salaryForm = this.fb.group({
+      salary: [this.employee?.salary || 0, [Validators.required, Validators.min(1)]],
+      leaveDays: [0, [Validators.required, Validators.min(0)]],
+      weekRange: [null, Validators.required],
       leaveDeductionPerDay: [0, [Validators.required, Validators.min(0)]],
       advanceDeductedThisTime: [0, [Validators.required, Validators.min(0)]]
     });
@@ -393,6 +411,8 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
 
     if (this.employee.salaryType === 'WEEKLY') {
       this.saveWeeklySalary();
+    } else if (this.employee.salaryType === 'WEEKLY_F') {
+      this.saveWeeklyFixedSalary();
     } else {
       this.saveMonthlySalary();
     }
@@ -491,6 +511,53 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
       });
   }
 
+  private saveWeeklyFixedSalary(): void {
+    if (!this.employee) return;
+
+    const formValue = this.salaryForm.value;
+    const advanceDeducted = formValue.advanceDeductedThisTime;
+
+    const payload: MonthlySalaryPayload = {
+      employeeId: this.employee.id,
+      employeeName: this.employee.name,
+      type: 'weekly_fixed',
+      salary: formValue.salary,
+      leaveDays: formValue.leaveDays,
+      leaveDeductionPerDay: formValue.leaveDeductionPerDay,
+      leaveDeductionTotal: this.leaveDeductionTotal,
+      bonus: this.autoBonus,
+      advanceTakenTotal: this.employee.advanceAmount,
+      advanceDeductedThisTime: advanceDeducted,
+      advanceRemaining: this.employee.advanceRemaining - advanceDeducted,
+      finalPay: this.finalPay,
+      createdAt: this.isEditMode ? this.salaryData.createdAt : new Date()
+    };
+
+    if (this.isEditMode && this.editSalaryId) {
+      payload.id = this.editSalaryId;
+    }
+
+    this.salaryService.saveMonthlySalary(payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: this.isEditMode ? 'Monthly salary updated successfully' : 'Monthly salary saved successfully',
+            life: 3000
+          });
+          this.saving = false;
+          this.saved.emit();
+          this.resetAfterSave();
+        },
+        error: () => {
+          this.saving = false;
+        }
+      });
+  }
+
+
   private resetAfterSave(): void {
     this.isEditMode = false;
     this.editSalaryId = null;
@@ -517,8 +584,11 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     return this.employee?.salaryType === 'WEEKLY';
   }
 
-  isMonthlyWorker(): boolean {
-    return this.employee?.salaryType === 'MONTHLY';
+    isMonthlyWorker(): boolean {
+      return this.employee?.salaryType === 'MONTHLY';
+    }
+  isWeeklyFixedWorker(): boolean {
+    return this.employee?.salaryType === 'WEEKLY_F';
   }
 
   formatCurrency(amount: number): string {

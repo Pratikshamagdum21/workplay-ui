@@ -14,7 +14,7 @@
                             <div class="employee-option">
                                 <div class="emp-name">{{ emp.name }}</div>
                                 <div class="emp-details">
-                                    <p-tag [value]="emp.salaryType === 'WEEKLY' ? 'Weekly' : 'Monthly'" [severity]="emp.salaryType === 'WEEKLY' ? 'success' : 'info'" styleClass="emp-type-tag">
+                                    <p-tag [value]="emp.salaryType === 'WEEKLY' ? 'Weekly(Meter Based)' : (emp.salaryType === 'MONTHLY' ? 'Monthly':'Weekly(Fixed)')" [severity]="emp.salaryType === 'WEEKLY' ? 'success' : 'info'" styleClass="emp-type-tag">
                                     </p-tag>
                                     <span class="emp-advance">Advance: {{ formatCurrency(emp.advanceRemaining) }}</span>
                                 </div>
@@ -30,7 +30,7 @@
                         <i class="pi pi-briefcase"></i> Salary Type
                     </label>
                     <div class="salary-type-display">
-                        <p-tag [value]="employee.salaryType === 'WEEKLY' ? 'Weekly (Meter-based)' : 'Monthly (Fixed)'" [severity]="employee.salaryType === 'WEEKLY' ? 'success' : 'info'" styleClass="salary-type-tag-large">
+                        <p-tag [value]="employee.salaryType === 'WEEKLY' ? 'Weekly(Meter Based)' : (employee.salaryType === 'MONTHLY' ? 'Monthly':'Weekly(Fixed)')" [severity]="employee.salaryType === 'WEEKLY' ? 'success' : 'info'" styleClass="salary-type-tag-large">
                         </p-tag>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
         <form [formGroup]="salaryForm" (ngSubmit)="onSubmit()">
             <div class="grid">
                 <!-- WEEKLY WORKER FORM -->
-                <ng-container *ngIf="isWeeklyWorker()">
+                <ng-container *ngIf="isWeeklyWorker() || isWeeklyFixedWorker()">
                     <!-- Week Range Selector -->
                     <div class="col-12">
                         <p-card header="Select Week Range" styleClass="section-card">
@@ -83,7 +83,7 @@
                     </div>
 
                     <!-- Rate Per Meter -->
-                    <div class="col-12 md:col-6">
+                    <div class="col-12 md:col-6" *ngIf="isWeeklyWorker()">
                         <p-card header="Rate Configuration" styleClass="section-card">
                             <div class="field">
                                 <label for="ratePerMeter" class="required-label">
@@ -96,7 +96,7 @@
                     </div>
 
                     <!-- Bonus (read-only, auto-calculated) -->
-                    <div class="col-12 md:col-6">
+                    <div class="col-12 md:col-6" *ngIf="isWeeklyWorker()">
                         <p-card header="Bonus" styleClass="section-card">
                             <div class="field">
                                 <label class="info-label">
@@ -117,7 +117,7 @@
                     </div>
 
                     <!-- Daily Meter Table -->
-                    <div class="col-12" *ngIf="meterDetailsArray && meterDetailsArray.length > 0">
+                    <div class="col-12" *ngIf="meterDetailsArray && meterDetailsArray.length > 0 && isWeeklyWorker()">
                         <p-card header="Daily Meter Details" styleClass="section-card">
                             <p-table [value]="meterDetailsArray.controls" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="400px">
                                 <ng-template pTemplate="header">
@@ -159,7 +159,7 @@
                 </ng-container>
 
                 <!-- MONTHLY WORKER FORM -->
-                <ng-container *ngIf="isMonthlyWorker()">
+                <ng-container *ngIf="isMonthlyWorker() || isWeeklyFixedWorker()">
                     <!-- Monthly Salary -->
                     <div class="col-12 md:col-6">
                         <p-card header="Monthly Salary" styleClass="section-card">
@@ -275,6 +275,11 @@
 
                             <div class="calc-row" *ngIf="isMonthlyWorker()">
                                 <span class="calc-label">Monthly Salary:</span>
+                                <span class="calc-value positive">{{ formatCurrency(salaryForm.get('salary')?.value || 0) }}</span>
+                            </div>
+
+                             <div class="calc-row" *ngIf="isWeeklyFixedWorker()">
+                                <span class="calc-label">Weekly Salary:</span>
                                 <span class="calc-value positive">{{ formatCurrency(salaryForm.get('salary')?.value || 0) }}</span>
                             </div>
 

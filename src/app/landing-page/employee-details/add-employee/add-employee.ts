@@ -26,7 +26,7 @@ export class AddEmployee implements OnInit {
   salaryTypes = [
     { label: 'Monthly (Fixed)', value: 'MONTHLY' },
     { label: 'Weekly (Per Meter)', value: 'WEEKLY' },
-    { label: 'Weekly (Fixed)', value: 'WEEKLY(Fix)' }
+    { label: 'Weekly (Fixed)', value: 'WEEKLY_F' }
   ];
 
   constructor(
@@ -169,7 +169,7 @@ export class AddEmployee implements OnInit {
 
   isWeeklyFixed(): boolean {
     const salaryType = this.employeeForm.get('salaryType')?.value;
-    return salaryType === 'WEEKLY(Fix)';
+    return salaryType === 'WEEKLY_F';
   }
 
   isBonus(): boolean {
