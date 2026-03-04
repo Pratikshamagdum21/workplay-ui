@@ -77,7 +77,7 @@ export class ViewEmployeeDetails implements OnChanges, OnInit, OnDestroy {
   }
 
   getSalaryTypeLabel(): string {
-    return this.employee?.salaryType === 'WEEKLY' ? 'Weekly (Per Meter)' : 'Monthly (Fixed)';
+    return this.employee?.salaryType === 'WEEKLY' ? 'Weekly (Per Meter)' :( this.employee?.salaryType === 'WEEKLY_F'?'Weekly (Fixed)':'Monthly (Fixed)');
   }
 
   formatCurrency(amount: number): string {

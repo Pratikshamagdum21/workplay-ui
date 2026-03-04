@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
 import { WorkManagementService } from '../../../../services/work-management.service';
-import { WorkType, Shift } from '../model/work-entry.model';
+import { WorkType, Shift, Employee } from '../model/work-entry.model';
 import { SHARED_IMPORTS } from '../../../shared-imports';
 import { FabricType } from '../../employee-details/model/employee.model';
 import { EmployeeService } from '../../../../services/employee.service';
@@ -17,7 +17,7 @@ import { EmployeeService } from '../../../../services/employee.service';
 })
 export class AddWorkForm implements OnInit, OnDestroy {
   @Output() entrySaved = new EventEmitter<void>();
-
+selectedEmp!:Employee;
   workForm!: FormGroup;
   employees: { id: string; name: string }[] = [];
   workTypes: WorkType[] = [];
@@ -48,6 +48,7 @@ export class AddWorkForm implements OnInit, OnDestroy {
     this.workForm = this.fb.group({
       employeeName: ['', Validators.required],
       employeeType: ['', Validators.required],
+      workType: ['', Validators.required],
       fabricMeters: [null, [Validators.required, Validators.min(1)]],
       date: [new Date(), Validators.required]
     });
@@ -57,15 +58,24 @@ export class AddWorkForm implements OnInit, OnDestroy {
     // Load employees from the real EmployeeService via WorkManagementService
     this.fabricTypes = this.employeeService.getFabricTypes();
 
-    this.workService.getEmployeeNames()
+    this.workService.getEmployees()
       .pipe(takeUntil(this.destroy$))
       .subscribe(employees => {
-        this.employees = employees;
+        this.employees = employees.filter(emp => emp.salaryType === 'WEEKLY');
       });
     this.workTypes = this.workService.getWorkTypes();
     this.shifts = this.workService.getShifts();
   }
 
+onEmployeeChange(event: any): void {
+  if (event) {
+      this.workForm.patchValue({
+        employeeName: event?.value.name,
+        employeeType: event?.value.salaryType,
+        workType: event?.value.workType
+      });
+    }
+}
   onSubmit(): void {
     if (this.workForm.invalid) {
       this.markFormGroupTouched(this.workForm);

@@ -80,6 +80,17 @@
                     </div>
                 </div>
             </div>
+            <div class="col-12 md:col-6" *ngIf="employee.salaryType === 'WEEKLY_F'">
+                <div class="financial-item">
+                    <div class="financial-icon salary-icon">
+                        <i class="pi pi-money-bill"></i>
+                    </div>
+                    <div class="financial-details">
+                        <span class="financial-label">Weekly Fixed Salary </span>
+                        <span class="financial-value salary">{{ formatCurrency(employee.salary) }}/m</span>
+                    </div>
+                </div>
+            </div>
 
             <div class="col-12 md:col-6">
                 <div class="financial-item">

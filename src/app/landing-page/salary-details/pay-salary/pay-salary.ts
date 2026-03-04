@@ -221,7 +221,7 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
   private initializeWeeklyForm(): void {
     this.salaryForm = this.fb.group({
       weekRange: [null, Validators.required],
-      ratePerMeter: [this.employee?.rate || 0, [Validators.required, Validators.min(1)]],
+      ratePerMeter: [this.employee?.rate || null, [Validators.required, Validators.min(1)]],
       meterDetails: this.fb.array([]),
       advanceDeductedThisTime: [0, [Validators.required, Validators.min(0)]]
     });

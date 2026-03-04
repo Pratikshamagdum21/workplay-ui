@@ -69,6 +69,11 @@ export class WorkManagementService {
     });
   }
 
+   getEmployees(): Observable<any[]> {
+      return this.employeeService.getEmployees();
+    }
+  
+
   getWorkTypes(): WorkType[] {
     return [...this.workTypes];
   }

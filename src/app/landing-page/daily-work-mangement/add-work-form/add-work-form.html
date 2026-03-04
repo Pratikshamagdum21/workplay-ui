@@ -9,7 +9,7 @@
                     <label for="employeeName" class="required-label">
               <i class="pi pi-user"></i> Employee Name
             </label>
-                    <p-select id="employeeName" formControlName="employeeName" appendTo="body" [options]="employees" optionLabel="name" optionValue="name" placeholder="Select Employee" [filter]="true" filterBy="name" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('employeeName')"
+                    <p-select id="employeeName" formControlName="employeeName" appendTo="body" [options]="employees" optionLabel="name" placeholder="Select Employee" [filter]="true" filterBy="name" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('employeeName')"
                         [class.ng-dirty]="isFieldInvalid('employeeName')">
                     </p-select>
                     <small class="p-error" *ngIf="isFieldInvalid('employeeName')">
@@ -20,13 +20,13 @@
                             <!-- Work Type -->
             <div class="col">
                     <div class="field">
-                        <label for="employeeType" class="required-label">
+                        <label for="workType" class="required-label">
               <i class="pi pi-briefcase"></i> Work Type
             </label>
-                        <p-select id="employeeType" appendTo="body" formControlName="employeeType" [options]="workTypes" optionLabel="name" optionValue="name" placeholder="Select Work Type" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('employeeType')" [class.ng-dirty]="isFieldInvalid('employeeType')">
+                        <p-select id="workType" appendTo="body" formControlName="workType" [options]="workTypes" optionLabel="name" optionValue="name" placeholder="Select Work Type" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('workType')" [class.ng-dirty]="isFieldInvalid('workType')">
                         </p-select>
-                        <small class="p-error" *ngIf="isFieldInvalid('employeeType')">
-              {{ getErrorMessage('employeeType') }}
+                        <small class="p-error" *ngIf="isFieldInvalid('workType')">
+              {{ getErrorMessage('workType') }}
             </small>
                     </div>
                 </div>

@@ -118,6 +118,7 @@ export class EmployeeService {
       .set('name', employee.name)
       .set('isBonused', employee.isBonused.toString())
       .set('fabricType', employee.fabricType)
+      .set('workType', employee.workType)
       .set('salary', employee.salary.toString())
       .set('bonusAmount', employee.bonusAmount.toString())
       .set('advanceAmount', employee.advanceAmount.toString())

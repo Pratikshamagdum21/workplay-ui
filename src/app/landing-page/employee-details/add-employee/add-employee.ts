@@ -57,7 +57,7 @@ workTypes: WorkType[] = [];
       isBonused: [, Validators.required],
       advanceAmount: [0, [Validators.required, Validators.min(0)]],
       salary: [0, [Validators.min(0)]],
-      rate: [0, [Validators.min(0)]],
+      rate: [, [Validators.min(0)]],
       clothDoneInMeter: [0]
     });
   }
@@ -68,6 +68,7 @@ workTypes: WorkType[] = [];
         name: this.employeeData.name,
         salaryType: this.employeeData.salaryType,
         fabricType: this.employeeData.fabricType,
+        workType: this.employeeData.workType,
         isBonused: this.employeeData.isBonused,
         bonusAmount: this.employeeData.bonusAmount,
         advanceAmount: this.employeeData.advanceAmount,
@@ -211,6 +212,7 @@ workTypes: WorkType[] = [];
       name: 'Employee Name',
       salaryType: 'Salary Type',
       fabricType: 'Fabric Type',
+      workType: 'Work Type',
       isBonused: 'Bonus Eligibility',
       bonusAmount: 'Bonus Amount',
       advanceAmount: 'Advance Amount',

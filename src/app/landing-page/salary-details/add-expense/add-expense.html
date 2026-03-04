@@ -5,7 +5,7 @@
                 <div class="p-fluid grid">
                     <div class="col-12 md:col-6">
                         <label class="required-label">Expense Type</label>
-                        <p-select [options]="expenseTypes" appendTo="body" formControlName="expenseType" placeholder="Select type">
+                        <p-select [options]="expenseTypes" appendTo="body" formControlName="expenseType" class="w-full" placeholder="Select type">
                         </p-select>
                         <!-- <small class="p-error" *ngIf="expenseForm?.controls?.expenseType?.touched && expenseForm?.controls?.expenseType?.invalid">
               Expense type is required

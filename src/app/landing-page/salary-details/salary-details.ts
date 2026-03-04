@@ -38,6 +38,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
   allExpenditures: Expenditure[] = [];
   filteredExpenditures: Expenditure[] = [];
   totalSalaryPaid: number = 0;
+  total_Year_end_Bonus:number = 0;
 
   filterOptions: FilterOption[] = [
     { label: 'All Time', value: 'all' },
