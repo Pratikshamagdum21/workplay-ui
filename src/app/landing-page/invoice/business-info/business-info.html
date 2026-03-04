@@ -1,0 +1,63 @@
+<div class="business-info-container">
+    <p-toast></p-toast>
+
+    <form [formGroup]="businessForm" (ngSubmit)="submit()">
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="businessName">Business Name *</label>
+                <input pInputText id="businessName" formControlName="businessName"
+                    placeholder="Enter business name" />
+                <small class="p-error" *ngIf="businessForm.get('businessName')?.touched && businessForm.get('businessName')?.hasError('required')">
+                    Business name is required
+                </small>
+            </div>
+            <div class="form-field">
+                <label for="ownerName">Owner Name *</label>
+                <input pInputText id="ownerName" formControlName="ownerName"
+                    placeholder="Enter owner name" />
+                <small class="p-error" *ngIf="businessForm.get('ownerName')?.touched && businessForm.get('ownerName')?.hasError('required')">
+                    Owner name is required
+                </small>
+            </div>
+            <div class="form-field full-width">
+                <label for="address">Address *</label>
+                <input pInputText id="address" formControlName="address"
+                    placeholder="Enter business address" />
+                <small class="p-error" *ngIf="businessForm.get('address')?.touched && businessForm.get('address')?.hasError('required')">
+                    Address is required
+                </small>
+            </div>
+            <div class="form-field">
+                <label for="gstin">GSTIN *</label>
+                <input pInputText id="gstin" formControlName="gstin"
+                    placeholder="Enter GSTIN" />
+                <small class="p-error" *ngIf="businessForm.get('gstin')?.touched && businessForm.get('gstin')?.hasError('required')">
+                    GSTIN is required
+                </small>
+            </div>
+            <div class="form-field">
+                <label for="state">State *</label>
+                <input pInputText id="state" formControlName="state"
+                    placeholder="Enter state" />
+                <small class="p-error" *ngIf="businessForm.get('state')?.touched && businessForm.get('state')?.hasError('required')">
+                    State is required
+                </small>
+            </div>
+            <div class="form-field">
+                <label for="phoneNumber">Phone Number *</label>
+                <input pInputText id="phoneNumber" formControlName="phoneNumber"
+                    placeholder="Enter phone number" />
+                <small class="p-error" *ngIf="businessForm.get('phoneNumber')?.touched && businessForm.get('phoneNumber')?.hasError('required')">
+                    Phone number is required
+                </small>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true"
+                (onClick)="cancel()"></p-button>
+            <p-button label="Save" icon="pi pi-check" severity="success"
+                type="submit"></p-button>
+        </div>
+    </form>
+</div>

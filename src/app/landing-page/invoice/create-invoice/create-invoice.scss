@@ -1,0 +1,142 @@
+.create-invoice-container {
+  padding: 0.5rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.business-info-summary {
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+
+    .info-item {
+      label {
+        display: block;
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-bottom: 0.15rem;
+      }
+
+      span {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.business-info-warning {
+  padding: 1rem;
+  border-radius: 6px;
+  background: var(--p-yellow-50);
+  color: var(--p-yellow-700);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    input,
+    :host ::ng-deep .p-inputnumber,
+    :host ::ng-deep .p-select,
+    :host ::ng-deep .p-datepicker {
+      width: 100%;
+    }
+  }
+}
+
+.amount-summary {
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid var(--p-surface-border);
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+
+    .summary-label {
+      font-weight: 500;
+    }
+
+    .summary-value {
+      font-weight: 600;
+      font-size: 1rem;
+
+      &.words {
+        font-size: 0.85rem;
+        font-weight: 500;
+        font-style: italic;
+        max-width: 60%;
+        text-align: right;
+      }
+    }
+
+    &.total-row {
+      .summary-label,
+      .summary-value {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--p-primary-color);
+      }
+    }
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--p-surface-border);
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .business-info-summary .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

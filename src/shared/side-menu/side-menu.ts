@@ -44,6 +44,11 @@ export class SideMenuComponent implements OnInit, OnDestroy {
       label: 'Daily Work Management',
       icon: 'pi pi-briefcase',
       routerLink: '/daily-work-management'
+    },
+    {
+      label: 'GST Invoices',
+      icon: 'pi pi-file-edit',
+      routerLink: '/invoices'
     }
   ];
 

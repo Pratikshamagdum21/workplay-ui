@@ -4,6 +4,7 @@ import { EmployeeDetails } from './landing-page/employee-details/employee-detail
 import { SalaryDetails } from './landing-page/salary-details/salary-details';
 import { CustomRate } from './landing-page/custom-rate/custom-rate';
 import { DailyWorkMangement } from './landing-page/daily-work-mangement/daily-work-mangement';
+import { InvoiceList } from './landing-page/invoice/invoice-list/invoice-list';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -13,6 +14,5 @@ export const routes: Routes = [
     { path: 'salary', component: SalaryDetails },
     { path: 'custom-rate', component: CustomRate },
     { path: 'daily-work-management', component: DailyWorkMangement },
-
-
+    { path: 'invoices', component: InvoiceList },
 ];

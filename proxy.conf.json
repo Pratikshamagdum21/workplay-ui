@@ -4,5 +4,29 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "info"
+  },
+  "/invoices": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "info"
+  },
+  "/customers": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "info"
+  },
+  "/fabric-qualities": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "info"
+  },
+  "/business-info": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "info"
   }
 }
