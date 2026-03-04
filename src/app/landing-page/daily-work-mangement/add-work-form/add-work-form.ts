@@ -67,22 +67,21 @@ selectedEmp!:Employee;
     this.shifts = this.workService.getShifts();
   }
 
-onEmployeeChange(event: any): void {
-  const emp = event?.value;
-  if (emp) {
-    this.workForm.patchValue({
-      employeeName: emp.name,
-      employeeType: emp.fabricType || '',
-      workType: emp.workType || ''
-    });
-    this.workForm.get('employeeType')?.disable();
-    this.workForm.get('workType')?.disable();
-  } else {
-    this.workForm.patchValue({ employeeType: '', workType: '' });
-    this.workForm.get('employeeType')?.enable();
-    this.workForm.get('workType')?.enable();
+  onEmployeeChange(event: any): void {
+    const emp = event?.value;
+    if (emp) {
+      this.workForm.patchValue({
+        employeeType: emp.fabricType || '',
+        workType: emp.workType || ''
+      });
+      this.workForm.get('employeeType')?.disable();
+      this.workForm.get('workType')?.disable();
+    } else {
+      this.workForm.patchValue({ employeeType: '', workType: '' });
+      this.workForm.get('employeeType')?.enable();
+      this.workForm.get('workType')?.enable();
+    }
   }
-}
   onSubmit(): void {
     if (this.workForm.invalid) {
       this.markFormGroupTouched(this.workForm);
@@ -103,7 +102,7 @@ onEmployeeChange(event: any): void {
       : formValue.date;
 
     const workEntry = {
-      employeeName: formValue.employeeName,
+      employeeName: formValue.employeeName?.name || formValue.employeeName,
       employeeType: formValue.employeeType,
       fabricMeters: formValue.fabricMeters,
       date: date
