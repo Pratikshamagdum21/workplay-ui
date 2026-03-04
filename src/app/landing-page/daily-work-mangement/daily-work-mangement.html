@@ -80,7 +80,7 @@
     <!-- Statistics Cards -->
     <div class="statistics-section">
         <div class="grid">
-            <div class="col-12 md:col-4">
+            <div class="col-12 md:col-3">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-list stat-icon"></i>
@@ -91,7 +91,7 @@
                     </div>
                 </p-card>
             </div>
-            <div class="col-12 md:col-4">
+            <div class="col-12 md:col-3">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-chart-line stat-icon"></i>
@@ -102,13 +102,24 @@
                     </div>
                 </p-card>
             </div>
-            <div class="col-12 md:col-4">
+            <div class="col-12 md:col-3">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-percentage stat-icon"></i>
                         <div class="stat-details">
                             <span class="stat-label">Average (m)</span>
                             <span class="stat-value">{{ getAverageFabricMeters() | number:'1.0-2' }}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 md:col-3">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <i class="pi pi-gift stat-icon" style="color: #22c55e;"></i>
+                        <div class="stat-details">
+                            <span class="stat-label">Total Year End Bonus</span>
+                            <span class="stat-value" style="font-size: 1rem;">{{ formatCurrency(totalYearEndBonus) }}</span>
                         </div>
                     </div>
                 </p-card>
