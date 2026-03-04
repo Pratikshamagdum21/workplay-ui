@@ -67,15 +67,21 @@ selectedEmp!:Employee;
     this.shifts = this.workService.getShifts();
   }
 
-onEmployeeChange(event: any): void {
-  if (event) {
+  onEmployeeChange(event: any): void {
+    const emp = event?.value;
+    if (emp) {
       this.workForm.patchValue({
-        employeeName: event?.value.name,
-        employeeType: event?.value.salaryType,
-        workType: event?.value.workType
+        employeeType: emp.fabricType || '',
+        workType: emp.workType || ''
       });
+      this.workForm.get('employeeType')?.disable();
+      this.workForm.get('workType')?.disable();
+    } else {
+      this.workForm.patchValue({ employeeType: '', workType: '' });
+      this.workForm.get('employeeType')?.enable();
+      this.workForm.get('workType')?.enable();
     }
-}
+  }
   onSubmit(): void {
     if (this.workForm.invalid) {
       this.markFormGroupTouched(this.workForm);
@@ -89,14 +95,14 @@ onEmployeeChange(event: any): void {
     }
 
     this.saving = true;
-    const formValue = this.workForm.value;
+    const formValue = this.workForm.getRawValue();
 
     const date = formValue.date instanceof Date
       ? formValue.date.toLocaleDateString('en-CA')
       : formValue.date;
 
     const workEntry = {
-      employeeName: formValue.employeeName,
+      employeeName: formValue.employeeName?.name || formValue.employeeName,
       employeeType: formValue.employeeType,
       fabricMeters: formValue.fabricMeters,
       date: date
@@ -129,6 +135,8 @@ onEmployeeChange(event: any): void {
   }
 
   resetForm(): void {
+    this.workForm.get('employeeType')?.enable();
+    this.workForm.get('workType')?.enable();
     this.workForm.reset({ date: new Date() });
   }
 

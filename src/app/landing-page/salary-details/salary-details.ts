@@ -90,6 +90,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
           this.employees = employees;
           this.filteredEmployees = employees;
           this.loading = false;
+          this.calculateTotalYearEndBonus();
         },
         error: () => {
           this.loading = false;
@@ -104,6 +105,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
         this.allSalaryHistory = history as any[];
         this.filteredsalary = [...this.allSalaryHistory];
         this.totalSalaryPaid = this.filteredsalary.reduce((sum, p) => sum + p.finalPay, 0);
+        this.calculateTotalYearEndBonus();
       });
   }
 
@@ -175,7 +177,21 @@ export class SalaryDetails implements OnInit, OnDestroy {
   }
 
   getTotalFabricMeters(): number {
-    return 1000;
+    return this.filteredsalary.reduce((sum, record) => sum + (record.totalMeters || 0), 0);
+  }
+
+  private calculateTotalYearEndBonus(): void {
+    this.total_Year_end_Bonus = this.employees
+      .filter(emp => !emp.isBonused)
+      .reduce((sum, emp) => sum + this.getYearEndBonus(emp), 0);
+  }
+
+  getUniqueSalaryTypes(): string[] {
+    return [...new Set(this.filteredsalary.map((r: any) => r.type as string))];
+  }
+
+  getUniqueExpenseTypes(): string[] {
+    return [...new Set(this.filteredExpenditures.map(e => e.expenseType))];
   }
 
   private getFilterDateRange(): { start: Date; end: Date } | null {

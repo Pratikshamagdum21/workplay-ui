@@ -60,18 +60,18 @@
     <!-- Statistics Cards -->
     <div class="statistics-section">
         <div class="grid">
-            <div class="col-12 md:col-4">
+            <div class="col-12 md:col-3">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-gift stat-icon" style="color: #22c55e;"></i>
                         <div class="stat-details">
                             <span class="stat-label">Total Year End Bonus Amount</span>
-                            <span class="stat-value">{{ getBonusedCount() }}</span>
+                            <span class="stat-value" style="font-size: 1rem;">{{ formatCurrency(total_Year_end_Bonus) }}</span>
                         </div>
                     </div>
                 </p-card>
             </div>
-            <div class="col-12 md:col-4">
+            <div class="col-12 md:col-3">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-money-bill stat-icon" style="color: #6366f1;"></i>
@@ -82,7 +82,18 @@
                     </div>
                 </p-card>
             </div>
-            <div class="col-12 md:col-4">
+            <div class="col-12 md:col-3">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <i class="pi pi-chart-line stat-icon" style="color: #f59e0b;"></i>
+                        <div class="stat-details">
+                            <span class="stat-label">Total Meters</span>
+                            <span class="stat-value">{{ getTotalFabricMeters() }}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-12 md:col-3">
                 <p-card styleClass="stat-card">
                     <div class="stat-content">
                         <i class="pi pi-wallet stat-icon" style="color: #ef4444;"></i>
@@ -107,9 +118,15 @@
                         Employee Name
                         <p-sortIcon field="name"></p-sortIcon>
                     </th>
-                    <th pSortableColumn="salaryType">
+                    <th pSortableColumn="type">
                         Salary Type
-                        <p-sortIcon field="salaryType"></p-sortIcon>
+                        <p-sortIcon field="type"></p-sortIcon>
+                        <p-columnFilter field="type" matchMode="equals" [showMenu]="false">
+                            <ng-template pTemplate="filter" let-value let-filterCallback="filterCallback">
+                                <p-select [ngModel]="value" [options]="getUniqueSalaryTypes()" placeholder="All" (onChange)="filterCallback($event.value)" [showClear]="true" styleClass="w-full">
+                                </p-select>
+                            </ng-template>
+                        </p-columnFilter>
                     </th>
                     <th>Salary Paid</th>
                     <th>Total Meter</th>
@@ -179,7 +196,15 @@
             <ng-template pTemplate="header">
                 <tr>
                     <th style="width: 20%">Date</th>
-                    <th style="width: 25%">Expense Type</th>
+                    <th style="width: 25%">
+                        Expense Type
+                        <p-columnFilter field="expenseType" matchMode="equals" [showMenu]="false">
+                            <ng-template pTemplate="filter" let-value let-filterCallback="filterCallback">
+                                <p-select [ngModel]="value" [options]="getUniqueExpenseTypes()" placeholder="All" (onChange)="filterCallback($event.value)" [showClear]="true" styleClass="w-full">
+                                </p-select>
+                            </ng-template>
+                        </p-columnFilter>
+                    </th>
                     <th style="width: 25%" class="text-right">Amount</th>
                     <th style="width: 20%">Note</th>
                     <th style="width: 10%" class="text-center">Actions</th>
