@@ -39,9 +39,14 @@
         gap: 0.5rem;
         justify-content: flex-end;
         margin-top: 0.25rem;
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
+            flex-direction: column;
             p-button {
                 width: 100%;
+                ::ng-deep .p-button {
+                    width: 100%;
+                    justify-content: center;
+                }
             }
         }
     }

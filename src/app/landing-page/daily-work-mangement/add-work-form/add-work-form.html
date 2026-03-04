@@ -2,78 +2,78 @@
     <p-toast></p-toast>
     <form [formGroup]="workForm" (ngSubmit)="onSubmit()">
         <div class="grid">
-            <div class="flex">
             <!-- Employee Name -->
-            <div class="col">
+            <div class="col-12 md:col-4">
                 <div class="field">
                     <label for="employeeName" class="required-label">
-              <i class="pi pi-user"></i> Employee Name
-            </label>
+                        <i class="pi pi-user"></i> Employee Name
+                    </label>
                     <p-select id="employeeName" formControlName="employeeName" appendTo="body" [options]="employees" optionLabel="name" placeholder="Select Employee" [filter]="true" filterBy="name" [showClear]="true" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('employeeName')"
                         [class.ng-dirty]="isFieldInvalid('employeeName')" (onChange)="onEmployeeChange($event)">
                     </p-select>
                     <small class="p-error" *ngIf="isFieldInvalid('employeeName')">
-              {{ getErrorMessage('employeeName') }}
-            </small>
+                        {{ getErrorMessage('employeeName') }}
+                    </small>
                 </div>
             </div>
-                            <!-- Work Type -->
-            <div class="col">
-                    <div class="field">
-                        <label for="workType" class="required-label">
-              <i class="pi pi-briefcase"></i> Work Type
-            </label>
-                        <p-select id="workType" appendTo="body" formControlName="workType" [options]="workTypes" optionLabel="name" optionValue="name" placeholder="Select Work Type" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('workType')" [class.ng-dirty]="isFieldInvalid('workType')">
-                        </p-select>
-                        <small class="p-error" *ngIf="isFieldInvalid('workType')">
-              {{ getErrorMessage('workType') }}
-            </small>
-                    </div>
-                </div>
-                <!-- Febric Type -->
-                <div class="col">
-                    <div class="field">
-                        <label for="employeeType" class="required-label">
-              <i class="pi pi-briefcase"></i> Febric Type
-            </label>
-                        <p-select id="employeeType" appendTo="body" formControlName="employeeType" [options]="fabricTypes" optionLabel="name" optionValue="name" placeholder="Select Fabric Type" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('employeeType')" [class.ng-dirty]="isFieldInvalid('employeeType')">
-                        </p-select>
-                        <small class="p-error" *ngIf="isFieldInvalid('employeeType')">
-              {{ getErrorMessage('employeeType') }}
-            </small>
-                    </div>
-                </div>
-            </div>
-            <div class="flex gap-3">
-                <!-- Fabric Meters -->
-                <div class="col-12 md:col-6">
-                    <div class="field">
-                        <label for="fabricMeters" class="required-label">
-              <i class="pi pi-chart-line"></i> Fabric (Meters)
-            </label>
-                        <p-inputnumber id="fabricMeters" formControlName="fabricMeters" appendTo="body" [min]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" placeholder="Enter meters" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('fabricMeters')"
-                            [class.ng-dirty]="isFieldInvalid('fabricMeters')">
-                        </p-inputnumber>
-                        <small class="p-error" *ngIf="isFieldInvalid('fabricMeters')">
-              {{ getErrorMessage('fabricMeters') }}
-            </small>
-                    </div>
-                </div>
 
-                <!-- Date -->
-                <div class="col-12 md:col-6">
-                    <div class="field">
-                        <label for="date" class="required-label">
-              <i class="pi pi-calendar"></i> Date
-            </label>
-                        <p-datepicker id="date" formControlName="date" appendTo="body" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
-                        </p-datepicker>
-                        <small class="p-error" *ngIf="isFieldInvalid('date')">
-              {{ getErrorMessage('date') }}
-            </small>
-                    </div>
+            <!-- Work Type -->
+            <div class="col-12 md:col-4">
+                <div class="field">
+                    <label for="workType" class="required-label">
+                        <i class="pi pi-briefcase"></i> Work Type
+                    </label>
+                    <p-select id="workType" appendTo="body" formControlName="workType" [options]="workTypes" optionLabel="name" optionValue="name" placeholder="Select Work Type" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('workType')" [class.ng-dirty]="isFieldInvalid('workType')">
+                    </p-select>
+                    <small class="p-error" *ngIf="isFieldInvalid('workType')">
+                        {{ getErrorMessage('workType') }}
+                    </small>
                 </div>
             </div>
+
+            <!-- Fabric Type -->
+            <div class="col-12 md:col-4">
+                <div class="field">
+                    <label for="employeeType" class="required-label">
+                        <i class="pi pi-briefcase"></i> Fabric Type
+                    </label>
+                    <p-select id="employeeType" appendTo="body" formControlName="employeeType" [options]="fabricTypes" optionLabel="name" optionValue="name" placeholder="Select Fabric Type" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('employeeType')" [class.ng-dirty]="isFieldInvalid('employeeType')">
+                    </p-select>
+                    <small class="p-error" *ngIf="isFieldInvalid('employeeType')">
+                        {{ getErrorMessage('employeeType') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Fabric Meters -->
+            <div class="col-12 md:col-6">
+                <div class="field">
+                    <label for="fabricMeters" class="required-label">
+                        <i class="pi pi-chart-line"></i> Fabric (Meters)
+                    </label>
+                    <p-inputnumber id="fabricMeters" formControlName="fabricMeters" appendTo="body" [min]="1" [showButtons]="true" buttonLayout="horizontal" incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus" placeholder="Enter meters" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('fabricMeters')"
+                        [class.ng-dirty]="isFieldInvalid('fabricMeters')">
+                    </p-inputnumber>
+                    <small class="p-error" *ngIf="isFieldInvalid('fabricMeters')">
+                        {{ getErrorMessage('fabricMeters') }}
+                    </small>
+                </div>
+            </div>
+
+            <!-- Date -->
+            <div class="col-12 md:col-6">
+                <div class="field">
+                    <label for="date" class="required-label">
+                        <i class="pi pi-calendar"></i> Date
+                    </label>
+                    <p-datepicker id="date" formControlName="date" appendTo="body" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
+                    </p-datepicker>
+                    <small class="p-error" *ngIf="isFieldInvalid('date')">
+                        {{ getErrorMessage('date') }}
+                    </small>
+                </div>
+            </div>
+
             <!-- Action Buttons -->
             <div class="col-12">
                 <div class="button-group">
