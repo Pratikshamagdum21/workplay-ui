@@ -4,9 +4,6 @@ import { Subject, takeUntil } from 'rxjs';
 import { WorkManagementService } from '../../../services/work-management.service';
 import { BranchService } from '../../../services/branch.service';
 import { ExpenditureService, Expenditure } from '../../../services/expenditure.service';
-import { SalaryService } from '../../../services/salary.service';
-import { EmployeeService } from '../../../services/employee.service';
-import { Employee } from '../employee-details/model/employee.model';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { SHARED_IMPORTS } from '../../shared-imports';
 import { AddWorkForm } from './add-work-form/add-work-form';
@@ -23,10 +20,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   workEntries: WorkEntry[] = [];
   filteredEntries: WorkEntry[] = [];
   expenditures: Expenditure[] = [];
-  employees: Employee[] = [];
   loading: boolean = false;
-  totalYearEndBonus: number = 0;
-  currentYear = new Date().getFullYear();
 
   // Filter properties
   fromDate: Date | null = null;
@@ -46,8 +40,6 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
     private workService: WorkManagementService,
     private branchService: BranchService,
     private expenditureService: ExpenditureService,
-    private salaryService: SalaryService,
-    private employeeService: EmployeeService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {}
@@ -55,21 +47,12 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadWorkEntries();
     this.loadExpenditures();
-    this.loadEmployeesAndBonus();
 
     // Reload when branch changes
     this.branchService.getSelectedBranch()
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.clearFilters(false);
-        this.loadEmployeesAndBonus();
-      });
-
-    // Recalculate bonus when salary history changes
-    this.salaryService.getSalaryHistory()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.calculateTotalYearEndBonus();
       });
   }
 
@@ -289,23 +272,5 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
       currency: 'INR',
       minimumFractionDigits: 0
     }).format(amount);
-  }
-
-  private loadEmployeesAndBonus(): void {
-    this.employeeService.getEmployees()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(employees => {
-        this.employees = employees;
-        this.calculateTotalYearEndBonus();
-      });
-  }
-
-  private calculateTotalYearEndBonus(): void {
-    this.totalYearEndBonus = this.employees
-      .filter(emp => !emp.isBonused)
-      .reduce((sum, emp) => {
-        const yearTotal = this.salaryService.getEmployeeYearSalary(emp.id, this.currentYear);
-        return sum + this.salaryService.calculateYearEndBonus(yearTotal);
-      }, 0);
   }
 }
