@@ -112,6 +112,7 @@
                         <p-sortIcon field="salaryType"></p-sortIcon>
                     </th>
                     <th>Salary Paid</th>
+                    <th>Total Meter</th>
                     <th pSortableColumn="advanceTaken" class="text-right">
                         Advance Deducted This Time
                         <p-sortIcon field="advanceTaken"></p-sortIcon>
@@ -135,6 +136,11 @@
                     <td>
                         <span  class="rate-info">
                             {{ formatCurrency(employee.finalPay) }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="meter-info">
+                            {{ employee.totalMeters? employee.totalMeters + ' m' : 'NA' }}
                         </span>
                     </td>
                     <td class="text-right">
