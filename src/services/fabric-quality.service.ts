@@ -38,6 +38,23 @@ export class FabricQualityService {
     );
   }
 
+  updateQuality(id: number, quality: Partial<FabricQuality>): Observable<FabricQuality> {
+    return this.http.put<FabricQuality>(`${this.baseUrl}/${id}`, quality).pipe(
+      tap((updated) => {
+        const qualities = this.qualitiesSubject.value.map(q => q.id === id ? updated : q);
+        this.qualitiesSubject.next(qualities);
+      })
+    );
+  }
+
+  deleteQuality(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+      tap(() => {
+        this.qualitiesSubject.next(this.qualitiesSubject.value.filter(q => q.id !== id));
+      })
+    );
+  }
+
   refreshQualities(): void {
     this.loadQualities();
   }

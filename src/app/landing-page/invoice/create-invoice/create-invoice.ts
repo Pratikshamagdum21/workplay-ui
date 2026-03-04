@@ -9,13 +9,12 @@ import { CustomerService } from '../../../../services/customer.service';
 import { FabricQualityService } from '../../../../services/fabric-quality.service';
 import { BusinessInfoService } from '../../../../services/business-info.service';
 import { AddCustomer } from '../add-customer/add-customer';
-import { AddFabricQuality } from '../add-fabric-quality/add-fabric-quality';
 import { BusinessInfoConfig } from '../business-info/business-info';
 
 @Component({
   selector: 'app-create-invoice',
   standalone: true,
-  imports: [...SHARED_IMPORTS, AddCustomer, AddFabricQuality, BusinessInfoConfig],
+  imports: [...SHARED_IMPORTS, AddCustomer, BusinessInfoConfig],
   providers: [MessageService],
   templateUrl: './create-invoice.html',
   styleUrl: './create-invoice.scss'
@@ -32,7 +31,6 @@ export class CreateInvoice implements OnInit, OnDestroy {
   selectedQuality: FabricQuality | null = null;
 
   displayAddCustomerDialog = false;
-  displayAddFabricQualityDialog = false;
   displayBusinessInfoDialog = false;
 
   private destroy$ = new Subject<void>();
@@ -156,19 +154,6 @@ export class CreateInvoice implements OnInit, OnDestroy {
   onCustomerAdded(): void {
     this.displayAddCustomerDialog = false;
     this.customerService.refreshCustomers();
-  }
-
-  openAddFabricQualityDialog(): void {
-    this.displayAddFabricQualityDialog = true;
-  }
-
-  closeAddFabricQualityDialog(): void {
-    this.displayAddFabricQualityDialog = false;
-  }
-
-  onFabricQualityAdded(): void {
-    this.displayAddFabricQualityDialog = false;
-    this.fabricQualityService.refreshQualities();
   }
 
   openBusinessInfoDialog(): void {

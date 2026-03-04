@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { SHARED_IMPORTS } from '../../../shared-imports';
+import { Customer } from '../model/invoice.model';
 import { CustomerService } from '../../../../services/customer.service';
 
 @Component({
@@ -12,23 +13,27 @@ import { CustomerService } from '../../../../services/customer.service';
   templateUrl: './add-customer.html',
   styleUrl: './add-customer.scss'
 })
-export class AddCustomer {
+export class AddCustomer implements OnInit {
+  @Input() isEditMode = false;
+  @Input() customerData: Customer | null = null;
   @Output() customerSaved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 
-  customerForm: FormGroup;
+  customerForm!: FormGroup;
 
   constructor(
     private fb: FormBuilder,
     private customerService: CustomerService,
     private messageService: MessageService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     this.customerForm = this.fb.group({
-      name: ['', Validators.required],
-      address: [''],
-      contactNumber: [''],
-      gstin: [''],
-      state: ['']
+      name: [this.customerData?.name || '', Validators.required],
+      address: [this.customerData?.address || ''],
+      contactNumber: [this.customerData?.contactNumber || ''],
+      gstin: [this.customerData?.gstin || ''],
+      state: [this.customerData?.state || '']
     });
   }
 
@@ -38,22 +43,28 @@ export class AddCustomer {
       return;
     }
 
-    this.customerService.addCustomer(this.customerForm.value).subscribe({
+    const operation = this.isEditMode && this.customerData
+      ? this.customerService.updateCustomer(this.customerData.id, this.customerForm.value)
+      : this.customerService.addCustomer(this.customerForm.value);
+
+    operation.subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Customer added successfully',
+          detail: this.isEditMode ? 'Customer updated successfully' : 'Customer added successfully',
           life: 3000
         });
         this.customerSaved.emit();
-        this.customerForm.reset();
+        if (!this.isEditMode) {
+          this.customerForm.reset();
+        }
       },
       error: () => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to add customer',
+          detail: this.isEditMode ? 'Failed to update customer' : 'Failed to add customer',
           life: 3000
         });
       }

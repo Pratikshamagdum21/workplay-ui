@@ -5,11 +5,13 @@ import { SHARED_IMPORTS } from '../../../shared-imports';
 import { Invoice } from '../model/invoice.model';
 import { InvoiceService } from '../../../../services/invoice.service';
 import { CreateInvoice } from '../create-invoice/create-invoice';
+import { ManageCustomers } from '../manage-customers/manage-customers';
+import { ManageFabricQualities } from '../manage-fabric-qualities/manage-fabric-qualities';
 
 @Component({
   selector: 'app-invoice-list',
   standalone: true,
-  imports: [...SHARED_IMPORTS, CreateInvoice],
+  imports: [...SHARED_IMPORTS, CreateInvoice, ManageCustomers, ManageFabricQualities],
   providers: [MessageService],
   templateUrl: './invoice-list.html',
   styleUrl: './invoice-list.scss'
@@ -19,6 +21,7 @@ export class InvoiceList implements OnInit, OnDestroy {
   selectedInvoices: Invoice[] = [];
   loading = false;
   displayCreateDialog = false;
+  activeTab: string = '0';
 
   first = 0;
   rows = 10;

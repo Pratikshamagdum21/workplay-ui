@@ -38,6 +38,23 @@ export class CustomerService {
     );
   }
 
+  updateCustomer(id: number, customer: Partial<Customer>): Observable<Customer> {
+    return this.http.put<Customer>(`${this.baseUrl}/${id}`, customer).pipe(
+      tap((updated) => {
+        const customers = this.customersSubject.value.map(c => c.id === id ? updated : c);
+        this.customersSubject.next(customers);
+      })
+    );
+  }
+
+  deleteCustomer(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
+      tap(() => {
+        this.customersSubject.next(this.customersSubject.value.filter(c => c.id !== id));
+      })
+    );
+  }
+
   refreshCustomers(): void {
     this.loadCustomers();
   }

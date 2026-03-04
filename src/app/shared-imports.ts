@@ -29,6 +29,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { PanelMenuModule } from 'primeng/panelmenu';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
+import { TabsModule } from 'primeng/tabs';
 
 export const SHARED_IMPORTS = [
     // Angular
@@ -67,6 +68,9 @@ export const SHARED_IMPORTS = [
     MenubarModule,
     MenuModule,
     ToolbarModule,
+
+    // PrimeNG Navigation
+    TabsModule,
 
     // PrimeNG Misc
     ProgressSpinnerModule,

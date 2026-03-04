@@ -38,7 +38,7 @@
         <div class="form-actions">
             <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true"
                 (onClick)="cancel()"></p-button>
-            <p-button label="Save Quality" icon="pi pi-check" severity="success"
+            <p-button [label]="isEditMode ? 'Update Quality' : 'Save Quality'" icon="pi pi-check" severity="success"
                 type="submit"></p-button>
         </div>
     </form>
