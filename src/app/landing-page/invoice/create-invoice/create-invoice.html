@@ -105,7 +105,11 @@
         <p-divider></p-divider>
 
         <!-- Fabric Quality Section -->
-        <h3><i class="pi pi-box"></i> Fabric Quality</h3>
+        <div class="section-header">
+            <h3><i class="pi pi-box"></i> Fabric Quality</h3>
+            <p-button label="Add Fabric Quality" icon="pi pi-plus" [text]="true" severity="success"
+                (onClick)="openAddFabricQualityDialog()"></p-button>
+        </div>
         <div class="form-grid">
             <div class="form-field full-width">
                 <label for="qualitySelect">Select Fabric Quality *</label>
@@ -212,6 +216,17 @@
             (customerSaved)="onCustomerAdded()"
             (cancelled)="closeAddCustomerDialog()">
         </app-add-customer>
+    </p-dialog>
+
+    <!-- Add Fabric Quality Dialog -->
+    <p-dialog header="Add New Fabric Quality" [(visible)]="displayAddFabricQualityDialog" [modal]="true"
+        [style]="{ width: '45vw' }"
+        [breakpoints]="{ '960px': '70vw', '640px': '100vw' }"
+        [draggable]="false" [resizable]="false" appendTo="body">
+        <app-add-fabric-quality
+            (qualitySaved)="onFabricQualityAdded()"
+            (cancelled)="closeAddFabricQualityDialog()">
+        </app-add-fabric-quality>
     </p-dialog>
 
     <!-- Business Info Dialog -->

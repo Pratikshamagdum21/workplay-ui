@@ -1,0 +1,45 @@
+<div class="add-fabric-quality-container">
+    <p-toast></p-toast>
+
+    <form [formGroup]="qualityForm" (ngSubmit)="submit()">
+        <div class="form-grid">
+            <div class="form-field full-width">
+                <label for="name">Quality Name *</label>
+                <input pInputText id="name" formControlName="name" placeholder="Enter fabric quality name" />
+                <small class="p-error" *ngIf="qualityForm.get('name')?.touched && qualityForm.get('name')?.hasError('required')">
+                    Quality name is required
+                </small>
+            </div>
+            <div class="form-field">
+                <label for="width">Width *</label>
+                <input pInputText id="width" formControlName="width" placeholder="Enter width" />
+                <small class="p-error" *ngIf="qualityForm.get('width')?.touched && qualityForm.get('width')?.hasError('required')">
+                    Width is required
+                </small>
+            </div>
+            <div class="form-field">
+                <label for="fani">Fani</label>
+                <input pInputText id="fani" formControlName="fani" placeholder="Enter fani" />
+            </div>
+            <div class="form-field">
+                <label for="peak">Peak</label>
+                <input pInputText id="peak" formControlName="peak" placeholder="Enter peak" />
+            </div>
+            <div class="form-field">
+                <label for="warp">Warp</label>
+                <input pInputText id="warp" formControlName="warp" placeholder="Enter warp" />
+            </div>
+            <div class="form-field">
+                <label for="weft">Weft</label>
+                <input pInputText id="weft" formControlName="weft" placeholder="Enter weft" />
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true"
+                (onClick)="cancel()"></p-button>
+            <p-button label="Save Quality" icon="pi pi-check" severity="success"
+                type="submit"></p-button>
+        </div>
+    </form>
+</div>
