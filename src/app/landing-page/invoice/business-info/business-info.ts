@@ -45,7 +45,7 @@ export class BusinessInfoConfig implements OnInit {
 
     const formVal = this.businessForm.value;
     const info: BusinessInfo = {
-      id: this.businessInfo?.id || 0,
+      id: this.businessInfo?.id || null,
       ...formVal
     };
 
