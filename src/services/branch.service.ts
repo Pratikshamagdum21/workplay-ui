@@ -65,7 +65,7 @@ export class BranchService {
     this.selectedBranchSubject.next(branch);
   }
 
-  clearAllData(): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/clearAllData`);
+  clearAllData(): Observable<string> {
+    return this.http.delete<string>(`${this.baseUrl}/clearAllData`);
   }
 }
