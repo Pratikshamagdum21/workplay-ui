@@ -127,6 +127,10 @@
     <p-button label="Employees" icon="pi pi-users" (onClick)="goTo('/employee')" />
     <p-button label="Daily Work" icon="pi pi-briefcase" severity="secondary" (onClick)="goTo('/daily-work-management')" />
     <p-button label="Salary" icon="pi pi-dollar" severity="success" (onClick)="goTo('/salary')" />
+    <p-button label="Clear All Data" icon="pi pi-trash" severity="danger" (onClick)="confirmClearData($event)" />
   </div>
+
+  <p-toast />
+  <p-confirmDialog />
 
 </div>

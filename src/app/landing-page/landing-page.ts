@@ -4,18 +4,24 @@ import { Subject, takeUntil } from 'rxjs';
 import { SHARED_IMPORTS } from '../shared-imports';
 import { EmployeeService } from '../../services/employee.service';
 import { WorkManagementService } from '../../services/work-management.service';
+import { BranchService } from '../../services/branch.service';
 import { Employee } from './employee-details/model/employee.model';
 import { WorkEntry } from './daily-work-mangement/model/work-entry.model';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-landing-page',
   imports: [...SHARED_IMPORTS],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.scss',
+  providers: [ConfirmationService, MessageService],
 })
 export class LandingPage implements OnInit, OnDestroy {
   private employeeService = inject(EmployeeService);
   private workService = inject(WorkManagementService);
+  private branchService = inject(BranchService);
+  private confirmationService = inject(ConfirmationService);
+  private messageService = inject(MessageService);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
 
@@ -75,5 +81,33 @@ export class LandingPage implements OnInit, OnDestroy {
 
   goTo(path: string): void {
     this.router.navigate([path]);
+  }
+
+  confirmClearData(event: Event): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Are you sure you want to clear all data? This action cannot be undone.',
+      header: 'Clear All Data',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.branchService.clearAllData().subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'All data has been cleared successfully.',
+            });
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to clear data. Please try again.',
+            });
+          },
+        });
+      },
+    });
   }
 }
