@@ -16,6 +16,7 @@ export interface Expenditure {
   id?:string;
   branchId?:number;
   note: string;
+  receiptIds?: string[];
 }
 
 @Injectable({
@@ -114,6 +115,10 @@ export class ExpenditureService {
     })
   );
 }
+
+  getReceiptImageUrl(receiptId: string): string {
+    return `${this.baseUrl}/receipt/${receiptId}`;
+  }
 
   getAllExpenditures(): Observable<Expenditure[]> {
     return this.expenditures$;

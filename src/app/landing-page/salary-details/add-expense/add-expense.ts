@@ -22,6 +22,7 @@ export class AddExpense implements OnInit, OnChanges {
 
   selectedReceiptFiles: File[] = [];
   receiptPreviewUrls: string[] = [];
+  existingReceiptUrls: string[] = [];
   receiptError: string | null = null;
   showImageViewer: boolean = false;
   imageZoom: number = 1;
@@ -79,10 +80,21 @@ export class AddExpense implements OnInit, OnChanges {
         date: new Date(this.expenseData.date),
         note: this.expenseData.note || ''
       });
+      this.clearReceipt();
+      this.loadExistingReceipts();
     } else {
       this.isEditMode = false;
       this.expenseForm.reset({ date: new Date() });
       this.clearReceipt();
+    }
+  }
+
+  private loadExistingReceipts(): void {
+    if (this.expenseData?.receiptIds && this.expenseData.receiptIds.length > 0) {
+      this.existingReceiptUrls = this.expenseData.receiptIds.map(
+        id => this.expenditureService.getReceiptImageUrl(id)
+      );
+      this.receiptPreviewUrls = [...this.existingReceiptUrls];
     }
   }
 
@@ -143,9 +155,18 @@ export class AddExpense implements OnInit, OnChanges {
   }
 
   removeReceipt(index: number): void {
-    URL.revokeObjectURL(this.receiptPreviewUrls[index]);
+    const url = this.receiptPreviewUrls[index];
+    const existingIndex = this.existingReceiptUrls.indexOf(url);
+    if (existingIndex !== -1) {
+      this.existingReceiptUrls.splice(existingIndex, 1);
+    } else {
+      const newFileIndex = index - this.existingReceiptUrls.length;
+      if (newFileIndex >= 0 && newFileIndex < this.selectedReceiptFiles.length) {
+        URL.revokeObjectURL(url);
+        this.selectedReceiptFiles.splice(newFileIndex, 1);
+      }
+    }
     this.receiptPreviewUrls.splice(index, 1);
-    this.selectedReceiptFiles.splice(index, 1);
     if (this.showImageViewer) {
       if (this.receiptPreviewUrls.length === 0) {
         this.closeImageViewer();
@@ -157,10 +178,13 @@ export class AddExpense implements OnInit, OnChanges {
 
   clearReceipt(): void {
     for (const url of this.receiptPreviewUrls) {
-      URL.revokeObjectURL(url);
+      if (!this.existingReceiptUrls.includes(url)) {
+        URL.revokeObjectURL(url);
+      }
     }
     this.selectedReceiptFiles = [];
     this.receiptPreviewUrls = [];
+    this.existingReceiptUrls = [];
     this.receiptError = null;
     this.closeImageViewer();
   }
