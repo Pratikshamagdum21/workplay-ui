@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, NgZone, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { SHARED_IMPORTS } from '../../../shared-imports';
@@ -51,7 +51,8 @@ export class AddExpense implements OnInit, OnChanges {
     private fb: FormBuilder,
     private expenditureService: ExpenditureService,
     private messageService: MessageService,
-    private branchService: BranchService
+    private branchService: BranchService,
+    private ngZone: NgZone
   ) {
 
   }
@@ -140,9 +141,11 @@ export class AddExpense implements OnInit, OnChanges {
         canvas.toBlob(
           (blob) => {
             if (blob) {
-              const resizedFile = new File([blob], file.name, { type: 'image/png' });
-              this.selectedReceiptFiles.push(resizedFile);
-              this.receiptPreviewUrls.push(URL.createObjectURL(blob));
+              this.ngZone.run(() => {
+                const resizedFile = new File([blob], file.name, { type: 'image/png' });
+                this.selectedReceiptFiles.push(resizedFile);
+                this.receiptPreviewUrls.push(URL.createObjectURL(blob));
+              });
             }
           },
           'image/png',
