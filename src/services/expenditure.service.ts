@@ -71,6 +71,27 @@ export class ExpenditureService {
     );
   }
 
+  updateExpenditure(id: string, expenditure: Expenditure, receiptImage?: File | null): Observable<Expenditure> {
+    if (receiptImage) {
+      const formData = new FormData();
+      formData.append('expenditure', new Blob([JSON.stringify(expenditure)], { type: 'application/json' }));
+      formData.append('receiptImage', receiptImage, receiptImage.name);
+      return this.http.put<Expenditure>(`${this.baseUrl}/update/${id}`, formData).pipe(
+        tap((updated) => {
+          const list = this.expendituresSubject.value.map(e => e.id === id ? updated : e);
+          this.expendituresSubject.next(list);
+        })
+      );
+    }
+
+    return this.http.put<Expenditure>(`${this.baseUrl}/update/${id}`, expenditure).pipe(
+      tap((updated) => {
+        const list = this.expendituresSubject.value.map(e => e.id === id ? updated : e);
+        this.expendituresSubject.next(list);
+      })
+    );
+  }
+
  deleteExpenditure(id: string, expenseType: string): Observable<string> {
   const params = new HttpParams()
     .set('id', id)

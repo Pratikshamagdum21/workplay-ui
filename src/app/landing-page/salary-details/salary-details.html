@@ -219,6 +219,8 @@
                     <td class="text-right font-bold">{{ formatCurrency(exp.amount) }}</td>
                     <td>{{ exp.note || '—' }}</td>
                     <td class="text-center">
+                        <p-button icon="pi pi-pencil" severity="success" [text]="true" [rounded]="true" pTooltip="Edit Expense" tooltipPosition="top" (onClick)="editExpense(exp)">
+                        </p-button>
                         <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" pTooltip="Delete Expense" tooltipPosition="top" (onClick)="confirmDeleteExpenditure(exp)">
                         </p-button>
                     </td>
@@ -282,6 +284,6 @@
     <app-pay-salary [salaryData]="selectedSalary" (saved)="onSalarySaved()"></app-pay-salary>
 </p-dialog>
 
-<p-dialog header="Process Expenses" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
-    <app-add-expense (saved)="onExpenseSaved()"></app-add-expense>
+<p-dialog [header]="selectedExpense ? 'Edit Expense' : 'Process Expenses'" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog" (onHide)="onExpenseDialogHide()">
+    <app-add-expense [expenseData]="selectedExpense" (saved)="onExpenseSaved()"></app-add-expense>
 </p-dialog>

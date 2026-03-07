@@ -1,8 +1,8 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { SHARED_IMPORTS } from '../../../shared-imports';
-import { ExpenditureService } from '../../../../services/expenditure.service';
+import { Expenditure, ExpenditureService } from '../../../../services/expenditure.service';
 import { BranchService } from '../../../../services/branch.service';
 
 @Component({
@@ -12,11 +12,13 @@ import { BranchService } from '../../../../services/branch.service';
   templateUrl: './add-expense.html',
   styleUrl: './add-expense.scss',
 })
-export class AddExpense implements OnInit {
+export class AddExpense implements OnInit, OnChanges {
+  @Input() expenseData: Expenditure | null = null;
   @Output() saved = new EventEmitter<any>();
 
   expenseForm!: FormGroup;
   saving: boolean = false;
+  isEditMode: boolean = false;
 
   selectedReceiptFile: File | null = null;
   receiptPreviewUrl: string | null = null;
@@ -56,6 +58,28 @@ export class AddExpense implements OnInit {
       date: [new Date(), Validators.required],
       note: ['']
     });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['expenseData'] && this.expenseForm) {
+      this.populateForm();
+    }
+  }
+
+  private populateForm(): void {
+    if (this.expenseData) {
+      this.isEditMode = true;
+      this.expenseForm.patchValue({
+        expenseType: this.expenseData.expenseType,
+        amount: this.expenseData.amount,
+        date: new Date(this.expenseData.date),
+        note: this.expenseData.note || ''
+      });
+    } else {
+      this.isEditMode = false;
+      this.expenseForm.reset({ date: new Date() });
+      this.clearReceipt();
+    }
   }
 
   onReceiptSelected(event: Event): void {
@@ -109,16 +133,23 @@ export class AddExpense implements OnInit {
     };
 
     this.saving = true;
-    this.expenditureService.saveExpenditure(expenditure, this.selectedReceiptFile).subscribe({
+
+    const request$ = this.isEditMode && this.expenseData?.id
+      ? this.expenditureService.updateExpenditure(this.expenseData.id, expenditure, this.selectedReceiptFile)
+      : this.expenditureService.saveExpenditure(expenditure, this.selectedReceiptFile);
+
+    request$.subscribe({
       next: (result) => {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Expense saved successfully',
+          detail: this.isEditMode ? 'Expense updated successfully' : 'Expense saved successfully',
           life: 3000
         });
         this.saving = false;
         this.saved.emit(result);
+        this.isEditMode = false;
+        this.expenseData = null;
         this.expenseForm.reset({ date: new Date() });
         this.clearReceipt();
       },

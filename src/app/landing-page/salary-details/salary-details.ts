@@ -33,6 +33,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
   displayViewDialog = false;
   displayExpenseViewDialog = false;
   selectedSalary: any = null;
+  selectedExpense: Expenditure | null = null;
   totalSalary: number = 0;
   expenditures: Expenditure[] = [];
   allExpenditures: Expenditure[] = [];
@@ -424,7 +425,17 @@ export class SalaryDetails implements OnInit, OnDestroy {
   }
 
   openAddExpensesDialog(): void {
+    this.selectedExpense = null;
     this.displayExpenseViewDialog = true;
+  }
+
+  editExpense(expense: Expenditure): void {
+    this.selectedExpense = expense;
+    this.displayExpenseViewDialog = true;
+  }
+
+  onExpenseDialogHide(): void {
+    this.selectedExpense = null;
   }
 }
 
