@@ -52,12 +52,41 @@
                                 <small>JPG, PNG, WEBP</small>
                             </div>
                             <div class="receipt-preview" *ngIf="receiptPreviewUrl">
-                                <img [src]="receiptPreviewUrl" alt="Receipt preview" />
-                                <button type="button" class="remove-receipt-btn" (click)="clearReceipt(); receiptInput.value = ''">
+                                <img [src]="receiptPreviewUrl" alt="Receipt preview" (click)="openImageViewer()" />
+                                <div class="receipt-preview-actions">
+                                    <button type="button" class="preview-action-btn" (click)="openImageViewer()" title="Zoom">
+                                        <i class="pi pi-search-plus"></i>
+                                    </button>
+                                    <button type="button" class="preview-action-btn remove" (click)="clearReceipt(); receiptInput.value = ''" title="Remove">
+                                        <i class="pi pi-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="p-error" *ngIf="receiptError">{{ receiptError }}</small>
+                        </div>
+                    </div>
+
+                    <!-- Image Viewer Overlay -->
+                    <div class="image-viewer-overlay" *ngIf="showImageViewer" (click)="closeImageViewer()">
+                        <div class="image-viewer-content" (click)="$event.stopPropagation()">
+                            <div class="image-viewer-toolbar">
+                                <button type="button" (click)="zoomOut()" [disabled]="imageZoom <= 0.25" title="Zoom Out">
+                                    <i class="pi pi-minus"></i>
+                                </button>
+                                <span class="zoom-level">{{ (imageZoom * 100) | number:'1.0-0' }}%</span>
+                                <button type="button" (click)="zoomIn()" [disabled]="imageZoom >= 3" title="Zoom In">
+                                    <i class="pi pi-plus"></i>
+                                </button>
+                                <button type="button" (click)="resetZoom()" title="Reset Zoom">
+                                    <i class="pi pi-refresh"></i>
+                                </button>
+                                <button type="button" (click)="closeImageViewer()" title="Close" class="close-btn">
                                     <i class="pi pi-times"></i>
                                 </button>
                             </div>
-                            <small class="p-error" *ngIf="receiptError">{{ receiptError }}</small>
+                            <div class="image-viewer-body">
+                                <img [src]="receiptPreviewUrl" alt="Receipt" [style.transform]="'scale(' + imageZoom + ')'" />
+                            </div>
                         </div>
                     </div>
 

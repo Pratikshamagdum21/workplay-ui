@@ -80,30 +80,45 @@
                 display: inline-block;
                 max-width: 100%;
                 img {
-                    max-width: 100%;
-                    max-height: 200px;
+                    max-width: 120px;
+                    max-height: 120px;
                     border-radius: 8px;
                     border: 1px solid #e2e8f0;
-                    object-fit: contain;
-                }
-                .remove-receipt-btn {
-                    position: absolute;
-                    top: -8px;
-                    right: -8px;
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 50%;
-                    border: none;
-                    background: #ef4444;
-                    color: white;
+                    object-fit: cover;
                     cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 0.7rem;
-                    transition: background 0.2s ease;
+                    transition: opacity 0.2s ease;
                     &:hover {
-                        background: #dc2626;
+                        opacity: 0.85;
+                    }
+                }
+                .receipt-preview-actions {
+                    display: flex;
+                    gap: 4px;
+                    position: absolute;
+                    top: -10px;
+                    right: -10px;
+                    .preview-action-btn {
+                        width: 24px;
+                        height: 24px;
+                        border-radius: 50%;
+                        border: none;
+                        background: #6366f1;
+                        color: white;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 0.65rem;
+                        transition: background 0.2s ease;
+                        &:hover {
+                            background: #4f46e5;
+                        }
+                        &.remove {
+                            background: #ef4444;
+                            &:hover {
+                                background: #dc2626;
+                            }
+                        }
                     }
                 }
             }
@@ -262,6 +277,97 @@
         i {
             color: #6366f1;
             font-size: 1rem;
+        }
+    }
+}
+
+.image-viewer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .image-viewer-content {
+        display: flex;
+        flex-direction: column;
+        max-width: 90vw;
+        max-height: 90vh;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .image-viewer-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: #1e293b;
+        color: white;
+
+        button {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: background 0.2s ease;
+
+            &:hover:not(:disabled) {
+                background: rgba(255, 255, 255, 0.3);
+            }
+
+            &:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+
+            &.close-btn {
+                margin-left: auto;
+                background: #ef4444;
+
+                &:hover {
+                    background: #dc2626;
+                }
+            }
+        }
+
+        .zoom-level {
+            font-size: 0.8rem;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+    }
+
+    .image-viewer-body {
+        overflow: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        max-height: calc(90vh - 48px);
+        background: #f1f5f9;
+
+        img {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            transition: transform 0.2s ease;
+            transform-origin: center center;
         }
     }
 }

@@ -23,8 +23,12 @@ export class AddExpense implements OnInit, OnChanges {
   selectedReceiptFile: File | null = null;
   receiptPreviewUrl: string | null = null;
   receiptError: string | null = null;
+  showImageViewer: boolean = false;
+  imageZoom: number = 1;
 
   private readonly allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  private readonly maxImageWidth = 1024;
+  private readonly compressionQuality = 0.7;
 
   expenseTypes = [
     { label: 'Light Bill', value: 'Light Bill' },
@@ -100,8 +104,45 @@ export class AddExpense implements OnInit, OnChanges {
       return;
     }
 
-    this.selectedReceiptFile = file;
-    this.receiptPreviewUrl = URL.createObjectURL(file);
+    this.compressImage(file);
+  }
+
+  private compressImage(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > this.maxImageWidth) {
+          height = Math.round(height * (this.maxImageWidth / width));
+          width = this.maxImageWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              this.selectedReceiptFile = new File([blob], file.name, { type: 'image/jpeg' });
+              if (this.receiptPreviewUrl) {
+                URL.revokeObjectURL(this.receiptPreviewUrl);
+              }
+              this.receiptPreviewUrl = URL.createObjectURL(blob);
+            }
+          },
+          'image/jpeg',
+          this.compressionQuality
+        );
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 
   clearReceipt(): void {
@@ -111,6 +152,33 @@ export class AddExpense implements OnInit, OnChanges {
     this.selectedReceiptFile = null;
     this.receiptPreviewUrl = null;
     this.receiptError = null;
+    this.closeImageViewer();
+  }
+
+  openImageViewer(): void {
+    this.imageZoom = 1;
+    this.showImageViewer = true;
+  }
+
+  closeImageViewer(): void {
+    this.showImageViewer = false;
+    this.imageZoom = 1;
+  }
+
+  zoomIn(): void {
+    if (this.imageZoom < 3) {
+      this.imageZoom = Math.round((this.imageZoom + 0.25) * 100) / 100;
+    }
+  }
+
+  zoomOut(): void {
+    if (this.imageZoom > 0.25) {
+      this.imageZoom = Math.round((this.imageZoom - 0.25) * 100) / 100;
+    }
+  }
+
+  resetZoom(): void {
+    this.imageZoom = 1;
   }
 
   submit(): void {
