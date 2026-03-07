@@ -254,11 +254,11 @@ export class AddExpense implements OnInit, OnChanges {
 
     this.saving = true;
 
-    const receiptFile = this.selectedReceiptFiles.length > 0 ? this.selectedReceiptFiles[0] : null;
+    const receiptFiles = this.selectedReceiptFiles.length > 0 ? this.selectedReceiptFiles : null;
 
     const request$ = this.isEditMode && this.expenseData?.id
-      ? this.expenditureService.updateExpenditure(this.expenseData.id, expenditure, receiptFile)
-      : this.expenditureService.saveExpenditure(expenditure, receiptFile);
+      ? this.expenditureService.updateExpenditure(this.expenseData.id, expenditure, receiptFiles)
+      : this.expenditureService.saveExpenditure(expenditure, receiptFiles);
 
     request$.subscribe({
       next: (result) => {
