@@ -37,30 +37,37 @@
                     </div>
 
                     <div class="col-12">
-                        <label>Upload Receipt Image</label>
+                        <label>Upload Receipt Images</label>
                         <div class="receipt-upload-area">
                             <input
                                 type="file"
                                 accept=".jpg,.jpeg,.png,.webp"
+                                multiple
                                 (change)="onReceiptSelected($event)"
                                 #receiptInput
                                 class="receipt-file-input"
                             />
-                            <div class="upload-placeholder" (click)="receiptInput.click()" *ngIf="!receiptPreviewUrl">
-                                <i class="pi pi-image"></i>
-                                <span>Click to upload receipt image</span>
-                                <small>JPG, PNG, WEBP</small>
-                            </div>
-                            <div class="receipt-preview" *ngIf="receiptPreviewUrl">
-                                <img [src]="receiptPreviewUrl" alt="Receipt preview" (click)="openImageViewer()" />
-                                <div class="receipt-preview-actions">
-                                    <button type="button" class="preview-action-btn" (click)="openImageViewer()" title="Zoom">
-                                        <i class="pi pi-search-plus"></i>
-                                    </button>
-                                    <button type="button" class="preview-action-btn remove" (click)="clearReceipt(); receiptInput.value = ''" title="Remove">
-                                        <i class="pi pi-times"></i>
-                                    </button>
+                            <div class="receipt-thumbnails" *ngIf="receiptPreviewUrls.length > 0">
+                                <div class="receipt-preview" *ngFor="let url of receiptPreviewUrls; let i = index">
+                                    <img [src]="url" alt="Receipt preview" (click)="openImageViewer(i)" />
+                                    <div class="receipt-preview-actions">
+                                        <button type="button" class="preview-action-btn" (click)="openImageViewer(i)" title="Zoom">
+                                            <i class="pi pi-search-plus"></i>
+                                        </button>
+                                        <button type="button" class="preview-action-btn remove" (click)="removeReceipt(i)" title="Remove">
+                                            <i class="pi pi-times"></i>
+                                        </button>
+                                    </div>
                                 </div>
+                                <div class="add-more-btn" (click)="receiptInput.click()">
+                                    <i class="pi pi-plus"></i>
+                                    <small>Add more</small>
+                                </div>
+                            </div>
+                            <div class="upload-placeholder" (click)="receiptInput.click()" *ngIf="receiptPreviewUrls.length === 0">
+                                <i class="pi pi-images"></i>
+                                <span>Click to upload receipt images</span>
+                                <small>JPG, PNG, WEBP (multiple allowed)</small>
                             </div>
                             <small class="p-error" *ngIf="receiptError">{{ receiptError }}</small>
                         </div>
@@ -70,6 +77,14 @@
                     <div class="image-viewer-overlay" *ngIf="showImageViewer" (click)="closeImageViewer()">
                         <div class="image-viewer-content" (click)="$event.stopPropagation()">
                             <div class="image-viewer-toolbar">
+                                <button type="button" (click)="viewerPrev()" [disabled]="viewerImageIndex <= 0" title="Previous">
+                                    <i class="pi pi-chevron-left"></i>
+                                </button>
+                                <span class="zoom-level">{{ viewerImageIndex + 1 }} / {{ receiptPreviewUrls.length }}</span>
+                                <button type="button" (click)="viewerNext()" [disabled]="viewerImageIndex >= receiptPreviewUrls.length - 1" title="Next">
+                                    <i class="pi pi-chevron-right"></i>
+                                </button>
+                                <span class="toolbar-separator"></span>
                                 <button type="button" (click)="zoomOut()" [disabled]="imageZoom <= 0.25" title="Zoom Out">
                                     <i class="pi pi-minus"></i>
                                 </button>
@@ -85,7 +100,7 @@
                                 </button>
                             </div>
                             <div class="image-viewer-body">
-                                <img [src]="receiptPreviewUrl" alt="Receipt" [style.transform]="'scale(' + imageZoom + ')'" />
+                                <img [src]="receiptPreviewUrls[viewerImageIndex]" alt="Receipt" [style.transform]="'scale(' + imageZoom + ')'" />
                             </div>
                         </div>
                     </div>

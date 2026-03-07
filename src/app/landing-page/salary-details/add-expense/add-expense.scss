@@ -75,13 +75,18 @@
                     font-size: 0.75rem;
                 }
             }
+            .receipt-thumbnails {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                align-items: flex-start;
+            }
             .receipt-preview {
                 position: relative;
                 display: inline-block;
-                max-width: 100%;
                 img {
-                    max-width: 120px;
-                    max-height: 120px;
+                    width: 100px;
+                    height: 100px;
                     border-radius: 8px;
                     border: 1px solid #e2e8f0;
                     object-fit: cover;
@@ -95,11 +100,11 @@
                     display: flex;
                     gap: 4px;
                     position: absolute;
-                    top: -10px;
-                    right: -10px;
+                    top: -8px;
+                    right: -8px;
                     .preview-action-btn {
-                        width: 24px;
-                        height: 24px;
+                        width: 22px;
+                        height: 22px;
                         border-radius: 50%;
                         border: none;
                         background: #6366f1;
@@ -108,7 +113,7 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        font-size: 0.65rem;
+                        font-size: 0.6rem;
                         transition: background 0.2s ease;
                         &:hover {
                             background: #4f46e5;
@@ -120,6 +125,32 @@
                             }
                         }
                     }
+                }
+            }
+            .add-more-btn {
+                width: 100px;
+                height: 100px;
+                border: 2px dashed #cbd5e1;
+                border-radius: 8px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 0.25rem;
+                cursor: pointer;
+                color: #94a3b8;
+                transition: all 0.2s ease;
+                &:hover {
+                    border-color: #6366f1;
+                    color: #6366f1;
+                    background: rgba(99, 102, 241, 0.04);
+                }
+                i {
+                    font-size: 1.25rem;
+                }
+                small {
+                    font-size: 0.7rem;
+                    font-weight: 500;
                 }
             }
         }
@@ -350,6 +381,13 @@
             font-weight: 600;
             min-width: 40px;
             text-align: center;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 0 0.25rem;
         }
     }
 

@@ -20,15 +20,15 @@ export class AddExpense implements OnInit, OnChanges {
   saving: boolean = false;
   isEditMode: boolean = false;
 
-  selectedReceiptFile: File | null = null;
-  receiptPreviewUrl: string | null = null;
+  selectedReceiptFiles: File[] = [];
+  receiptPreviewUrls: string[] = [];
   receiptError: string | null = null;
   showImageViewer: boolean = false;
   imageZoom: number = 1;
+  viewerImageIndex: number = 0;
 
   private readonly allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
   private readonly maxImageWidth = 1024;
-  private readonly compressionQuality = 0.7;
 
   expenseTypes = [
     { label: 'Light Bill', value: 'Light Bill' },
@@ -91,28 +91,26 @@ export class AddExpense implements OnInit, OnChanges {
     this.receiptError = null;
 
     if (!input.files || input.files.length === 0) {
-      this.clearReceipt();
       return;
     }
 
-    const file = input.files[0];
-
-    if (!this.allowedImageTypes.includes(file.type)) {
-      this.receiptError = 'Only image files (JPG, PNG, WEBP) are allowed.';
-      this.clearReceipt();
-      input.value = '';
-      return;
+    const files = Array.from(input.files);
+    for (const file of files) {
+      if (!this.allowedImageTypes.includes(file.type)) {
+        this.receiptError = 'Only image files (JPG, PNG, WEBP) are allowed.';
+        continue;
+      }
+      this.resizeImage(file);
     }
 
-    this.compressImage(file);
+    input.value = '';
   }
 
-  private compressImage(file: File): void {
+  private resizeImage(file: File): void {
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
 
@@ -121,6 +119,7 @@ export class AddExpense implements OnInit, OnChanges {
           width = this.maxImageWidth;
         }
 
+        const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d')!;
@@ -129,15 +128,13 @@ export class AddExpense implements OnInit, OnChanges {
         canvas.toBlob(
           (blob) => {
             if (blob) {
-              this.selectedReceiptFile = new File([blob], file.name, { type: 'image/jpeg' });
-              if (this.receiptPreviewUrl) {
-                URL.revokeObjectURL(this.receiptPreviewUrl);
-              }
-              this.receiptPreviewUrl = URL.createObjectURL(blob);
+              const resizedFile = new File([blob], file.name, { type: 'image/png' });
+              this.selectedReceiptFiles.push(resizedFile);
+              this.receiptPreviewUrls.push(URL.createObjectURL(blob));
             }
           },
-          'image/jpeg',
-          this.compressionQuality
+          'image/png',
+          1.0
         );
       };
       img.src = e.target?.result as string;
@@ -145,17 +142,31 @@ export class AddExpense implements OnInit, OnChanges {
     reader.readAsDataURL(file);
   }
 
-  clearReceipt(): void {
-    if (this.receiptPreviewUrl) {
-      URL.revokeObjectURL(this.receiptPreviewUrl);
+  removeReceipt(index: number): void {
+    URL.revokeObjectURL(this.receiptPreviewUrls[index]);
+    this.receiptPreviewUrls.splice(index, 1);
+    this.selectedReceiptFiles.splice(index, 1);
+    if (this.showImageViewer) {
+      if (this.receiptPreviewUrls.length === 0) {
+        this.closeImageViewer();
+      } else if (this.viewerImageIndex >= this.receiptPreviewUrls.length) {
+        this.viewerImageIndex = this.receiptPreviewUrls.length - 1;
+      }
     }
-    this.selectedReceiptFile = null;
-    this.receiptPreviewUrl = null;
+  }
+
+  clearReceipt(): void {
+    for (const url of this.receiptPreviewUrls) {
+      URL.revokeObjectURL(url);
+    }
+    this.selectedReceiptFiles = [];
+    this.receiptPreviewUrls = [];
     this.receiptError = null;
     this.closeImageViewer();
   }
 
-  openImageViewer(): void {
+  openImageViewer(index: number = 0): void {
+    this.viewerImageIndex = index;
     this.imageZoom = 1;
     this.showImageViewer = true;
   }
@@ -163,6 +174,20 @@ export class AddExpense implements OnInit, OnChanges {
   closeImageViewer(): void {
     this.showImageViewer = false;
     this.imageZoom = 1;
+  }
+
+  viewerPrev(): void {
+    if (this.viewerImageIndex > 0) {
+      this.viewerImageIndex--;
+      this.imageZoom = 1;
+    }
+  }
+
+  viewerNext(): void {
+    if (this.viewerImageIndex < this.receiptPreviewUrls.length - 1) {
+      this.viewerImageIndex++;
+      this.imageZoom = 1;
+    }
   }
 
   zoomIn(): void {
@@ -202,9 +227,11 @@ export class AddExpense implements OnInit, OnChanges {
 
     this.saving = true;
 
+    const receiptFiles = this.selectedReceiptFiles.length > 0 ? this.selectedReceiptFiles : null;
+
     const request$ = this.isEditMode && this.expenseData?.id
-      ? this.expenditureService.updateExpenditure(this.expenseData.id, expenditure, this.selectedReceiptFile)
-      : this.expenditureService.saveExpenditure(expenditure, this.selectedReceiptFile);
+      ? this.expenditureService.updateExpenditure(this.expenseData.id, expenditure, receiptFiles)
+      : this.expenditureService.saveExpenditure(expenditure, receiptFiles);
 
     request$.subscribe({
       next: (result) => {

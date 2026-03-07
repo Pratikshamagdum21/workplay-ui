@@ -44,11 +44,13 @@ export class ExpenditureService {
     });
   }
 
-  saveExpenditure(expenditure: Expenditure, receiptImage?: File | null): Observable<Expenditure> {
-    if (receiptImage) {
+  saveExpenditure(expenditure: Expenditure, receiptImages?: File[] | null): Observable<Expenditure> {
+    if (receiptImages && receiptImages.length > 0) {
       const formData = new FormData();
       formData.append('expenditure', new Blob([JSON.stringify(expenditure)], { type: 'application/json' }));
-      formData.append('receiptImage', receiptImage, receiptImage.name);
+      for (const file of receiptImages) {
+        formData.append('receiptImages', file, file.name);
+      }
       return this.http.post<Expenditure>(`${this.baseUrl}/save`, formData).pipe(
         tap((saved) => {
           if (saved) {
@@ -71,11 +73,13 @@ export class ExpenditureService {
     );
   }
 
-  updateExpenditure(id: string, expenditure: Expenditure, receiptImage?: File | null): Observable<Expenditure> {
-    if (receiptImage) {
+  updateExpenditure(id: string, expenditure: Expenditure, receiptImages?: File[] | null): Observable<Expenditure> {
+    if (receiptImages && receiptImages.length > 0) {
       const formData = new FormData();
       formData.append('expenditure', new Blob([JSON.stringify(expenditure)], { type: 'application/json' }));
-      formData.append('receiptImage', receiptImage, receiptImage.name);
+      for (const file of receiptImages) {
+        formData.append('receiptImages', file, file.name);
+      }
       return this.http.put<Expenditure>(`${this.baseUrl}/update/${id}`, formData).pipe(
         tap((updated) => {
           const list = this.expendituresSubject.value.map(e => e.id === id ? updated : e);
