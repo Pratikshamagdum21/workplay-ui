@@ -18,6 +18,12 @@ export class AddExpense implements OnInit {
   expenseForm!: FormGroup;
   saving: boolean = false;
 
+  selectedReceiptFile: File | null = null;
+  receiptPreviewUrl: string | null = null;
+  receiptError: string | null = null;
+
+  private readonly allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
   expenseTypes = [
     { label: 'Light Bill', value: 'Light Bill' },
     { label: 'Vaifani', value: 'Vaifani' },
@@ -39,8 +45,8 @@ export class AddExpense implements OnInit {
     private expenditureService: ExpenditureService,
     private messageService: MessageService,
     private branchService: BranchService
-  ) { 
-      
+  ) {
+
   }
 
   ngOnInit(): void {
@@ -50,6 +56,37 @@ export class AddExpense implements OnInit {
       date: [new Date(), Validators.required],
       note: ['']
     });
+  }
+
+  onReceiptSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.receiptError = null;
+
+    if (!input.files || input.files.length === 0) {
+      this.clearReceipt();
+      return;
+    }
+
+    const file = input.files[0];
+
+    if (!this.allowedImageTypes.includes(file.type)) {
+      this.receiptError = 'Only image files (JPG, PNG, WEBP) are allowed.';
+      this.clearReceipt();
+      input.value = '';
+      return;
+    }
+
+    this.selectedReceiptFile = file;
+    this.receiptPreviewUrl = URL.createObjectURL(file);
+  }
+
+  clearReceipt(): void {
+    if (this.receiptPreviewUrl) {
+      URL.revokeObjectURL(this.receiptPreviewUrl);
+    }
+    this.selectedReceiptFile = null;
+    this.receiptPreviewUrl = null;
+    this.receiptError = null;
   }
 
   submit(): void {
@@ -63,16 +100,16 @@ export class AddExpense implements OnInit {
       ? formValue.date.toISOString().split('T')[0]
       : formValue.date;
     const branch = this.branchService.getSelectedBranchSnapshot();
-          const expenditure = {
-            branchId: branch.id,
-            date: date,
-            expenseType: formValue.expenseType,
-            amount: formValue.amount,
-            note: formValue.note || ''
+    const expenditure = {
+      branchId: branch.id,
+      date: date,
+      expenseType: formValue.expenseType,
+      amount: formValue.amount,
+      note: formValue.note || ''
     };
 
     this.saving = true;
-    this.expenditureService.saveExpenditure(expenditure).subscribe({
+    this.expenditureService.saveExpenditure(expenditure, this.selectedReceiptFile).subscribe({
       next: (result) => {
         this.messageService.add({
           severity: 'success',
@@ -83,6 +120,7 @@ export class AddExpense implements OnInit {
         this.saving = false;
         this.saved.emit(result);
         this.expenseForm.reset({ date: new Date() });
+        this.clearReceipt();
       },
       error: () => {
         this.saving = false;

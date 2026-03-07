@@ -44,7 +44,22 @@ export class ExpenditureService {
     });
   }
 
-  saveExpenditure(expenditure: Expenditure): Observable<Expenditure> {
+  saveExpenditure(expenditure: Expenditure, receiptImage?: File | null): Observable<Expenditure> {
+    if (receiptImage) {
+      const formData = new FormData();
+      formData.append('expenditure', new Blob([JSON.stringify(expenditure)], { type: 'application/json' }));
+      formData.append('receiptImage', receiptImage, receiptImage.name);
+      return this.http.post<Expenditure>(`${this.baseUrl}/save`, formData).pipe(
+        tap((saved) => {
+          if (saved) {
+            this.expendituresSubject.next([...this.expendituresSubject.value, saved]);
+          } else {
+            this.loadExpenditures();
+          }
+        })
+      );
+    }
+
     return this.http.post<Expenditure>(`${this.baseUrl}/save`, expenditure).pipe(
       tap((saved) => {
         if (saved) {

@@ -36,6 +36,31 @@
             </textarea>
                     </div>
 
+                    <div class="col-12">
+                        <label>Upload Receipt Image</label>
+                        <div class="receipt-upload-area">
+                            <input
+                                type="file"
+                                accept=".jpg,.jpeg,.png,.webp"
+                                (change)="onReceiptSelected($event)"
+                                #receiptInput
+                                class="receipt-file-input"
+                            />
+                            <div class="upload-placeholder" (click)="receiptInput.click()" *ngIf="!receiptPreviewUrl">
+                                <i class="pi pi-image"></i>
+                                <span>Click to upload receipt image</span>
+                                <small>JPG, PNG, WEBP</small>
+                            </div>
+                            <div class="receipt-preview" *ngIf="receiptPreviewUrl">
+                                <img [src]="receiptPreviewUrl" alt="Receipt preview" />
+                                <button type="button" class="remove-receipt-btn" (click)="clearReceipt(); receiptInput.value = ''">
+                                    <i class="pi pi-times"></i>
+                                </button>
+                            </div>
+                            <small class="p-error" *ngIf="receiptError">{{ receiptError }}</small>
+                        </div>
+                    </div>
+
                     <div class="col-12 flex justify-content-end mt-3">
                         <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" type="button" (onClick)="cancel()">
                         </p-button>
