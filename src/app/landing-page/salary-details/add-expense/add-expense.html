@@ -14,7 +14,9 @@
 
                     <div class="col-12 md:col-6">
                         <label class="required-label">Amount</label>
-                        <p-inputNumber formControlName="amount" mode="currency" currency="INR" locale="en-IN" [min]="1">
+                        <p-inputNumber formControlName="amount" mode="currency" 
+                        currency="INR" locale="en-IN" [min]="1" [minFractionDigits]="0"
+  [maxFractionDigits]="0">
                         </p-inputNumber>
                         <!-- <small class="p-error" *ngIf="expenseForm?.controls?.amount?.touched && expenseForm?.controls?.amount?.invalid">
               Enter valid amount
@@ -41,8 +43,9 @@
                         <div class="receipt-upload-area">
                             <input
                                 type="file"
-                                accept=".jpg,.jpeg,.png,.webp"
+                                accept="image/*"
                                 multiple
+                                capture="environment"
                                 (change)="onReceiptSelected($event)"
                                 #receiptInput
                                 class="receipt-file-input"

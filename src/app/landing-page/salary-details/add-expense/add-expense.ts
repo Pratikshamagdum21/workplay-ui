@@ -41,8 +41,9 @@ export class AddExpense implements OnInit, OnChanges {
     { label: 'Checker', value: 'Checker' },
     { label: 'Petrol', value: 'Petrol' },
     { label: 'Sutar', value: 'Sutar' },
-    { label: 'Worker Payment', value: 'WORKER' },
-    { label: 'Mill Store', value: 'MATERIAL' },
+    { label: 'Worker Payment', value: 'Worker Payment' },
+    { label: 'Mill Store', value: 'Mill Store' },
+    { label: 'Mending', value: 'Mending' },
     { label: 'Transport', value: 'TRANSPORT' },
     { label: 'Other', value: 'OTHER' }
   ];

@@ -50,7 +50,7 @@ export class ExpenditureService {
       const formData = new FormData();
       formData.append('expenditure', new Blob([JSON.stringify(expenditure)], { type: 'application/json' }));
       for (const file of images) {
-        formData.append('image', file, file.name);
+        formData.append('images', file, file.name);
       }
       return this.http.post<Expenditure>(`${this.baseUrl}/save`, formData).pipe(
         tap((saved) => {
@@ -83,7 +83,7 @@ export class ExpenditureService {
       formData.append('expenditure', new Blob([JSON.stringify(expenditure)], { type: 'application/json' }));
       if (hasNewImages) {
         for (const file of images) {
-          formData.append('image', file, file.name);
+          formData.append('images', file, file.name);
         }
       }
       if (hasExistingReceipts) {

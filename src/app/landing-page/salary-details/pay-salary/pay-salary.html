@@ -89,7 +89,8 @@
                                 <label for="ratePerMeter" class="required-label">
                                     <i class="pi pi-money-bill"></i> Rate Per Meter
                                 </label>
-                                <p-inputNumber id="ratePerMeter" formControlName="ratePerMeter" mode="currency" currency="INR" locale="en-IN" [min]="1" [showButtons]="true" styleClass="w-full">
+                                <p-inputNumber id="ratePerMeter" formControlName="ratePerMeter" mode="currency" 
+                                currency="INR" locale="en-IN" [min]="1" [showButtons]="true" styleClass="w-full">
                                 </p-inputNumber>
                             </div>
                         </p-card>
@@ -214,7 +215,9 @@
                                         <label for="leaveDeductionPerDay" class="required-label">
                                             <i class="pi pi-money-bill"></i> Leave Deduction Per Day
                                         </label>
-                                        <p-inputNumber id="leaveDeductionPerDay" formControlName="leaveDeductionPerDay" mode="currency" currency="INR" locale="en-IN" [min]="0" [showButtons]="true" styleClass="w-full">
+                                        <p-inputNumber id="leaveDeductionPerDay" formControlName="leaveDeductionPerDay"
+                                        [minFractionDigits]="0" [maxFractionDigits]="0" 
+                                        mode="currency" currency="INR" locale="en-IN" [min]="0" [showButtons]="true" styleClass="w-full">
                                         </p-inputNumber>
                                     </div>
                                 </div>
@@ -253,7 +256,8 @@
                                     <label for="advanceDeductedThisTime" class="required-label">
                                         <i class="pi pi-wallet"></i> Deduct This Time
                                     </label>
-                                    <p-inputNumber id="advanceDeductedThisTime" formControlName="advanceDeductedThisTime" mode="currency" currency="INR" locale="en-IN" [min]="0" [max]="employee.advanceRemaining" [showButtons]="true" styleClass="w-full">
+                                    <p-inputNumber id="advanceDeductedThisTime" [minFractionDigits]="0" [maxFractionDigits]="0"
+                                    formControlName="advanceDeductedThisTime" mode="currency" currency="INR" locale="en-IN" [min]="0" [max]="employee.advanceRemaining" [showButtons]="true" styleClass="w-full">
                                     </p-inputNumber>
                                     <small class="p-info">
                                         Maximum: {{ formatCurrency(employee.advanceRemaining) }}
