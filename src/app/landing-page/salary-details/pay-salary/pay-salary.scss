@@ -121,7 +121,7 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     .field {
-        margin-bottom: 1rem;
+        margin-bottom: 0rem;
         label {
             display: block;
             margin-bottom: 0.375rem;
@@ -312,7 +312,6 @@
         }
     }
     .single-entry-meter-display {
-        margin-top: 0.5rem;
     }
     .action-buttons {
         display: flex;
