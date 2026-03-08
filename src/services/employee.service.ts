@@ -16,10 +16,7 @@ export class EmployeeService {
 
   private readonly fabricTypes: FabricType[] = [
     { id: '1', name: 'Cotton' },
-    { id: '2', name: 'Rayon' },
-    { id: '3', name: 'Denim' },
-    { id: '4', name: 'Poplin' },
-    { id: '5', name: 'Voile' }
+    { id: '2', name: 'PC' }
   ];
 
   private readonly bonusOptions: BonusOption[] = [
