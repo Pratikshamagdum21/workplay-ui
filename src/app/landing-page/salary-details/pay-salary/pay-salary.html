@@ -54,11 +54,11 @@
                     <strong *ngIf="isBonusedEmployee">With Bonus — auto-calculated per payout</strong>
                     <strong *ngIf="!isBonusedEmployee">Without Per-Payout Bonus — year-end bonus applies</strong>
                     <span *ngIf="isBonusedEmployee">
-                        Bonus = (Base Salary / 100) × 16.66&nbsp;&nbsp;→&nbsp;&nbsp;
+                        Bonus = ((Base Salary - Leave Deduction) / 100) × 16.66&nbsp;&nbsp;→&nbsp;&nbsp;
                         <span class="bonus-amount">{{ formatCurrency(autoBonus) }}</span> this cycle
                     </span>
                     <span *ngIf="!isBonusedEmployee">
-                        This employee receives a lump-sum year-end bonus: (Total Year Salary / 100) × 16.66
+                        This employee receives a lump-sum year-end bonus: ((Total Year Salary - Leave Deductions) / 100) × 16.66
                     </span>
                 </div>
             </div>
@@ -78,6 +78,9 @@
                                 <p-datepicker id="weekRange" formControlName="weekRange" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [minDate]="minDate" [maxDate]="maxDate" placeholder="Select week start and end date" styleClass="w-full">
                                 </p-datepicker>
                                 <small class="p-info">Select the start and end date of the week</small>
+                                <div *ngIf="singleEntryMeters !== null" class="single-entry-meter-display">
+                                    <p-tag severity="success" [value]="'Total Meters: ' + singleEntryMeters"></p-tag>
+                                </div>
                             </div>
                         </p-card>
                     </div>
@@ -106,7 +109,7 @@
                                 <div class="bonus-readonly-display">
                                     <span class="bonus-calculated-value">{{ formatCurrency(autoBonus) }}</span>
                                     <small class="p-info" *ngIf="isBonusedEmployee">
-                                        Auto-calculated: (Base Salary / 100) × 16.66
+                                        Auto-calculated: ((Base Salary - Leave Deduction) / 100) × 16.66
                                     </small>
                                     <small class="p-info bonus-info-yearly" *ngIf="!isBonusedEmployee">
                                         <i class="pi pi-info-circle"></i>
@@ -185,7 +188,7 @@
                                 <div class="bonus-readonly-display">
                                     <span class="bonus-calculated-value">{{ formatCurrency(autoBonus) }}</span>
                                     <small class="p-info" *ngIf="isBonusedEmployee">
-                                        Auto-calculated: (Monthly Salary / 100) × 16.66
+                                        Auto-calculated: ((Salary - Leave Deduction) / 100) × 16.66
                                     </small>
                                     <small class="p-info bonus-info-yearly" *ngIf="!isBonusedEmployee">
                                         <i class="pi pi-info-circle"></i>
@@ -300,8 +303,8 @@
                                     <i class="pi pi-calendar" style="margin-right: 4px;"></i>
                                     Bonus (year-end only):
                                 </span>
-                                                                <span class="calc-value" style="color: #94a3b8;" *ngIf="employee.salaryType === 'WEEKLY'" >₹{{formatCurrency(baseSalary*16.66/100)}} (paid at year end)</span>
-                                <span class="calc-value" style="color: #94a3b8;" *ngIf="employee.salaryType !== 'WEEKLY'" >₹{{formatCurrency(employee.salary*16.66/100)}} (paid at year end)</span>
+                                                                <span class="calc-value" style="color: #94a3b8;" *ngIf="employee.salaryType === 'WEEKLY'" >₹{{formatCurrency((baseSalary - leaveDeductionTotal)*16.66/100)}} (paid at year end)</span>
+                                <span class="calc-value" style="color: #94a3b8;" *ngIf="employee.salaryType !== 'WEEKLY'" >₹{{formatCurrency((employee.salary - leaveDeductionTotal)*16.66/100)}} (paid at year end)</span>
                             </div>
 
                             <div class="calc-row">
