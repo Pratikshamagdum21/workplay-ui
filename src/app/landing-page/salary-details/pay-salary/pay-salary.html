@@ -120,29 +120,56 @@
                     <!-- Daily Meter Table -->
                     <div class="col-12" *ngIf="meterDetailsArray && meterDetailsArray.length > 0 && isWeeklyWorker()">
                         <p-card header="Daily Meter Details" styleClass="section-card">
-                            <p-table [value]="meterDetailsArray.controls" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="400px">
-                                <ng-template pTemplate="header">
-                                    <tr>
-                                        <th style="width: 20%">Date</th>
-                                        <th style="width: 15%">Meter</th>
-                                        <th style="width: 30%">Note</th>
-                                    </tr>
-                                </ng-template>
-                                <ng-template pTemplate="body" let-control let-i="rowIndex">
-                                    <tr [formGroup]="control">
-                                        <td>
-                                            <strong>{{ formatDate(control.get('date')?.value) }}</strong>
-                                        </td>
-                                        <td>
-                                            <p-inputNumber formControlName="meter" [min]="0" [showButtons]="true" styleClass="w-full meter-input">
-                                            </p-inputNumber>
-                                        </td>
-                                        <td>
-                                            <input pInputText formControlName="note" placeholder="Add note" class="w-full" />
-                                        </td>
-                                    </tr>
-                                </ng-template>
-                            </p-table>
+                            <!-- Single entry with endDate: show simplified view -->
+                            <ng-container *ngIf="singleEntryMeters !== null; else dailyMeterTable">
+                                <div class="single-entry-summary">
+                                    <div class="grid">
+                                        <div class="col-12 md:col-6">
+                                            <div class="single-entry-info">
+                                                <span class="info-label"><i class="pi pi-calendar"></i> Week Range</span>
+                                                <span class="info-value">
+                                                    {{ formatDate(meterDetailsArray.at(0)?.get('date')?.value) }}
+                                                    —
+                                                    {{ formatDate(meterDetailsArray.at(meterDetailsArray.length - 1)?.get('date')?.value) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 md:col-6">
+                                            <div class="single-entry-info">
+                                                <span class="info-label"><i class="pi pi-chart-bar"></i> Total Meters</span>
+                                                <span class="info-value highlight">{{ singleEntryMeters }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+
+                            <!-- Multiple entries: show full daily table -->
+                            <ng-template #dailyMeterTable>
+                                <p-table [value]="meterDetailsArray.controls" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="400px">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th style="width: 20%">Date</th>
+                                            <th style="width: 15%">Meter</th>
+                                            <th style="width: 30%">Note</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-control let-i="rowIndex">
+                                        <tr [formGroup]="control">
+                                            <td>
+                                                <strong>{{ formatDate(control.get('date')?.value) }}</strong>
+                                            </td>
+                                            <td>
+                                                <p-inputNumber formControlName="meter" [min]="0" [showButtons]="true" styleClass="w-full meter-input">
+                                                </p-inputNumber>
+                                            </td>
+                                            <td>
+                                                <input pInputText formControlName="note" placeholder="Add note" class="w-full" />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </ng-template>
 
                             <!-- Weekly Summary -->
                             <div class="weekly-summary">
