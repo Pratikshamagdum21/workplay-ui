@@ -74,12 +74,22 @@ export class ExpenditureService {
     );
   }
 
-  updateExpenditure(id: string, expenditure: Expenditure, images?: File[] | null): Observable<Expenditure> {
-    if (images && images.length > 0) {
+  updateExpenditure(id: string, expenditure: Expenditure, images?: File[] | null, existingReceiptIds?: string[]): Observable<Expenditure> {
+    const hasNewImages = images && images.length > 0;
+    const hasExistingReceipts = existingReceiptIds && existingReceiptIds.length > 0;
+
+    if (hasNewImages || hasExistingReceipts) {
       const formData = new FormData();
       formData.append('expenditure', new Blob([JSON.stringify(expenditure)], { type: 'application/json' }));
-      for (const file of images) {
-        formData.append('image', file, file.name);
+      if (hasNewImages) {
+        for (const file of images) {
+          formData.append('image', file, file.name);
+        }
+      }
+      if (hasExistingReceipts) {
+        for (const receiptId of existingReceiptIds) {
+          formData.append('existingReceiptIds', receiptId);
+        }
       }
       return this.http.put<Expenditure>(`${this.baseUrl}/update/${id}`, formData).pipe(
         tap((updated) => {
