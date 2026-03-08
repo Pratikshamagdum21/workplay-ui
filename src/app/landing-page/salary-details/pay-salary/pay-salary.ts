@@ -45,6 +45,7 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
   leaveDeductionTotal: number = 0;
   finalPay: number = 0;
   autoBonus: number = 0;
+  singleEntryMeters: number | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -281,10 +282,17 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
         const workEntries = this.workService.filterEntries(startDate, endDate)
           .filter(e => e.employeeName === this.employee?.name);
 
+        // Check if there's a single work entry with endDate covering the range
+        if (workEntries.length === 1 && workEntries[0].endDate) {
+          this.singleEntryMeters = workEntries[0].fabricMeters;
+        } else {
+          this.singleEntryMeters = null;
+        }
+
         // Build a map of date → total fabric meters from work entries
         const metersMap = new Map<string, number>();
         for (const entry of workEntries) {
-          const dateKey = new Date(entry.date).toISOString().split('T')[0];
+          const dateKey = new Date(entry.date).toLocaleDateString('en-CA');
           metersMap.set(dateKey, (metersMap.get(dateKey) || 0) + entry.fabricMeters);
         }
 
@@ -358,9 +366,9 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     const baseSalary = totalMeters * ratePerMeter;
     const leaveDeductionTotal = meterDetails.reduce((sum, day) => sum + day.leaveDeduction, 0);
 
-    // Auto-calculate bonus for isBonused employees; zero for others (year-end bonus only)
+    // Auto-calculate bonus for isBonused employees on (baseSalary - leaveDeduction)
     this.autoBonus = this.isBonusedEmployee
-      ? this.salaryService.calculatePerSalaryBonus(baseSalary)
+      ? this.salaryService.calculatePerSalaryBonus(baseSalary - leaveDeductionTotal)
       : 0;
 
     const calculation = this.salaryService.calculateWeeklySalary(
@@ -380,10 +388,11 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     const leaveDays = this.salaryForm.get('leaveDays')?.value || 0;
     const leaveDeductionPerDay = this.salaryForm.get('leaveDeductionPerDay')?.value || 0;
     const advanceDeducted = this.salaryForm.get('advanceDeductedThisTime')?.value || 0;
+    const leaveDeductionTotal = leaveDays * leaveDeductionPerDay;
 
-    // Auto-calculate bonus for isBonused employees; zero for others (year-end bonus only)
+    // Auto-calculate bonus for isBonused employees on (salary - leaveDeduction)
     this.autoBonus = this.isBonusedEmployee
-      ? this.salaryService.calculatePerSalaryBonus(salary)
+      ? this.salaryService.calculatePerSalaryBonus(salary - leaveDeductionTotal)
       : 0;
 
     const calculation = this.salaryService.calculateMonthlySalary(
@@ -401,10 +410,11 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     const leaveDays = this.salaryForm.get('leaveDays')?.value || 0;
     const leaveDeductionPerDay = this.salaryForm.get('leaveDeductionPerDay')?.value || 0;
     const advanceDeducted = this.salaryForm.get('advanceDeductedThisTime')?.value || 0;
+    const leaveDeductionTotal = leaveDays * leaveDeductionPerDay;
 
-    // Auto-calculate bonus for isBonused employees; zero for others (year-end bonus only)
+    // Auto-calculate bonus for isBonused employees on (salary - leaveDeduction)
     this.autoBonus = this.isBonusedEmployee
-      ? this.salaryService.calculatePerSalaryBonus(salary)
+      ? this.salaryService.calculatePerSalaryBonus(salary - leaveDeductionTotal)
       : 0;
 
     const calculation = this.salaryService.calculateMonthlySalary(
@@ -604,6 +614,7 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     this.leaveDeductionTotal = 0;
     this.finalPay = 0;
     this.autoBonus = 0;
+    this.singleEntryMeters = null;
   }
 
   cancel(): void {
