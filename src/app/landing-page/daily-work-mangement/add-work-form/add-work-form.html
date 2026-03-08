@@ -66,8 +66,19 @@
                     <label for="date" class="required-label">
                         <i class="pi pi-calendar"></i> Date
                     </label>
-                    <p-datepicker id="date" formControlName="date" appendTo="body" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
+                    <div class="flex align-items-center gap-2 mb-2">
+                        <p-checkbox [(ngModel)]="isRangeMode" [ngModelOptions]="{standalone: true}" [binary]="true" label="Date Range (Weekly Entry)" (onChange)="onDateModeChange()">
+                        </p-checkbox>
+                    </div>
+
+                    <!-- Single Date Picker -->
+                    <p-datepicker *ngIf="!isRangeMode" id="date" formControlName="date" appendTo="body" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
                     </p-datepicker>
+
+                    <!-- Range Date Picker -->
+                    <p-datepicker *ngIf="isRangeMode" id="date" formControlName="date" appendTo="body" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date Range" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
+                    </p-datepicker>
+
                     <small class="p-error" *ngIf="isFieldInvalid('date')">
                         {{ getErrorMessage('date') }}
                     </small>

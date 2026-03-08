@@ -24,6 +24,7 @@ selectedEmp!:Employee;
   fabricTypes: FabricType[] = [];
   shifts: Shift[] = [];
   saving = false;
+  isRangeMode = false;
 
   private destroy$ = new Subject<void>();
 
@@ -67,6 +68,10 @@ selectedEmp!:Employee;
     this.shifts = this.workService.getShifts();
   }
 
+  onDateModeChange(): void {
+    this.workForm.get('date')?.setValue(this.isRangeMode ? [] : new Date());
+  }
+
   onEmployeeChange(event: any): void {
     const emp = event?.value;
     if (emp) {
@@ -97,15 +102,35 @@ selectedEmp!:Employee;
     this.saving = true;
     const formValue = this.workForm.getRawValue();
 
-    const date = formValue.date instanceof Date
-      ? formValue.date.toLocaleDateString('en-CA')
-      : formValue.date;
+    let date: string;
+    let endDate: string | undefined;
+
+    if (this.isRangeMode && Array.isArray(formValue.date)) {
+      const [start, end] = formValue.date;
+      if (!start || !end) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'Please select both start and end dates',
+          life: 3000
+        });
+        this.saving = false;
+        return;
+      }
+      date = start instanceof Date ? start.toLocaleDateString('en-CA') : start;
+      endDate = end instanceof Date ? end.toLocaleDateString('en-CA') : end;
+    } else {
+      date = formValue.date instanceof Date
+        ? formValue.date.toLocaleDateString('en-CA')
+        : formValue.date;
+    }
 
     const workEntry = {
       employeeName: formValue.employeeName?.name || formValue.employeeName,
       employeeType: formValue.employeeType,
       fabricMeters: formValue.fabricMeters,
-      date: date
+      date: date,
+      ...(endDate && { endDate })
     };
 
     this.workService.addEntry(workEntry)
@@ -135,6 +160,7 @@ selectedEmp!:Employee;
   }
 
   resetForm(): void {
+    this.isRangeMode = false;
     this.workForm.get('employeeType')?.enable();
     this.workForm.get('workType')?.enable();
     this.workForm.reset({ date: new Date() });
