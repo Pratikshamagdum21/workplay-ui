@@ -285,25 +285,34 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
         // Check if there's a single work entry with endDate covering the range
         if (workEntries.length === 1 && workEntries[0].endDate) {
           this.singleEntryMeters = workEntries[0].fabricMeters;
+
+          // For single entry, put all meters on the first row so the editable input works
+          const populated = dailyMeters.map((day, index) => ({
+            ...day,
+            meter: index === 0 ? workEntries[0].fabricMeters : 0
+          }));
+
+          this.setMeterDetails(populated);
+          this.calculateWeeklySalary();
         } else {
           this.singleEntryMeters = null;
+
+          // Build a map of date → total fabric meters from work entries
+          const metersMap = new Map<string, number>();
+          for (const entry of workEntries) {
+            const dateKey = new Date(entry.date).toLocaleDateString('en-CA');
+            metersMap.set(dateKey, (metersMap.get(dateKey) || 0) + entry.fabricMeters);
+          }
+
+          // Apply real meter values to the daily meter entries
+          const populated = dailyMeters.map(day => ({
+            ...day,
+            meter: metersMap.get(day.date) || 0
+          }));
+
+          this.setMeterDetails(populated);
+          this.calculateWeeklySalary();
         }
-
-        // Build a map of date → total fabric meters from work entries
-        const metersMap = new Map<string, number>();
-        for (const entry of workEntries) {
-          const dateKey = new Date(entry.date).toLocaleDateString('en-CA');
-          metersMap.set(dateKey, (metersMap.get(dateKey) || 0) + entry.fabricMeters);
-        }
-
-        // Apply real meter values to the daily meter entries
-        const populated = dailyMeters.map(day => ({
-          ...day,
-          meter: metersMap.get(day.date) || 0
-        }));
-
-        this.setMeterDetails(populated);
-        this.calculateWeeklySalary();
       });
   }
 
