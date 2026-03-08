@@ -102,8 +102,8 @@ selectedEmp!:Employee;
     this.saving = true;
     const formValue = this.workForm.getRawValue();
 
-    let date: string;
-    let endDate: string | undefined;
+    let date: Date;
+    let endDate: Date | undefined;
 
     if (this.isRangeMode && Array.isArray(formValue.date)) {
       const [start, end] = formValue.date;
@@ -117,12 +117,12 @@ selectedEmp!:Employee;
         this.saving = false;
         return;
       }
-      date = start instanceof Date ? start.toLocaleDateString('en-CA') : start;
-      endDate = end instanceof Date ? end.toLocaleDateString('en-CA') : end;
+      date = start instanceof Date ? start : new Date(start);
+      endDate = end instanceof Date ? end : new Date(end);
     } else {
       date = formValue.date instanceof Date
-        ? formValue.date.toLocaleDateString('en-CA')
-        : formValue.date;
+        ? formValue.date
+        : new Date(formValue.date);
     }
 
     const workEntry = {
