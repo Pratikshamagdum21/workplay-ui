@@ -119,6 +119,18 @@ selectedEmp!:Employee;
       }
       date = start instanceof Date ? start : new Date(start);
       endDate = end instanceof Date ? end : new Date(end);
+
+      // Validate: range must be Saturday to Friday
+      if (date.getDay() !== 6 || endDate.getDay() !== 5) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Invalid Week Range',
+          detail: 'Date range must start on Saturday and end on Friday',
+          life: 4000
+        });
+        this.saving = false;
+        return;
+      }
     } else {
       date = formValue.date instanceof Date
         ? formValue.date

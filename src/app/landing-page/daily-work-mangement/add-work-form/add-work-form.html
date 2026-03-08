@@ -80,8 +80,9 @@
                     </p-datepicker>
 
                     <!-- Range Date Picker -->
-                    <p-datepicker *ngIf="isRangeMode" id="date" formControlName="date" appendTo="body" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date Range" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
+                    <p-datepicker *ngIf="isRangeMode" id="date" formControlName="date" appendTo="body" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Saturday to Friday range" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
                     </p-datepicker>
+                    <small *ngIf="isRangeMode" class="text-color-secondary">Week must start on Saturday and end on Friday</small>
 
                     <small class="p-error" *ngIf="isFieldInvalid('date')">
                         {{ getErrorMessage('date') }}

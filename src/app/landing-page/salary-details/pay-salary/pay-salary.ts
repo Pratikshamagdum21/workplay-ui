@@ -37,6 +37,7 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
   editSalaryId: number | null = null;
 
   weekRange: Date[] = [];
+  weekRangeError: string | null = null;
   minDate: Date = new Date();
   maxDate: Date = new Date();
 
@@ -230,7 +231,19 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     this.salaryForm.get('weekRange')?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((range) => {
-        if (range && range.length === 2) {
+        if (range && range.length === 2 && range[0] && range[1]) {
+          const start: Date = range[0];
+          const end: Date = range[1];
+          // Validate: start must be Saturday (6), end must be Friday (5)
+          if (start.getDay() !== 6 || end.getDay() !== 5) {
+            this.weekRangeError = 'Week range must start on Saturday and end on Friday';
+            this.meterDetailsArray?.clear();
+            this.totalMeters = 0;
+            this.baseSalary = 0;
+            this.finalPay = 0;
+            return;
+          }
+          this.weekRangeError = null;
           this.loadWeeklyData(range[0], range[1]);
         }
       });

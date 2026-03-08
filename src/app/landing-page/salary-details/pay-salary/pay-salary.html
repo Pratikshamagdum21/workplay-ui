@@ -76,8 +76,9 @@
                                     <i class="pi pi-calendar"></i> Week Range
                                 </label>
                                 <div class="flex gap-2 align-items-center">
-                                <p-datepicker id="weekRange" formControlName="weekRange" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [minDate]="minDate" [maxDate]="maxDate" placeholder="Select week start and end date">
+                                <p-datepicker id="weekRange" formControlName="weekRange" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [minDate]="minDate" [maxDate]="maxDate" placeholder="Select Saturday to Friday range">
                                 </p-datepicker>
+                                <small *ngIf="weekRangeError" class="p-error">{{ weekRangeError }}</small>
                                 <div *ngIf="singleEntryMeters !== null" class="single-entry-meter-display">
                                     <p-tag severity="success" [value]="'Total Meters: ' + singleEntryMeters"></p-tag>
                                 </div>
@@ -363,7 +364,7 @@
                     <div class="action-buttons">
                         <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="cancel()">
                         </p-button>
-                        <p-button [label]="isEditMode ? 'Update Salary' : 'Save Salary'" icon="pi pi-check" severity="success" type="submit" [loading]="saving" [disabled]="salaryForm.invalid">
+                        <p-button [label]="isEditMode ? 'Update Salary' : 'Save Salary'" icon="pi pi-check" severity="success" type="submit" [loading]="saving" [disabled]="salaryForm.invalid || weekRangeError">
                         </p-button>
                     </div>
                 </div>
