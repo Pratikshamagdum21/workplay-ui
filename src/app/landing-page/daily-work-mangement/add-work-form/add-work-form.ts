@@ -24,7 +24,7 @@ selectedEmp!:Employee;
   fabricTypes: FabricType[] = [];
   shifts: Shift[] = [];
   saving = false;
-  isRangeMode = false;
+  isRangeMode = true;
 
   private destroy$ = new Subject<void>();
 

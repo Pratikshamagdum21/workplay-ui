@@ -46,7 +46,7 @@
             </div>
 
             <!-- Fabric Meters -->
-            <div class="col-12 md:col-6">
+            <div class="col-12 md:col-4">
                 <div class="field">
                     <label for="fabricMeters" class="required-label">
                         <i class="pi pi-chart-line"></i> Fabric (Meters)
@@ -59,17 +59,21 @@
                     </small>
                 </div>
             </div>
-
+<div class="col-12 md:col-2">
+    <div class="field">
+                                           <label for="date" class="required-label">
+                        <i class="pi pi-minus-circle"></i> Weekly Date Mode:
+                    </label>
+                        <p-checkbox [(ngModel)]="isRangeMode" [ngModelOptions]="{standalone: true}" [binary]="true" label="Date Range (Weekly Entry)" (onChange)="onDateModeChange()">
+                        </p-checkbox>
+                    </div>
+</div>
             <!-- Date -->
-            <div class="col-12 md:col-6">
+            <div class="col-12 md:col-5">
                 <div class="field">
                     <label for="date" class="required-label">
                         <i class="pi pi-calendar"></i> Date
                     </label>
-                    <div class="flex align-items-center gap-2 mb-2">
-                        <p-checkbox [(ngModel)]="isRangeMode" [ngModelOptions]="{standalone: true}" [binary]="true" label="Date Range (Weekly Entry)" (onChange)="onDateModeChange()">
-                        </p-checkbox>
-                    </div>
 
                     <!-- Single Date Picker -->
                     <p-datepicker *ngIf="!isRangeMode" id="date" formControlName="date" appendTo="body" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
