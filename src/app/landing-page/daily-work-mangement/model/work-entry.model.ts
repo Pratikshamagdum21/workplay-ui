@@ -4,6 +4,7 @@ export interface WorkEntry {
     employeeType: string;
     fabricMeters: number;
     date: Date;
+    endDate?: Date;
     createdAt: Date;
 }
 

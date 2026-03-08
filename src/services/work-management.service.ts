@@ -50,6 +50,7 @@ export class WorkManagementService {
         const sorted = this.sortByDateDesc(entries.map(e => ({
           ...e,
           date: new Date(e.date),
+          endDate: e.endDate ? new Date(e.endDate) : undefined,
           createdAt: new Date(e.createdAt)
         })));
         this.workEntriesSubject.next(sorted);
@@ -87,13 +88,17 @@ export class WorkManagementService {
     const date = entry.date instanceof Date
       ? entry.date.toLocaleDateString('en-CA')
       : entry.date;
-    const payload = { ...entry, branchId, date };
+    const endDate = entry.endDate
+      ? (entry.endDate instanceof Date ? entry.endDate.toLocaleDateString('en-CA') : entry.endDate)
+      : undefined;
+    const payload = { ...entry, branchId, date, ...(endDate && { endDate }) };
     return this.http.post<WorkEntry>(`${this.baseUrl}/saveWork`, payload).pipe(
       tap((saved) => {
         if (saved) {
           const newEntry: WorkEntry = {
             ...saved,
             date: new Date(saved.date),
+            endDate: saved.endDate ? new Date(saved.endDate) : undefined,
             createdAt: new Date(saved.createdAt)
           };
           const current = this.workEntriesSubject.value;
@@ -136,23 +141,26 @@ export class WorkManagementService {
     }
 
     return allEntries.filter(entry => {
-      const entryDate = new Date(entry.date);
-      entryDate.setHours(0, 0, 0, 0);
+      const entryStart = new Date(entry.date);
+      entryStart.setHours(0, 0, 0, 0);
+      const entryEnd = entry.endDate ? new Date(entry.endDate) : new Date(entry.date);
+      entryEnd.setHours(23, 59, 59, 999);
 
       if (fromDate && toDate) {
         const from = new Date(fromDate);
         from.setHours(0, 0, 0, 0);
         const to = new Date(toDate);
         to.setHours(23, 59, 59, 999);
-        return entryDate >= from && entryDate <= to;
+        // Two ranges overlap iff start1 <= end2 AND end1 >= start2
+        return entryStart <= to && entryEnd >= from;
       } else if (fromDate) {
         const from = new Date(fromDate);
         from.setHours(0, 0, 0, 0);
-        return entryDate >= from;
+        return entryEnd >= from;
       } else if (toDate) {
         const to = new Date(toDate);
         to.setHours(23, 59, 59, 999);
-        return entryDate <= to;
+        return entryStart <= to;
       }
 
       return true;
