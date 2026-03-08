@@ -238,6 +238,36 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     this.salaryForm.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.calculateWeeklySalary());
+
+    // Auto-populate with the previous Sat–Fri week range when not editing
+    if (!this.isEditMode) {
+      const [prevSat, prevFri] = this.getPreviousWeekRange();
+      this.salaryForm.patchValue({ weekRange: [prevSat, prevFri] });
+    }
+  }
+
+  /**
+   * Returns the previous completed Sat–Fri week range relative to today.
+   * If today is Saturday, returns the week that ended yesterday (Friday).
+   */
+  private getPreviousWeekRange(): [Date, Date] {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dayOfWeek = today.getDay(); // 0=Sun, 6=Sat
+
+    // Find the most recent Friday (end of last completed week)
+    // If today is Saturday (6), Friday was 1 day ago
+    // If today is Sunday (0), Friday was 2 days ago
+    // If today is Friday (5), the last completed Friday was 7 days ago
+    const daysSinceLastFriday = (dayOfWeek + 2) % 7 || 7;
+    const lastFriday = new Date(today);
+    lastFriday.setDate(today.getDate() - daysSinceLastFriday);
+
+    // The Saturday that started that week is 6 days before Friday
+    const lastSaturday = new Date(lastFriday);
+    lastSaturday.setDate(lastFriday.getDate() - 6);
+
+    return [lastSaturday, lastFriday];
   }
 
   private initializeMonthlyForm(): void {
