@@ -25,6 +25,7 @@ selectedEmp!:Employee;
   shifts: Shift[] = [];
   saving = false;
   isRangeMode = true;
+  dateRangeError: string | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -53,6 +54,28 @@ selectedEmp!:Employee;
       fabricMeters: [null, [Validators.required, Validators.min(1)]],
       date: [new Date(), Validators.required]
     });
+
+    // Validate Sat-Fri range on date selection
+    this.workForm.get('date')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => {
+        if (!this.isRangeMode || !Array.isArray(value)) {
+          this.dateRangeError = null;
+          return;
+        }
+        const [start, end] = value;
+        if (start && end) {
+          const s = start instanceof Date ? start : new Date(start);
+          const e = end instanceof Date ? end : new Date(end);
+          if (s.getDay() !== 6 || e.getDay() !== 5) {
+            this.dateRangeError = 'Week range must start on Saturday and end on Friday';
+          } else {
+            this.dateRangeError = null;
+          }
+        } else {
+          this.dateRangeError = null;
+        }
+      });
   }
 
   private loadMasterData(): void {
@@ -69,6 +92,7 @@ selectedEmp!:Employee;
   }
 
   onDateModeChange(): void {
+    this.dateRangeError = null;
     this.workForm.get('date')?.setValue(this.isRangeMode ? [] : new Date());
   }
 
@@ -88,6 +112,7 @@ selectedEmp!:Employee;
     }
   }
   onSubmit(): void {
+    if (this.dateRangeError) return;
     if (this.workForm.invalid) {
       this.markFormGroupTouched(this.workForm);
       this.messageService.add({
@@ -119,18 +144,6 @@ selectedEmp!:Employee;
       }
       date = start instanceof Date ? start : new Date(start);
       endDate = end instanceof Date ? end : new Date(end);
-
-      // Validate: range must be Saturday to Friday
-      if (date.getDay() !== 6 || endDate.getDay() !== 5) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Invalid Week Range',
-          detail: 'Date range must start on Saturday and end on Friday',
-          life: 4000
-        });
-        this.saving = false;
-        return;
-      }
     } else {
       date = formValue.date instanceof Date
         ? formValue.date
