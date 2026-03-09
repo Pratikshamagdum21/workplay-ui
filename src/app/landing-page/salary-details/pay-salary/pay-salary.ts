@@ -176,8 +176,8 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
   onEmployeeSelect(event: any): void {
     const employeeId = event.value;
     if (employeeId) {
-      this.loadEmployeeDetails(employeeId);
       this.resetForm();
+      this.loadEmployeeDetails(employeeId);
     } else {
       this.employee = null;
   
