@@ -54,11 +54,11 @@
                     <strong *ngIf="isBonusedEmployee">With Bonus — auto-calculated per payout</strong>
                     <strong *ngIf="!isBonusedEmployee">Without Per-Payout Bonus — year-end bonus applies</strong>
                     <span *ngIf="isBonusedEmployee">
-                        Bonus = (Base Salary / 100) × 16.66&nbsp;&nbsp;→&nbsp;&nbsp;
+                        Bonus = ((Base Salary - Leave Deduction) / 100) × 16.66&nbsp;&nbsp;→&nbsp;&nbsp;
                         <span class="bonus-amount">{{ formatCurrency(autoBonus) }}</span> this cycle
                     </span>
                     <span *ngIf="!isBonusedEmployee">
-                        This employee receives a lump-sum year-end bonus: (Total Year Salary / 100) × 16.66
+                        This employee receives a lump-sum year-end bonus: ((Total Year Salary - Leave Deductions) / 100) × 16.66
                     </span>
                 </div>
             </div>
@@ -69,19 +69,23 @@
                 <!-- WEEKLY WORKER FORM -->
                 <ng-container *ngIf="isWeeklyWorker() || isWeeklyFixedWorker()">
                     <!-- Week Range Selector -->
-                    <div class="col-12">
+                    <div class="col-12 md:col-6">
                         <p-card header="Select Week Range" styleClass="section-card">
                             <div class="field">
                                 <label for="weekRange" class="required-label">
                                     <i class="pi pi-calendar"></i> Week Range
                                 </label>
-                                <p-datepicker id="weekRange" formControlName="weekRange" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [minDate]="minDate" [maxDate]="maxDate" placeholder="Select week start and end date" styleClass="w-full">
+                                <div class="flex gap-2 align-items-center">
+                                <p-datepicker id="weekRange" formControlName="weekRange" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [minDate]="minDate" [maxDate]="maxDate" placeholder="Select Saturday to Friday range">
                                 </p-datepicker>
-                                <small class="p-info">Select the start and end date of the week</small>
+                                <small *ngIf="weekRangeError" class="p-error">{{ weekRangeError }}</small>
+                                <div *ngIf="singleEntryMeters !== null" class="single-entry-meter-display">
+                                    <p-tag severity="success" [value]="'Total Meters: ' + singleEntryMeters"></p-tag>
+                                </div>
+                                </div>
                             </div>
                         </p-card>
                     </div>
-
                     <!-- Rate Per Meter -->
                     <div class="col-12 md:col-6" *ngIf="isWeeklyWorker()">
                         <p-card header="Rate Configuration" styleClass="section-card">
@@ -89,14 +93,15 @@
                                 <label for="ratePerMeter" class="required-label">
                                     <i class="pi pi-money-bill"></i> Rate Per Meter
                                 </label>
-                                <p-inputNumber id="ratePerMeter" formControlName="ratePerMeter" mode="currency" currency="INR" locale="en-IN" [min]="1" [showButtons]="true" styleClass="w-full">
+                                <p-inputNumber id="ratePerMeter" formControlName="ratePerMeter" mode="currency" 
+                                currency="INR" locale="en-IN" [min]="1" [showButtons]="true" styleClass="w-full">
                                 </p-inputNumber>
                             </div>
                         </p-card>
                     </div>
 
                     <!-- Bonus (read-only, auto-calculated) -->
-                    <div class="col-12 md:col-6" *ngIf="isWeeklyWorker()">
+                    <!-- <div class="col-12 md:col-6" *ngIf="isWeeklyWorker()">
                         <p-card header="Bonus" styleClass="section-card">
                             <div class="field">
                                 <label class="info-label">
@@ -104,9 +109,6 @@
                                 </label>
                                 <div class="bonus-readonly-display">
                                     <span class="bonus-calculated-value">{{ formatCurrency(autoBonus) }}</span>
-                                    <small class="p-info" *ngIf="isBonusedEmployee">
-                                        Auto-calculated: (Base Salary / 100) × 16.66
-                                    </small>
                                     <small class="p-info bonus-info-yearly" *ngIf="!isBonusedEmployee">
                                         <i class="pi pi-info-circle"></i>
                                         No per-payout bonus — year-end lump sum applies
@@ -114,34 +116,68 @@
                                 </div>
                             </div>
                         </p-card>
-                    </div>
+                    </div> -->
 
                     <!-- Daily Meter Table -->
                     <div class="col-12" *ngIf="meterDetailsArray && meterDetailsArray.length > 0 && isWeeklyWorker()">
                         <p-card header="Daily Meter Details" styleClass="section-card">
-                            <p-table [value]="meterDetailsArray.controls" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="400px">
-                                <ng-template pTemplate="header">
-                                    <tr>
-                                        <th style="width: 20%">Date</th>
-                                        <th style="width: 15%">Meter</th>
-                                        <th style="width: 30%">Note</th>
-                                    </tr>
-                                </ng-template>
-                                <ng-template pTemplate="body" let-control let-i="rowIndex">
-                                    <tr [formGroup]="control">
-                                        <td>
-                                            <strong>{{ formatDate(control.get('date')?.value) }}</strong>
-                                        </td>
-                                        <td>
-                                            <p-inputNumber formControlName="meter" [min]="0" [showButtons]="true" styleClass="w-full meter-input">
-                                            </p-inputNumber>
-                                        </td>
-                                        <td>
-                                            <input pInputText formControlName="note" placeholder="Add note" class="w-full" />
-                                        </td>
-                                    </tr>
-                                </ng-template>
-                            </p-table>
+                            <!-- Single entry with endDate: one editable row with week range -->
+                            <ng-container *ngIf="singleEntryMeters !== null; else dailyMeterTable">
+                                <p-table [value]="[meterDetailsArray.at(0)]" styleClass="p-datatable-striped">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th style="width: 35%">Week Range</th>
+                                            <th style="width: 25%">Meter</th>
+                                            <th style="width: 40%">Note</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-control>
+                                        <tr [formGroup]="control">
+                                            <td>
+                                                <strong>
+                                                    {{ formatDate(meterDetailsArray.at(0)?.get('date')?.value) }}
+                                                    —
+                                                    {{ formatDate(meterDetailsArray.at(meterDetailsArray.length - 1)?.get('date')?.value) }}
+                                                </strong>
+                                            </td>
+                                            <td>
+                                                <p-inputNumber formControlName="meter" [min]="0" [showButtons]="true" styleClass="w-full meter-input">
+                                                </p-inputNumber>
+                                            </td>
+                                            <td>
+                                                <input pInputText formControlName="note" placeholder="Add note" class="w-full" />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </ng-container>
+
+                            <!-- Multiple entries: show full daily table -->
+                            <ng-template #dailyMeterTable>
+                                <p-table [value]="meterDetailsArray.controls" styleClass="p-datatable-striped" [scrollable]="true" scrollHeight="400px">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th style="width: 20%">Date</th>
+                                            <th style="width: 15%">Meter</th>
+                                            <th style="width: 30%">Note</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-control let-i="rowIndex">
+                                        <tr [formGroup]="control">
+                                            <td>
+                                                <strong>{{ formatDate(control.get('date')?.value) }}</strong>
+                                            </td>
+                                            <td>
+                                                <p-inputNumber formControlName="meter" [min]="0" [showButtons]="true" styleClass="w-full meter-input">
+                                                </p-inputNumber>
+                                            </td>
+                                            <td>
+                                                <input pInputText formControlName="note" placeholder="Add note" class="w-full" />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+                            </ng-template>
 
                             <!-- Weekly Summary -->
                             <div class="weekly-summary">
@@ -184,7 +220,7 @@
                                 <div class="bonus-readonly-display">
                                     <span class="bonus-calculated-value">{{ formatCurrency(autoBonus) }}</span>
                                     <small class="p-info" *ngIf="isBonusedEmployee">
-                                        Auto-calculated: (Monthly Salary / 100) × 16.66
+                                        Auto-calculated: ((Salary - Leave Deduction) / 100) × 16.66
                                     </small>
                                     <small class="p-info bonus-info-yearly" *ngIf="!isBonusedEmployee">
                                         <i class="pi pi-info-circle"></i>
@@ -214,7 +250,9 @@
                                         <label for="leaveDeductionPerDay" class="required-label">
                                             <i class="pi pi-money-bill"></i> Leave Deduction Per Day
                                         </label>
-                                        <p-inputNumber id="leaveDeductionPerDay" formControlName="leaveDeductionPerDay" mode="currency" currency="INR" locale="en-IN" [min]="0" [showButtons]="true" styleClass="w-full">
+                                        <p-inputNumber id="leaveDeductionPerDay" formControlName="leaveDeductionPerDay"
+                                        [minFractionDigits]="0" [maxFractionDigits]="0" 
+                                        mode="currency" currency="INR" locale="en-IN" [min]="0" [showButtons]="true" styleClass="w-full">
                                         </p-inputNumber>
                                     </div>
                                 </div>
@@ -253,7 +291,8 @@
                                     <label for="advanceDeductedThisTime" class="required-label">
                                         <i class="pi pi-wallet"></i> Deduct This Time
                                     </label>
-                                    <p-inputNumber id="advanceDeductedThisTime" formControlName="advanceDeductedThisTime" mode="currency" currency="INR" locale="en-IN" [min]="0" [max]="employee.advanceRemaining" [showButtons]="true" styleClass="w-full">
+                                    <p-inputNumber id="advanceDeductedThisTime" [minFractionDigits]="0" [maxFractionDigits]="0"
+                                    formControlName="advanceDeductedThisTime" mode="currency" currency="INR" locale="en-IN" [min]="0" [max]="employee.advanceRemaining" [showButtons]="true" styleClass="w-full">
                                     </p-inputNumber>
                                     <small class="p-info">
                                         Maximum: {{ formatCurrency(employee.advanceRemaining) }}
@@ -296,8 +335,8 @@
                                     <i class="pi pi-calendar" style="margin-right: 4px;"></i>
                                     Bonus (year-end only):
                                 </span>
-                                                                <span class="calc-value" style="color: #94a3b8;" *ngIf="employee.salaryType === 'WEEKLY'" >₹{{formatCurrency(baseSalary*16.66/100)}} (paid at year end)</span>
-                                <span class="calc-value" style="color: #94a3b8;" *ngIf="employee.salaryType !== 'WEEKLY'" >₹{{formatCurrency(employee.salary*16.66/100)}} (paid at year end)</span>
+                                                                <span class="calc-value" style="color: #94a3b8;" *ngIf="employee.salaryType === 'WEEKLY'" >₹{{formatCurrency((baseSalary - leaveDeductionTotal)*16.66/100)}} (paid at year end)</span>
+                                <span class="calc-value" style="color: #94a3b8;" *ngIf="employee.salaryType !== 'WEEKLY'" >₹{{formatCurrency((employee.salary - leaveDeductionTotal)*16.66/100)}} (paid at year end)</span>
                             </div>
 
                             <div class="calc-row">
@@ -325,7 +364,7 @@
                     <div class="action-buttons">
                         <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="cancel()">
                         </p-button>
-                        <p-button [label]="isEditMode ? 'Update Salary' : 'Save Salary'" icon="pi pi-check" severity="success" type="submit" [loading]="saving" [disabled]="salaryForm.invalid">
+                        <p-button [label]="isEditMode ? 'Update Salary' : 'Save Salary'" icon="pi pi-check" severity="success" type="submit" [loading]="saving" [disabled]="salaryForm.invalid || weekRangeError">
                         </p-button>
                     </div>
                 </div>

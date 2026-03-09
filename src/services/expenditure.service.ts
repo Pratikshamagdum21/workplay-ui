@@ -16,6 +16,7 @@ export interface Expenditure {
   id?:string;
   branchId?:number;
   note: string;
+  receiptIds?: string[];
 }
 
 @Injectable({
@@ -44,7 +45,24 @@ export class ExpenditureService {
     });
   }
 
-  saveExpenditure(expenditure: Expenditure): Observable<Expenditure> {
+  saveExpenditure(expenditure: Expenditure, images?: File[] | null): Observable<Expenditure> {
+    if (images && images.length > 0) {
+      const formData = new FormData();
+      formData.append('expenditure', new Blob([JSON.stringify(expenditure)], { type: 'application/json' }));
+      for (const file of images) {
+        formData.append('images', file, file.name);
+      }
+      return this.http.post<Expenditure>(`${this.baseUrl}/save`, formData).pipe(
+        tap((saved) => {
+          if (saved) {
+            this.expendituresSubject.next([...this.expendituresSubject.value, saved]);
+          } else {
+            this.loadExpenditures();
+          }
+        })
+      );
+    }
+
     return this.http.post<Expenditure>(`${this.baseUrl}/save`, expenditure).pipe(
       tap((saved) => {
         if (saved) {
@@ -52,6 +70,39 @@ export class ExpenditureService {
         } else {
           this.loadExpenditures();
         }
+      })
+    );
+  }
+
+  updateExpenditure(id: string, expenditure: Expenditure, images?: File[] | null, existingReceiptIds?: string[]): Observable<Expenditure> {
+    const hasNewImages = images && images.length > 0;
+    const hasExistingReceipts = existingReceiptIds && existingReceiptIds.length > 0;
+
+    if (hasNewImages || hasExistingReceipts) {
+      const formData = new FormData();
+      formData.append('expenditure', new Blob([JSON.stringify(expenditure)], { type: 'application/json' }));
+      if (hasNewImages) {
+        for (const file of images) {
+          formData.append('images', file, file.name);
+        }
+      }
+      if (hasExistingReceipts) {
+        for (const receiptId of existingReceiptIds) {
+          formData.append('existingReceiptIds', receiptId);
+        }
+      }
+      return this.http.put<Expenditure>(`${this.baseUrl}/update/${id}`, formData).pipe(
+        tap((updated) => {
+          const list = this.expendituresSubject.value.map(e => e.id === id ? updated : e);
+          this.expendituresSubject.next(list);
+        })
+      );
+    }
+
+    return this.http.put<Expenditure>(`${this.baseUrl}/update/${id}`, expenditure).pipe(
+      tap((updated) => {
+        const list = this.expendituresSubject.value.map(e => e.id === id ? updated : e);
+        this.expendituresSubject.next(list);
       })
     );
   }
@@ -74,6 +125,10 @@ export class ExpenditureService {
     })
   );
 }
+
+  getReceiptImageUrl(receiptId: string): string {
+    return `${this.baseUrl}/receipt/${receiptId}`;
+  }
 
   getAllExpenditures(): Observable<Expenditure[]> {
     return this.expenditures$;

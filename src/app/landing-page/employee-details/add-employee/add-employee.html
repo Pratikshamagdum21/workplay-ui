@@ -114,11 +114,11 @@
             <!-- Advance Amount -->
             <div class="col-12 md:col-6">
                 <div class="field">
-                    <label for="advanceAmount" class="required-label">
+                    <label for="advanceAmount">
                         <i class="pi pi-wallet"></i> Advance Amount
                     </label>
                     <p-inputNumber id="advanceAmount" [ngModel]="employeeData?.advanceAmount"
-                    formControlName="advanceAmount" mode="currency"
+                    formControlName="advanceAmount" mode="currency" [minFractionDigits]="0" [maxFractionDigits]="0"
                         currency="INR" locale="en-IN" [min]="0" [showButtons]="true"
                         buttonLayout="horizontal" incrementButtonIcon="pi pi-plus"
                         decrementButtonIcon="pi pi-minus" placeholder="Enter advance amount"
@@ -134,11 +134,12 @@
             <!-- Monthly Salary (MONTHLY only) -->
             <div class="col-12 md:col-6" *ngIf="isMonthly()">
                 <div class="field">
-                    <label for="salary" class="required-label">
+                    <label for="salary">
                         <i class="pi pi-dollar"></i> Monthly Salary
                     </label>
                     <p-inputNumber id="salary" [ngModel]="employeeData?.salary"
                      formControlName="salary" mode="currency" currency="INR"
+                     [minFractionDigits]="0" [maxFractionDigits]="0"
                         locale="en-IN" [min]="0" [showButtons]="true" buttonLayout="horizontal"
                         incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
                         placeholder="Enter monthly salary" styleClass="w-full"
@@ -178,6 +179,7 @@
                     </label>
                     <p-inputNumber id="salary" [ngModel]="employeeData?.salary"
                      formControlName="salary" mode="currency" currency="INR"
+                     [minFractionDigits]="0" [maxFractionDigits]="0"
                         locale="en-IN" [min]="0" [showButtons]="true" buttonLayout="horizontal"
                         incrementButtonIcon="pi pi-plus" decrementButtonIcon="pi pi-minus"
                         placeholder="Enter monthly salary" styleClass="w-full"
