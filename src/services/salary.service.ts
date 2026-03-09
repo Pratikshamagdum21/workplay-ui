@@ -60,7 +60,7 @@ export class SalaryService {
 
     while (currentDate <= weekRange.endDate) {
       dailyMeters.push({
-        date: currentDate.toISOString().split('T')[0],
+        date: currentDate.toLocaleDateString('en-CA'),
         meter: 0,
         isLeave: false,
         leaveDeduction: 0,

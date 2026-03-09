@@ -46,7 +46,7 @@
             </div>
 
             <!-- Fabric Meters -->
-            <div class="col-12 md:col-6">
+            <div class="col-12 md:col-4">
                 <div class="field">
                     <label for="fabricMeters" class="required-label">
                         <i class="pi pi-chart-line"></i> Fabric (Meters)
@@ -59,16 +59,33 @@
                     </small>
                 </div>
             </div>
-
+<div class="col-12 md:col-2">
+    <div class="field">
+                                           <label for="date" class="required-label">
+                        <i class="pi pi-minus-circle"></i> Weekly Date Mode:
+                    </label>
+                        <p-checkbox [(ngModel)]="isRangeMode" [ngModelOptions]="{standalone: true}" [binary]="true" label="Date Range (Weekly Entry)" (onChange)="onDateModeChange()">
+                        </p-checkbox>
+                    </div>
+</div>
             <!-- Date -->
-            <div class="col-12 md:col-6">
+            <div class="col-12 md:col-5">
                 <div class="field">
                     <label for="date" class="required-label">
                         <i class="pi pi-calendar"></i> Date
                     </label>
-                    <p-datepicker id="date" formControlName="date" appendTo="body" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
+
+                    <!-- Single Date Picker -->
+                    <p-datepicker *ngIf="!isRangeMode" id="date" formControlName="date" appendTo="body" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Date" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
                     </p-datepicker>
-                    <small class="p-error" *ngIf="isFieldInvalid('date')">
+
+                    <!-- Range Date Picker -->
+                    <p-datepicker *ngIf="isRangeMode" id="date" formControlName="date" appendTo="body" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" [showButtonBar]="true" placeholder="Select Saturday to Friday range" styleClass="w-full" [class.ng-invalid]="isFieldInvalid('date')" [class.ng-dirty]="isFieldInvalid('date')">
+                    </p-datepicker>
+                    <small *ngIf="dateRangeError" class="p-error">{{ dateRangeError }}</small>
+                    <small *ngIf="isRangeMode && !dateRangeError" class="text-color-secondary">Week must start on Saturday and end on Friday</small>
+
+                    <small class="p-error" *ngIf="isFieldInvalid('date') && !dateRangeError">
                         {{ getErrorMessage('date') }}
                     </small>
                 </div>
@@ -77,7 +94,7 @@
             <!-- Action Buttons -->
             <div class="col-12">
                 <div class="button-group">
-                    <p-button label="Add Entry" icon="pi pi-plus" type="submit" severity="success" [disabled]="workForm.invalid">
+                    <p-button label="Add Entry" icon="pi pi-plus" type="submit" severity="success" [disabled]="workForm.invalid || dateRangeError">
                     </p-button>
                     <p-button label="Reset" icon="pi pi-refresh" type="button" severity="secondary" [outlined]="true" (onClick)="resetForm()">
                     </p-button>

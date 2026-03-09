@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideRouter } from '@angular/router';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { CustomRate } from './custom-rate';
 
 describe('CustomRate', () => {
@@ -8,9 +9,9 @@ describe('CustomRate', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CustomRate]
-    })
-    .compileComponents();
+      imports: [CustomRate, NoopAnimationsModule],
+      providers: [provideRouter([])]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CustomRate);
     component = fixture.componentInstance;

@@ -24,6 +24,8 @@ selectedEmp!:Employee;
   fabricTypes: FabricType[] = [];
   shifts: Shift[] = [];
   saving = false;
+  isRangeMode = true;
+  dateRangeError: string | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -52,6 +54,28 @@ selectedEmp!:Employee;
       fabricMeters: [null, [Validators.required, Validators.min(1)]],
       date: [new Date(), Validators.required]
     });
+
+    // Validate Sat-Fri range on date selection
+    this.workForm.get('date')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(value => {
+        if (!this.isRangeMode || !Array.isArray(value)) {
+          this.dateRangeError = null;
+          return;
+        }
+        const [start, end] = value;
+        if (start && end) {
+          const s = start instanceof Date ? start : new Date(start);
+          const e = end instanceof Date ? end : new Date(end);
+          if (s.getDay() !== 6 || e.getDay() !== 5) {
+            this.dateRangeError = 'Week range must start on Saturday and end on Friday';
+          } else {
+            this.dateRangeError = null;
+          }
+        } else {
+          this.dateRangeError = null;
+        }
+      });
   }
 
   private loadMasterData(): void {
@@ -65,6 +89,11 @@ selectedEmp!:Employee;
       });
     this.workTypes = this.workService.getWorkTypes();
     this.shifts = this.workService.getShifts();
+  }
+
+  onDateModeChange(): void {
+    this.dateRangeError = null;
+    this.workForm.get('date')?.setValue(this.isRangeMode ? [] : new Date());
   }
 
   onEmployeeChange(event: any): void {
@@ -83,6 +112,7 @@ selectedEmp!:Employee;
     }
   }
   onSubmit(): void {
+    if (this.dateRangeError) return;
     if (this.workForm.invalid) {
       this.markFormGroupTouched(this.workForm);
       this.messageService.add({
@@ -97,15 +127,35 @@ selectedEmp!:Employee;
     this.saving = true;
     const formValue = this.workForm.getRawValue();
 
-    const date = formValue.date instanceof Date
-      ? formValue.date.toLocaleDateString('en-CA')
-      : formValue.date;
+    let date: Date;
+    let endDate: Date | undefined;
+
+    if (this.isRangeMode && Array.isArray(formValue.date)) {
+      const [start, end] = formValue.date;
+      if (!start || !end) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Validation Error',
+          detail: 'Please select both start and end dates',
+          life: 3000
+        });
+        this.saving = false;
+        return;
+      }
+      date = start instanceof Date ? start : new Date(start);
+      endDate = end instanceof Date ? end : new Date(end);
+    } else {
+      date = formValue.date instanceof Date
+        ? formValue.date
+        : new Date(formValue.date);
+    }
 
     const workEntry = {
       employeeName: formValue.employeeName?.name || formValue.employeeName,
       employeeType: formValue.employeeType,
       fabricMeters: formValue.fabricMeters,
-      date: date
+      date: date,
+      ...(endDate && { endDate })
     };
 
     this.workService.addEntry(workEntry)
@@ -135,6 +185,7 @@ selectedEmp!:Employee;
   }
 
   resetForm(): void {
+    this.isRangeMode = false;
     this.workForm.get('employeeType')?.enable();
     this.workForm.get('workType')?.enable();
     this.workForm.reset({ date: new Date() });

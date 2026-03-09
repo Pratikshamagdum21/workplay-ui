@@ -14,7 +14,9 @@
 
                     <div class="col-12 md:col-6">
                         <label class="required-label">Amount</label>
-                        <p-inputNumber formControlName="amount" mode="currency" currency="INR" locale="en-IN" [min]="1">
+                        <p-inputNumber formControlName="amount" mode="currency" [minFractionDigits]="0" [maxFractionDigits]="0"
+                        currency="INR" locale="en-IN" [min]="1"
+  >
                         </p-inputNumber>
                         <!-- <small class="p-error" *ngIf="expenseForm?.controls?.amount?.touched && expenseForm?.controls?.amount?.invalid">
               Enter valid amount
@@ -36,10 +38,80 @@
             </textarea>
                     </div>
 
+                    <div class="col-12">
+                        <label>Upload Receipt Images</label>
+                        <div class="receipt-upload-area">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                capture="environment"
+                                (change)="onReceiptSelected($event)"
+                                #receiptInput
+                                class="receipt-file-input"
+                            />
+                            <div class="receipt-thumbnails" *ngIf="receiptPreviewUrls.length > 0">
+                                <div class="receipt-preview" *ngFor="let url of receiptPreviewUrls; let i = index">
+                                    <img [src]="url" alt="Receipt preview" (click)="openImageViewer(i)" />
+                                    <div class="receipt-preview-actions">
+                                        <button type="button" class="preview-action-btn" (click)="openImageViewer(i)" title="Zoom">
+                                            <i class="pi pi-search-plus"></i>
+                                        </button>
+                                        <button type="button" class="preview-action-btn remove" (click)="removeReceipt(i)" title="Remove">
+                                            <i class="pi pi-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="add-more-btn" (click)="receiptInput.click()">
+                                    <i class="pi pi-plus"></i>
+                                    <small>Add more</small>
+                                </div>
+                            </div>
+                            <div class="upload-placeholder" (click)="receiptInput.click()" *ngIf="receiptPreviewUrls.length === 0">
+                                <i class="pi pi-images"></i>
+                                <span>Click to upload receipt images</span>
+                                <small>JPG, PNG, WEBP (multiple allowed)</small>
+                            </div>
+                            <small class="p-error" *ngIf="receiptError">{{ receiptError }}</small>
+                        </div>
+                    </div>
+
+                    <!-- Image Viewer Overlay -->
+                    <div class="image-viewer-overlay" *ngIf="showImageViewer" (click)="closeImageViewer()">
+                        <div class="image-viewer-content" (click)="$event.stopPropagation()">
+                            <div class="image-viewer-toolbar">
+                                <button type="button" (click)="viewerPrev()" [disabled]="viewerImageIndex <= 0" title="Previous">
+                                    <i class="pi pi-chevron-left"></i>
+                                </button>
+                                <span class="zoom-level">{{ viewerImageIndex + 1 }} / {{ receiptPreviewUrls.length }}</span>
+                                <button type="button" (click)="viewerNext()" [disabled]="viewerImageIndex >= receiptPreviewUrls.length - 1" title="Next">
+                                    <i class="pi pi-chevron-right"></i>
+                                </button>
+                                <span class="toolbar-separator"></span>
+                                <button type="button" (click)="zoomOut()" [disabled]="imageZoom <= 0.25" title="Zoom Out">
+                                    <i class="pi pi-minus"></i>
+                                </button>
+                                <span class="zoom-level">{{ (imageZoom * 100) | number:'1.0-0' }}%</span>
+                                <button type="button" (click)="zoomIn()" [disabled]="imageZoom >= 3" title="Zoom In">
+                                    <i class="pi pi-plus"></i>
+                                </button>
+                                <button type="button" (click)="resetZoom()" title="Reset Zoom">
+                                    <i class="pi pi-refresh"></i>
+                                </button>
+                                <button type="button" (click)="closeImageViewer()" title="Close" class="close-btn">
+                                    <i class="pi pi-times"></i>
+                                </button>
+                            </div>
+                            <div class="image-viewer-body">
+                                <img [src]="receiptPreviewUrls[viewerImageIndex]" alt="Receipt" [style.transform]="'scale(' + imageZoom + ')'" />
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="col-12 flex justify-content-end mt-3">
                         <p-button label="Cancel" icon="pi pi-times" severity="secondary" [outlined]="true" type="button" (onClick)="cancel()">
                         </p-button>
-                        <p-button label="Save Expense" icon="pi pi-check" severity="success" type="submit" [disabled]="expenseForm.invalid">
+                        <p-button [label]="isEditMode ? 'Update Expense' : 'Save Expense'" icon="pi pi-check" severity="success" type="submit" [disabled]="expenseForm.invalid">
                         </p-button>
                     </div>
                 </div>
