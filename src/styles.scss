@@ -5,10 +5,14 @@
 // ─────────────────────────────────────────────
 html {
   font-size: 80%; // scale down the entire UI (~12.8px base instead of 16px)
-  -webkit-text-size-adjust: 100%; // prevent Android auto-scaling
+  -webkit-text-size-adjust: 100%; // prevent auto-scaling
   scroll-behavior: smooth;
-    font-size: 80%; // ~12.8px base instead of 16px
+}
 
+@media (max-width: 640px) {
+  html {
+    font-size: 87.5%; // ~14px base on mobile for better readability
+  }
 }
 
 body {
@@ -435,6 +439,159 @@ body {
 // ─────────────────────────────────────────────
 .employee-list-container,
 .daily-work-management,
-.dashboard-container {
+.dashboard-container,
+.salary-create-container,
+.add-expense-container {
   padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+}
+
+// ─────────────────────────────────────────────
+// 15. MOBILE WEB — prevent overflow & fix alignment
+// ─────────────────────────────────────────────
+@media (max-width: 640px) {
+  // Prevent horizontal overflow on the whole page
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  // PrimeFlex grid — remove negative margins that cause horizontal scroll
+  .grid {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .grid > [class*="col-"] {
+    padding-left: 0.35rem !important;
+    padding-right: 0.35rem !important;
+  }
+
+  // Flex containers that hold header actions — stack vertically
+  .flex.justify-content-between {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  // Ensure inline header action groups wrap properly
+  .header-actions {
+    width: 100%;
+
+    p-button, .p-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  // Fix salary-create-container inside dialog on mobile
+  .salary-create-container {
+    padding: 0.5rem !important;
+
+    .employee-info-banner {
+      flex-direction: column !important;
+      gap: 0.5rem;
+      padding: 0.75rem;
+    }
+
+    .weekly-summary {
+      flex-direction: column !important;
+      gap: 0.5rem;
+      padding: 0.75rem;
+    }
+
+    .advance-info-box {
+      padding: 0.5rem;
+    }
+
+    .calculation-breakdown .calc-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.15rem;
+
+      .calc-value {
+        align-self: flex-end;
+      }
+    }
+
+    .action-buttons {
+      flex-direction: column !important;
+
+      p-button {
+        width: 100%;
+      }
+    }
+  }
+
+  // Fix add-expense container inside dialog
+  .add-expense-container {
+    padding: 0.25rem !important;
+
+    form {
+      padding: 0.75rem !important;
+    }
+  }
+
+  // View employee details — tighter padding inside dialog
+  .employee-details-container {
+    padding: 0.5rem !important;
+
+    .financial-item {
+      padding: 0.5rem;
+    }
+
+    .footer-actions {
+      justify-content: stretch;
+
+      p-button {
+        width: 100%;
+      }
+    }
+  }
+
+  // Ensure all p-button inside flex containers are full width on mobile
+  .button-group {
+    flex-direction: column !important;
+
+    p-button {
+      width: 100%;
+
+      .p-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  // Fix PrimeNG input-number width inside grid columns
+  p-inputNumber,
+  .p-inputnumber {
+    width: 100%;
+  }
+
+  .p-inputnumber-input {
+    width: 100% !important;
+  }
+
+  // Ensure select dropdowns don't overflow
+  p-select,
+  .p-select {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  // Fix datepicker overflow
+  p-datepicker,
+  .p-datepicker {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  .p-datepicker-input {
+    width: 100% !important;
+  }
+
+  // Textarea full width
+  textarea {
+    width: 100% !important;
+    max-width: 100%;
+  }
 }

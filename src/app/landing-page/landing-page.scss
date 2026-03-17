@@ -86,3 +86,70 @@
   gap: 0.625rem;
   flex-wrap: wrap;
 }
+
+/* Responsive — mobile */
+@media (max-width: 640px) {
+  .dashboard-container {
+    padding: 0.5rem;
+  }
+
+  .dash-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+
+    h2 {
+      font-size: 1.1rem;
+    }
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .kpi-value {
+    font-size: 1.1rem;
+  }
+
+  .kpi-label {
+    font-size: 0.72rem;
+  }
+
+  .kpi-sub {
+    font-size: 0.65rem;
+  }
+
+  .kpi-icon {
+    font-size: 1.2rem;
+  }
+
+  .kpi-content {
+    gap: 0.5rem;
+  }
+
+  .tables-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+
+    p-button {
+      width: 100%;
+
+      .p-button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}

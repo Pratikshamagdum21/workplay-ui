@@ -96,15 +96,54 @@
         }
     }
 
+    @media (max-width: 640px) {
+        padding: 0.5rem;
+
+        .page-header {
+            margin-bottom: 0.75rem;
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+
+                .header-actions {
+                    width: 100%;
+
+                    p-button {
+                        width: 100%;
+
+                        .p-button {
+                            width: 100%;
+                            justify-content: center;
+                        }
+                    }
+                }
+            }
+
+            h1 {
+                font-size: 1.1rem;
+            }
+
+            .subtitle {
+                font-size: 0.8rem;
+            }
+        }
+
+        .action-buttons {
+            gap: 0.2rem;
+        }
+    }
+
     @media (max-width: 480px) {
-        padding: 0;
+        padding: 0.35rem;
 
         .page-header h1 {
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .page-header .subtitle {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
     }
      :host ::ng-deep {

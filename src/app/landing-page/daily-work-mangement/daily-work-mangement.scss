@@ -184,14 +184,21 @@
             // Stack the two action buttons vertically
             > .flex {
                 width: 100%;
+                flex-direction: column;
+                gap: 0.35rem;
             }
 
             .header-actions {
                 width: 100%;
+                margin-right: 0 !important;
 
-                .p-button {
+                p-button {
                     width: 100%;
-                    justify-content: center;
+
+                    .p-button {
+                        width: 100%;
+                        justify-content: center;
+                    }
                 }
             }
         }
@@ -202,6 +209,12 @@
 
         .statistics-section {
             margin-bottom: 0.5rem;
+        }
+
+        // Expense records header
+        .flex.justify-content-between.align-items-center {
+            flex-wrap: wrap;
+            gap: 0.25rem;
         }
     }
 
