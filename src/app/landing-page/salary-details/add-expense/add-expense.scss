@@ -47,6 +47,10 @@
             .receipt-file-input {
                 display: none;
             }
+            .upload-placeholder-group {
+                display: flex;
+                gap: 0.75rem;
+            }
             .upload-placeholder {
                 display: flex;
                 flex-direction: column;
@@ -59,21 +63,19 @@
                 cursor: pointer;
                 transition: all 0.2s ease;
                 color: #94a3b8;
+                flex: 1;
                 &:hover {
                     border-color: #6366f1;
                     background: rgba(99, 102, 241, 0.04);
                     color: #6366f1;
                 }
-                i {
-                    font-size: 1.5rem;
+                &.camera-placeholder {
+                    border-color: #a5b4fc;
+                    color: #6366f1;
                 }
-                span {
-                    font-size: 0.875rem;
-                    font-weight: 500;
-                }
-                small {
-                    font-size: 0.75rem;
-                }
+                i { font-size: 1.5rem; }
+                span { font-size: 0.875rem; font-weight: 500; }
+                small { font-size: 0.75rem; }
             }
             .receipt-thumbnails {
                 display: flex;
@@ -144,6 +146,10 @@
                     border-color: #6366f1;
                     color: #6366f1;
                     background: rgba(99, 102, 241, 0.04);
+                }
+                &.camera-btn {
+                    border-color: #a5b4fc;
+                    color: #6366f1;
                 }
                 i {
                     font-size: 1.25rem;
