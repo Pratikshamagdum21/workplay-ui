@@ -233,6 +233,63 @@
             text-align: center;
         }
     }
+
+    @media (max-width: 640px) {
+        padding: 0.5rem;
+
+        .detail-card {
+            margin-bottom: 0.5rem;
+
+            .card-header {
+                padding: 0.5rem 0.75rem;
+
+                h3 {
+                    font-size: 0.9rem;
+                }
+            }
+        }
+
+        .financial-card .financial-item {
+            flex-direction: row;
+            text-align: left;
+            padding: 0.5rem;
+            gap: 0.5rem;
+
+            .financial-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+
+                i {
+                    font-size: 1rem;
+                }
+            }
+
+            .financial-details {
+                .financial-label {
+                    font-size: 0.72rem;
+                }
+
+                .financial-value {
+                    font-size: 1rem;
+                }
+            }
+        }
+
+        .footer-actions {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+
+            p-button {
+                width: 100%;
+
+                .p-button {
+                    width: 100%;
+                    justify-content: center;
+                }
+            }
+        }
+    }
      :host ::ng-deep {
         .p-card-body {
             padding: 1rem;

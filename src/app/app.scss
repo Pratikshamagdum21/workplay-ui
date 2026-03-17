@@ -20,8 +20,9 @@
 
 @media (max-width: 768px) {
     .main-content {
-        margin-left: 70px;
-        width: calc(100% - 70px);
+        margin-left: 75px;
+        width: calc(100% - 75px);
+        padding-left: 0.5rem;
     }
 }
 

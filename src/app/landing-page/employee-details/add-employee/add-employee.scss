@@ -95,4 +95,46 @@
             width: 100%;
         }
     }
+
+    @media (max-width: 640px) {
+        padding: 0.5rem;
+
+        .field {
+            margin-bottom: 0.625rem;
+
+            label {
+                font-size: 0.82rem;
+            }
+        }
+
+        // Ensure the bare .col (Work Type) is full width
+        .grid > .col {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .net-payable-section {
+            flex-direction: column;
+            gap: 0.25rem;
+            text-align: center;
+            padding: 0.625rem;
+
+            .net-payable-value {
+                font-size: 1.15rem;
+            }
+        }
+
+        .button-group {
+            flex-direction: column;
+
+            p-button {
+                width: 100%;
+
+                .p-button {
+                    width: 100%;
+                    justify-content: center;
+                }
+            }
+        }
+    }
 }
