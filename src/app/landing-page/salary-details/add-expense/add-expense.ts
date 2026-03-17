@@ -4,6 +4,8 @@ import { MessageService } from 'primeng/api';
 import { SHARED_IMPORTS } from '../../../shared-imports';
 import { Expenditure, ExpenditureService } from '../../../../services/expenditure.service';
 import { BranchService } from '../../../../services/branch.service';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-add-expense',
@@ -27,6 +29,8 @@ export class AddExpense implements OnInit, OnChanges {
   showImageViewer: boolean = false;
   imageZoom: number = 1;
   viewerImageIndex: number = 0;
+
+  isNativePlatform = Capacitor.isNativePlatform();
 
   private readonly allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
   private readonly maxImageWidth = 1024;
@@ -118,6 +122,37 @@ export class AddExpense implements OnInit, OnChanges {
     }
 
     input.value = '';
+  }
+
+  async captureFromCamera(): Promise<void> {
+    try {
+      this.receiptError = null;
+      const image = await Camera.getPhoto({
+        quality: 80,
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Camera,
+        width: this.maxImageWidth,
+        correctOrientation: true,
+      });
+
+      if (image.dataUrl) {
+        const response = await fetch(image.dataUrl);
+        const blob = await response.blob();
+        const fileName = `camera_receipt_${Date.now()}.${image.format || 'jpeg'}`;
+        const file = new File([blob], fileName, { type: `image/${image.format || 'jpeg'}` });
+
+        this.ngZone.run(() => {
+          this.selectedReceiptFiles.push(file);
+          this.receiptPreviewUrls.push(image.dataUrl!);
+        });
+      }
+    } catch (error: any) {
+      if (error?.message !== 'User cancelled photos app') {
+        this.ngZone.run(() => {
+          this.receiptError = 'Failed to capture photo. Please try again.';
+        });
+      }
+    }
   }
 
   private resizeImage(file: File): void {

@@ -66,11 +66,22 @@
                                     <i class="pi pi-plus"></i>
                                     <small>Add more</small>
                                 </div>
+                                <div class="add-more-btn camera-btn" (click)="captureFromCamera()" *ngIf="isNativePlatform">
+                                    <i class="pi pi-camera"></i>
+                                    <small>Camera</small>
+                                </div>
                             </div>
-                            <div class="upload-placeholder" (click)="receiptInput.click()" *ngIf="receiptPreviewUrls.length === 0">
-                                <i class="pi pi-images"></i>
-                                <span>Click to upload receipt images</span>
-                                <small>JPG, PNG, WEBP (multiple allowed)</small>
+                            <div class="upload-placeholder-group" *ngIf="receiptPreviewUrls.length === 0">
+                                <div class="upload-placeholder" (click)="receiptInput.click()">
+                                    <i class="pi pi-images"></i>
+                                    <span>Upload from gallery</span>
+                                    <small>JPG, PNG, WEBP (multiple allowed)</small>
+                                </div>
+                                <div class="upload-placeholder camera-placeholder" (click)="captureFromCamera()" *ngIf="isNativePlatform">
+                                    <i class="pi pi-camera"></i>
+                                    <span>Take a photo</span>
+                                    <small>Capture receipt with camera</small>
+                                </div>
                             </div>
                             <small class="p-error" *ngIf="receiptError">{{ receiptError }}</small>
                         </div>
