@@ -148,6 +148,7 @@
                     <td>
                         <div class="date-cell">
                             <i class="pi pi-calendar"></i> {{ formatDate(entry.date) }}
+                            <span *ngIf="entry.endDate"> - {{ formatDate(entry.endDate) }}</span>
                         </div>
                     </td>
                     <td>

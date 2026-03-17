@@ -1,0 +1,228 @@
+<div class="create-invoice-container">
+    <p-toast></p-toast>
+
+    <form [formGroup]="invoiceForm" (ngSubmit)="submit()">
+        <!-- Business Info Section -->
+        <div class="section-header">
+            <h3><i class="pi pi-building"></i> Business Information</h3>
+            <p-button label="Configure" icon="pi pi-cog" [text]="true" severity="info"
+                (onClick)="openBusinessInfoDialog()"></p-button>
+        </div>
+        <div class="business-info-summary" *ngIf="businessInfo">
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Business Name</label>
+                    <span>{{ businessInfo.businessName }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Owner</label>
+                    <span>{{ businessInfo.ownerName }}</span>
+                </div>
+                <div class="info-item">
+                    <label>GSTIN</label>
+                    <span>{{ businessInfo.gstin }}</span>
+                </div>
+                <div class="info-item">
+                    <label>State</label>
+                    <span>{{ businessInfo.state }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Phone</label>
+                    <span>{{ businessInfo.phoneNumber }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Address</label>
+                    <span>{{ businessInfo.address }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="business-info-warning" *ngIf="!businessInfo">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>Business information not configured. Please click "Configure" to set up.</span>
+        </div>
+
+        <p-divider></p-divider>
+
+        <!-- Invoice Info Section -->
+        <h3><i class="pi pi-file"></i> Invoice Information</h3>
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="invoiceNumber">Invoice Number *</label>
+                <input pInputText id="invoiceNumber" formControlName="invoiceNumber"
+                    placeholder="Enter invoice number" />
+            </div>
+            <div class="form-field">
+                <label for="invoiceDate">Invoice Date *</label>
+                <p-datepicker id="invoiceDate" formControlName="invoiceDate" dateFormat="dd/mm/yy"
+                    [showIcon]="true" appendTo="body"></p-datepicker>
+            </div>
+        </div>
+
+        <p-divider></p-divider>
+
+        <!-- Customer Section -->
+        <div class="section-header">
+            <h3><i class="pi pi-user"></i> Customer Information</h3>
+            <p-button label="Add Customer" icon="pi pi-plus" [text]="true" severity="success"
+                (onClick)="openAddCustomerDialog()"></p-button>
+        </div>
+        <div class="form-grid">
+            <div class="form-field full-width">
+                <label for="customerSelect">Select Customer</label>
+                <p-select id="customerSelect" [options]="customers" [(ngModel)]="selectedCustomer"
+                    [ngModelOptions]="{standalone: true}" optionLabel="name"
+                    placeholder="Select a customer" [filter]="true" filterBy="name"
+                    (onChange)="onCustomerChange($event)" appendTo="body" [showClear]="true">
+                </p-select>
+            </div>
+            <div class="form-field">
+                <label for="customerName">Customer Name *</label>
+                <input pInputText id="customerName" formControlName="customerName"
+                    placeholder="Customer name" />
+            </div>
+            <div class="form-field">
+                <label for="customerAddress">Address</label>
+                <input pInputText id="customerAddress" formControlName="customerAddress"
+                    placeholder="Customer address" />
+            </div>
+            <div class="form-field">
+                <label for="customerContact">Contact Number</label>
+                <input pInputText id="customerContact" formControlName="customerContact"
+                    placeholder="Contact number" />
+            </div>
+            <div class="form-field">
+                <label for="customerGstin">GSTIN</label>
+                <input pInputText id="customerGstin" formControlName="customerGstin"
+                    placeholder="Customer GSTIN" />
+            </div>
+            <div class="form-field">
+                <label for="customerState">State</label>
+                <input pInputText id="customerState" formControlName="customerState"
+                    placeholder="Customer state" />
+            </div>
+        </div>
+
+        <p-divider></p-divider>
+
+        <!-- Fabric Quality Section -->
+        <h3><i class="pi pi-box"></i> Fabric Quality</h3>
+        <div class="form-grid">
+            <div class="form-field full-width">
+                <label for="qualitySelect">Select Fabric Quality *</label>
+                <p-select id="qualitySelect" [options]="fabricQualities" [(ngModel)]="selectedQuality"
+                    [ngModelOptions]="{standalone: true}" optionLabel="name"
+                    placeholder="Select fabric quality" [filter]="true" filterBy="name"
+                    (onChange)="onQualityChange($event)" appendTo="body" [showClear]="true">
+                </p-select>
+            </div>
+            <div class="form-field">
+                <label for="qualityName">Quality Name *</label>
+                <input pInputText id="qualityName" formControlName="qualityName"
+                    placeholder="Quality name" readonly />
+            </div>
+            <div class="form-field">
+                <label for="width">Width</label>
+                <input pInputText id="width" formControlName="width" placeholder="Width" readonly />
+            </div>
+            <div class="form-field">
+                <label for="fani">Fani</label>
+                <input pInputText id="fani" formControlName="fani" placeholder="Fani" readonly />
+            </div>
+            <div class="form-field">
+                <label for="peak">Peak</label>
+                <input pInputText id="peak" formControlName="peak" placeholder="Peak" readonly />
+            </div>
+            <div class="form-field">
+                <label for="warp">Warp</label>
+                <input pInputText id="warp" formControlName="warp" placeholder="Warp" readonly />
+            </div>
+            <div class="form-field">
+                <label for="weft">Weft</label>
+                <input pInputText id="weft" formControlName="weft" placeholder="Weft" readonly />
+            </div>
+        </div>
+
+        <p-divider></p-divider>
+
+        <!-- Quantity & Rate Section -->
+        <h3><i class="pi pi-calculator"></i> Quantity & Rate</h3>
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="rolls">Rolls *</label>
+                <p-inputNumber id="rolls" formControlName="rolls" [min]="0"
+                    placeholder="Number of rolls"></p-inputNumber>
+            </div>
+            <div class="form-field">
+                <label for="meters">Total Meters *</label>
+                <p-inputNumber id="meters" formControlName="meters" [min]="0"
+                    [minFractionDigits]="2" [maxFractionDigits]="2"
+                    placeholder="Total meters"></p-inputNumber>
+            </div>
+            <div class="form-field">
+                <label for="rate">Rate Per Meter *</label>
+                <p-inputNumber id="rate" formControlName="rate" [min]="0"
+                    [minFractionDigits]="2" [maxFractionDigits]="2" mode="currency" currency="INR"
+                    locale="en-IN" placeholder="Rate per meter"></p-inputNumber>
+            </div>
+        </div>
+
+        <p-divider></p-divider>
+
+        <!-- Calculation Summary -->
+        <h3><i class="pi pi-indian-rupee"></i> Amount Summary</h3>
+        <div class="amount-summary">
+            <div class="summary-row">
+                <span class="summary-label">Total Amount (Meters x Rate)</span>
+                <span class="summary-value">{{ formatCurrency(totalAmount) }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">CGST (2.5%)</span>
+                <span class="summary-value">{{ formatCurrency(cgstAmount) }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">SGST (2.5%)</span>
+                <span class="summary-value">{{ formatCurrency(sgstAmount) }}</span>
+            </div>
+            <p-divider></p-divider>
+            <div class="summary-row total-row">
+                <span class="summary-label">Net Payable</span>
+                <span class="summary-value">{{ formatCurrency(netPayable) }}</span>
+            </div>
+            <div class="summary-row words-row">
+                <span class="summary-label">Amount in Words</span>
+                <span class="summary-value words">{{ amountInWords }}</span>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true"
+                (onClick)="cancel()"></p-button>
+            <p-button label="Create Invoice" icon="pi pi-check" severity="success"
+                type="submit"></p-button>
+        </div>
+    </form>
+
+    <!-- Add Customer Dialog -->
+    <p-dialog header="Add New Customer" [(visible)]="displayAddCustomerDialog" [modal]="true"
+        [style]="{ width: '40vw' }"
+        [breakpoints]="{ '960px': '70vw', '640px': '100vw' }"
+        [draggable]="false" [resizable]="false" appendTo="body">
+        <app-add-customer
+            (customerSaved)="onCustomerAdded()"
+            (cancelled)="closeAddCustomerDialog()">
+        </app-add-customer>
+    </p-dialog>
+
+    <!-- Business Info Dialog -->
+    <p-dialog header="Business Information" [(visible)]="displayBusinessInfoDialog" [modal]="true"
+        [style]="{ width: '50vw' }"
+        [breakpoints]="{ '960px': '70vw', '640px': '100vw' }"
+        [draggable]="false" [resizable]="false" appendTo="body">
+        <app-business-info
+            [businessInfo]="businessInfo"
+            (saved)="onBusinessInfoSaved()"
+            (cancelled)="closeBusinessInfoDialog()">
+        </app-business-info>
+    </p-dialog>
+</div>

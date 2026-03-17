@@ -1,0 +1,95 @@
+.invoice-list-container {
+  padding: 1.5rem;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .header-text {
+      h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .subtitle {
+        margin: 0.25rem 0 0;
+        opacity: 0.7;
+        font-size: 0.875rem;
+      }
+    }
+  }
+}
+
+.tab-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+:host ::ng-deep {
+  .p-tabs {
+    .p-tablist {
+      .p-tab {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
+  }
+}
+
+.invoice-number {
+  font-weight: 600;
+  color: var(--p-primary-color);
+}
+
+.customer-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.amount-value {
+  font-weight: 600;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.empty-message {
+  padding: 2rem;
+
+  i {
+    font-size: 2rem;
+    opacity: 0.5;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  small {
+    opacity: 0.7;
+  }
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}

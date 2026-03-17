@@ -219,6 +219,8 @@
                     <td class="text-right font-bold">{{ formatCurrency(exp.amount) }}</td>
                     <td>{{ exp.note || '—' }}</td>
                     <td class="text-center">
+                        <p-button icon="pi pi-pencil" severity="success" [text]="true" [rounded]="true" pTooltip="Edit Expense" tooltipPosition="top" (onClick)="editExpense(exp)">
+                        </p-button>
                         <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" pTooltip="Delete Expense" tooltipPosition="top" (onClick)="confirmDeleteExpenditure(exp)">
                         </p-button>
                     </td>
@@ -247,10 +249,12 @@
     <!-- Year-End Bonus Summary for non-bonus employees -->
     <p-card styleClass="year-end-summary-card mt-3" *ngIf="filteredEmployees.length > 0">
         <ng-template pTemplate="header">
-            <div class="year-end-card-header">
+            <div class="flex justify-content-between align-items-center px-3 pt-3">
+                <div class="year-end-card-header">
                 <i class="pi pi-calendar-plus"></i>
                 <span>Year-End Bonus Summary — {{ currentYear }}</span>
-                <p-badge [value]="total_Year_end_Bonus" severity="warn" styleClass="formula-badge"></p-badge>
+                </div>
+                <span class="font-bold text-primary">Total: {{ formatCurrency(total_Year_end_Bonus) }}</span>
             </div>
         </ng-template>
         <div class="year-end-summary-grid">
@@ -282,6 +286,6 @@
     <app-pay-salary [salaryData]="selectedSalary" (saved)="onSalarySaved()"></app-pay-salary>
 </p-dialog>
 
-<p-dialog header="Process Expenses" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog">
-    <app-add-expense (saved)="onExpenseSaved()"></app-add-expense>
+<p-dialog [header]="selectedExpense ? 'Edit Expense' : 'Process Expenses'" [(visible)]="displayExpenseViewDialog" [modal]="true" [style]="{ width: '70vw' }" [breakpoints]="{ '960px': '75vw', '640px': '100vw', '480px': '100vw' }" [draggable]="false" [resizable]="false" styleClass="view-employee-dialog" (onHide)="onExpenseDialogHide()">
+    <app-add-expense [expenseData]="selectedExpense" (saved)="onExpenseSaved()"></app-add-expense>
 </p-dialog>

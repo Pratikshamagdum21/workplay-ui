@@ -1,0 +1,135 @@
+<div class="invoice-list-container">
+    <p-toast></p-toast>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-text">
+                <h1>
+                    <i class="pi pi-file-edit"></i> GST Invoice Management
+                </h1>
+                <p class="subtitle">Manage invoices, customers, and fabric qualities</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <p-tabs [(value)]="activeTab">
+        <p-tablist>
+            <p-tab value="0"><i class="pi pi-file-edit"></i> Invoices</p-tab>
+            <p-tab value="1"><i class="pi pi-users"></i> Customers</p-tab>
+            <p-tab value="2"><i class="pi pi-box"></i> Fabric Qualities</p-tab>
+        </p-tablist>
+
+        <p-tabpanels>
+            <!-- Invoices Tab -->
+            <p-tabpanel value="0">
+                <div class="tab-actions">
+                    <p-button label="Download Selected" icon="pi pi-download" severity="info"
+                        [disabled]="selectedInvoices.length === 0" (onClick)="downloadSelected()"
+                        class="mr-2">
+                    </p-button>
+                    <p-button label="Create Invoice" icon="pi pi-plus" severity="success"
+                        (onClick)="openCreateDialog()">
+                    </p-button>
+                </div>
+
+                <p-card styleClass="invoice-table-card">
+                    <p-table [value]="invoices" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="[10, 25, 50]"
+                        [showCurrentPageReport]="true"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} invoices"
+                        [(first)]="first" [totalRecords]="totalRecords"
+                        [(selection)]="selectedInvoices" dataKey="id"
+                        [tableStyle]="{ 'min-width': '700px' }" styleClass="p-datatable-striped" [scrollable]="true">
+
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width: 4rem">
+                                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                                </th>
+                                <th pSortableColumn="invoiceNumber" style="width: 15%">
+                                    Invoice Number
+                                    <p-sortIcon field="invoiceNumber"></p-sortIcon>
+                                </th>
+                                <th pSortableColumn="customerName" style="width: 25%">
+                                    Customer Name
+                                    <p-sortIcon field="customerName"></p-sortIcon>
+                                </th>
+                                <th pSortableColumn="invoiceDate" style="width: 15%">
+                                    Invoice Date
+                                    <p-sortIcon field="invoiceDate"></p-sortIcon>
+                                </th>
+                                <th pSortableColumn="netPayable" style="width: 20%" class="text-right">
+                                    Net Amount
+                                    <p-sortIcon field="netPayable"></p-sortIcon>
+                                </th>
+                                <th style="width: 15%" class="text-center">Actions</th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-invoice>
+                            <tr>
+                                <td>
+                                    <p-tableCheckbox [value]="invoice"></p-tableCheckbox>
+                                </td>
+                                <td>
+                                    <span class="invoice-number">{{ invoice.invoiceNumber }}</span>
+                                </td>
+                                <td>
+                                    <div class="customer-name-cell">
+                                        <i class="pi pi-user"></i> {{ invoice.customerName }}
+                                    </div>
+                                </td>
+                                <td>{{ formatDate(invoice.invoiceDate) }}</td>
+                                <td class="text-right">
+                                    <span class="amount-value">{{ formatCurrency(invoice.netPayable) }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="action-buttons">
+                                        <p-button icon="pi pi-download" severity="info" [text]="true" [rounded]="true"
+                                            pTooltip="Download Invoice" tooltipPosition="top"
+                                            (onClick)="downloadInvoice(invoice)">
+                                        </p-button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="empty-message">
+                                        <i class="pi pi-file-edit"></i>
+                                        <p>No invoices found</p>
+                                        <small>Click "Create Invoice" to get started</small>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </p-card>
+            </p-tabpanel>
+
+            <!-- Customers Tab -->
+            <p-tabpanel value="1">
+                <app-manage-customers></app-manage-customers>
+            </p-tabpanel>
+
+            <!-- Fabric Qualities Tab -->
+            <p-tabpanel value="2">
+                <app-manage-fabric-qualities></app-manage-fabric-qualities>
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+
+    <!-- Create Invoice Dialog -->
+    <p-dialog header="Create New Invoice" [(visible)]="displayCreateDialog" [modal]="true"
+        [style]="{ width: '70vw' }"
+        [breakpoints]="{ '960px': '90vw', '640px': '100vw' }"
+        [draggable]="false" [resizable]="false" styleClass="create-invoice-dialog">
+        <app-create-invoice
+            (invoiceSaved)="onInvoiceCreated()"
+            (cancelled)="closeCreateDialog()">
+        </app-create-invoice>
+    </p-dialog>
+</div>

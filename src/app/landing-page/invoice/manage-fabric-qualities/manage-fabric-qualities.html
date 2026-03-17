@@ -1,0 +1,88 @@
+<div class="manage-qualities-container">
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+
+    <div class="section-header">
+        <h2><i class="pi pi-box"></i> Fabric Quality Management</h2>
+        <p-button label="Add Fabric Quality" icon="pi pi-plus" severity="success" (onClick)="openAddDialog()"></p-button>
+    </div>
+
+    <p-card styleClass="qualities-table-card">
+        <p-table [value]="qualities" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="[10, 25, 50]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} qualities"
+            [(first)]="first" [totalRecords]="totalRecords"
+            [tableStyle]="{ 'min-width': '700px' }" styleClass="p-datatable-striped" [scrollable]="true">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="name" style="width: 20%">
+                        Quality Name
+                        <p-sortIcon field="name"></p-sortIcon>
+                    </th>
+                    <th style="width: 12%">Width</th>
+                    <th style="width: 12%">Fani</th>
+                    <th style="width: 12%">Peak</th>
+                    <th style="width: 12%">Warp</th>
+                    <th style="width: 12%">Weft</th>
+                    <th style="width: 15%" class="text-center">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-quality>
+                <tr>
+                    <td>
+                        <div class="name-cell">
+                            <i class="pi pi-box"></i> {{ quality.name }}
+                        </div>
+                    </td>
+                    <td>{{ quality.width }}</td>
+                    <td>{{ quality.fani }}</td>
+                    <td>{{ quality.peak }}</td>
+                    <td>{{ quality.warp }}</td>
+                    <td>{{ quality.weft }}</td>
+                    <td class="text-center">
+                        <div class="action-buttons">
+                            <p-button icon="pi pi-pencil" severity="success" [text]="true" [rounded]="true"
+                                pTooltip="Edit" tooltipPosition="top"
+                                (onClick)="openEditDialog(quality)"></p-button>
+                            <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
+                                pTooltip="Delete" tooltipPosition="top"
+                                (onClick)="confirmDelete(quality)"></p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7" class="text-center">
+                        <div class="empty-message">
+                            <i class="pi pi-box"></i>
+                            <p>No fabric qualities found</p>
+                            <small>Click "Add Fabric Quality" to get started</small>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+
+    <!-- Add Quality Dialog -->
+    <p-dialog header="Add New Fabric Quality" [(visible)]="displayAddDialog" [modal]="true"
+        [style]="{ width: '45vw' }" [breakpoints]="{ '960px': '70vw', '640px': '100vw' }"
+        [draggable]="false" [resizable]="false">
+        <app-add-fabric-quality [isEditMode]="false"
+            (qualitySaved)="onQualityAdded()" (cancelled)="closeAddDialog()">
+        </app-add-fabric-quality>
+    </p-dialog>
+
+    <!-- Edit Quality Dialog -->
+    <p-dialog header="Edit Fabric Quality" [(visible)]="displayEditDialog" [modal]="true"
+        [style]="{ width: '45vw' }" [breakpoints]="{ '960px': '70vw', '640px': '100vw' }"
+        [draggable]="false" [resizable]="false">
+        <app-add-fabric-quality [isEditMode]="true" [qualityData]="selectedQuality"
+            (qualitySaved)="onQualityUpdated()" (cancelled)="closeEditDialog()">
+        </app-add-fabric-quality>
+    </p-dialog>
+</div>

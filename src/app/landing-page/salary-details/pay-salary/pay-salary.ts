@@ -37,6 +37,7 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
   editSalaryId: number | null = null;
 
   weekRange: Date[] = [];
+  weekRangeError: string | null = null;
   minDate: Date = new Date();
   maxDate: Date = new Date();
 
@@ -45,6 +46,7 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
   leaveDeductionTotal: number = 0;
   finalPay: number = 0;
   autoBonus: number = 0;
+  singleEntryMeters: number | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -174,8 +176,8 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
   onEmployeeSelect(event: any): void {
     const employeeId = event.value;
     if (employeeId) {
-      this.loadEmployeeDetails(employeeId);
       this.resetForm();
+      this.loadEmployeeDetails(employeeId);
     } else {
       this.employee = null;
   
@@ -229,7 +231,19 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     this.salaryForm.get('weekRange')?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((range) => {
-        if (range && range.length === 2) {
+        if (range && range.length === 2 && range[0] && range[1]) {
+          const start: Date = range[0];
+          const end: Date = range[1];
+          // Validate: start must be Saturday (6), end must be Friday (5)
+          if (start.getDay() !== 6 || end.getDay() !== 5) {
+            this.weekRangeError = 'Week range must start on Saturday and end on Friday';
+            this.meterDetailsArray?.clear();
+            this.totalMeters = 0;
+            this.baseSalary = 0;
+            this.finalPay = 0;
+            return;
+          }
+          this.weekRangeError = null;
           this.loadWeeklyData(range[0], range[1]);
         }
       });
@@ -237,6 +251,36 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     this.salaryForm.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.calculateWeeklySalary());
+
+    // Auto-populate with the previous Sat–Fri week range when not editing
+    if (!this.isEditMode) {
+      const [prevSat, prevFri] = this.getPreviousWeekRange();
+      this.salaryForm.patchValue({ weekRange: [prevSat, prevFri] });
+    }
+  }
+
+  /**
+   * Returns the previous completed Sat–Fri week range relative to today.
+   * If today is Saturday, returns the week that ended yesterday (Friday).
+   */
+  private getPreviousWeekRange(): [Date, Date] {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dayOfWeek = today.getDay(); // 0=Sun, 6=Sat
+
+    // Find the most recent Friday (end of last completed week)
+    // If today is Saturday (6), Friday was 1 day ago
+    // If today is Sunday (0), Friday was 2 days ago
+    // If today is Friday (5), the last completed Friday was 7 days ago
+    const daysSinceLastFriday = (dayOfWeek + 2) % 7 || 7;
+    const lastFriday = new Date(today);
+    lastFriday.setDate(today.getDate() - daysSinceLastFriday);
+
+    // The Saturday that started that week is 6 days before Friday
+    const lastSaturday = new Date(lastFriday);
+    lastSaturday.setDate(lastFriday.getDate() - 6);
+
+    return [lastSaturday, lastFriday];
   }
 
   private initializeMonthlyForm(): void {
@@ -281,21 +325,37 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
         const workEntries = this.workService.filterEntries(startDate, endDate)
           .filter(e => e.employeeName === this.employee?.name);
 
-        // Build a map of date → total fabric meters from work entries
-        const metersMap = new Map<string, number>();
-        for (const entry of workEntries) {
-          const dateKey = new Date(entry.date).toISOString().split('T')[0];
-          metersMap.set(dateKey, (metersMap.get(dateKey) || 0) + entry.fabricMeters);
+        // Check if there's a single work entry with endDate covering the range
+        if (workEntries.length === 1 && workEntries[0].endDate) {
+          this.singleEntryMeters = workEntries[0].fabricMeters;
+
+          // For single entry, put all meters on the first row so the editable input works
+          const populated = dailyMeters.map((day, index) => ({
+            ...day,
+            meter: index === 0 ? workEntries[0].fabricMeters : 0
+          }));
+
+          this.setMeterDetails(populated);
+          this.calculateWeeklySalary();
+        } else {
+          this.singleEntryMeters = null;
+
+          // Build a map of date → total fabric meters from work entries
+          const metersMap = new Map<string, number>();
+          for (const entry of workEntries) {
+            const dateKey = new Date(entry.date).toLocaleDateString('en-CA');
+            metersMap.set(dateKey, (metersMap.get(dateKey) || 0) + entry.fabricMeters);
+          }
+
+          // Apply real meter values to the daily meter entries
+          const populated = dailyMeters.map(day => ({
+            ...day,
+            meter: metersMap.get(day.date) || 0
+          }));
+
+          this.setMeterDetails(populated);
+          this.calculateWeeklySalary();
         }
-
-        // Apply real meter values to the daily meter entries
-        const populated = dailyMeters.map(day => ({
-          ...day,
-          meter: metersMap.get(day.date) || 0
-        }));
-
-        this.setMeterDetails(populated);
-        this.calculateWeeklySalary();
       });
   }
 
@@ -358,9 +418,9 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     const baseSalary = totalMeters * ratePerMeter;
     const leaveDeductionTotal = meterDetails.reduce((sum, day) => sum + day.leaveDeduction, 0);
 
-    // Auto-calculate bonus for isBonused employees; zero for others (year-end bonus only)
+    // Auto-calculate bonus for isBonused employees on (baseSalary - leaveDeduction)
     this.autoBonus = this.isBonusedEmployee
-      ? this.salaryService.calculatePerSalaryBonus(baseSalary)
+      ? this.salaryService.calculatePerSalaryBonus(baseSalary - leaveDeductionTotal)
       : 0;
 
     const calculation = this.salaryService.calculateWeeklySalary(
@@ -380,10 +440,11 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     const leaveDays = this.salaryForm.get('leaveDays')?.value || 0;
     const leaveDeductionPerDay = this.salaryForm.get('leaveDeductionPerDay')?.value || 0;
     const advanceDeducted = this.salaryForm.get('advanceDeductedThisTime')?.value || 0;
+    const leaveDeductionTotal = leaveDays * leaveDeductionPerDay;
 
-    // Auto-calculate bonus for isBonused employees; zero for others (year-end bonus only)
+    // Auto-calculate bonus for isBonused employees on (salary - leaveDeduction)
     this.autoBonus = this.isBonusedEmployee
-      ? this.salaryService.calculatePerSalaryBonus(salary)
+      ? this.salaryService.calculatePerSalaryBonus(salary - leaveDeductionTotal)
       : 0;
 
     const calculation = this.salaryService.calculateMonthlySalary(
@@ -401,10 +462,11 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     const leaveDays = this.salaryForm.get('leaveDays')?.value || 0;
     const leaveDeductionPerDay = this.salaryForm.get('leaveDeductionPerDay')?.value || 0;
     const advanceDeducted = this.salaryForm.get('advanceDeductedThisTime')?.value || 0;
+    const leaveDeductionTotal = leaveDays * leaveDeductionPerDay;
 
-    // Auto-calculate bonus for isBonused employees; zero for others (year-end bonus only)
+    // Auto-calculate bonus for isBonused employees on (salary - leaveDeduction)
     this.autoBonus = this.isBonusedEmployee
-      ? this.salaryService.calculatePerSalaryBonus(salary)
+      ? this.salaryService.calculatePerSalaryBonus(salary - leaveDeductionTotal)
       : 0;
 
     const calculation = this.salaryService.calculateMonthlySalary(
@@ -604,6 +666,7 @@ export class PaySalary implements OnInit, OnDestroy, OnChanges {
     this.leaveDeductionTotal = 0;
     this.finalPay = 0;
     this.autoBonus = 0;
+    this.singleEntryMeters = null;
   }
 
   cancel(): void {

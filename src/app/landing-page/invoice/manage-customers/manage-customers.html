@@ -1,0 +1,92 @@
+<div class="manage-customers-container">
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+
+    <div class="section-header">
+        <h2><i class="pi pi-users"></i> Customer Management</h2>
+        <p-button label="Add Customer" icon="pi pi-plus" severity="success" (onClick)="openAddDialog()"></p-button>
+    </div>
+
+    <p-card styleClass="customers-table-card">
+        <p-table [value]="customers" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="[10, 25, 50]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} customers"
+            [(first)]="first" [totalRecords]="totalRecords"
+            [tableStyle]="{ 'min-width': '600px' }" styleClass="p-datatable-striped" [scrollable]="true">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="name" style="width: 20%">
+                        Customer Name
+                        <p-sortIcon field="name"></p-sortIcon>
+                    </th>
+                    <th style="width: 25%">Address</th>
+                    <th pSortableColumn="contactNumber" style="width: 15%">
+                        Contact
+                        <p-sortIcon field="contactNumber"></p-sortIcon>
+                    </th>
+                    <th style="width: 15%">GSTIN</th>
+                    <th pSortableColumn="state" style="width: 10%">
+                        State
+                        <p-sortIcon field="state"></p-sortIcon>
+                    </th>
+                    <th style="width: 15%" class="text-center">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-customer>
+                <tr>
+                    <td>
+                        <div class="name-cell">
+                            <i class="pi pi-user"></i> {{ customer.name }}
+                        </div>
+                    </td>
+                    <td>{{ customer.address }}</td>
+                    <td>{{ customer.contactNumber }}</td>
+                    <td>{{ customer.gstin }}</td>
+                    <td>{{ customer.state }}</td>
+                    <td class="text-center">
+                        <div class="action-buttons">
+                            <p-button icon="pi pi-pencil" severity="success" [text]="true" [rounded]="true"
+                                pTooltip="Edit" tooltipPosition="top"
+                                (onClick)="openEditDialog(customer)"></p-button>
+                            <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
+                                pTooltip="Delete" tooltipPosition="top"
+                                (onClick)="confirmDelete(customer)"></p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6" class="text-center">
+                        <div class="empty-message">
+                            <i class="pi pi-users"></i>
+                            <p>No customers found</p>
+                            <small>Click "Add Customer" to get started</small>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+
+    <!-- Add Customer Dialog -->
+    <p-dialog header="Add New Customer" [(visible)]="displayAddDialog" [modal]="true"
+        [style]="{ width: '40vw' }" [breakpoints]="{ '960px': '70vw', '640px': '100vw' }"
+        [draggable]="false" [resizable]="false">
+        <app-add-customer [isEditMode]="false"
+            (customerSaved)="onCustomerAdded()" (cancelled)="closeAddDialog()">
+        </app-add-customer>
+    </p-dialog>
+
+    <!-- Edit Customer Dialog -->
+    <p-dialog header="Edit Customer" [(visible)]="displayEditDialog" [modal]="true"
+        [style]="{ width: '40vw' }" [breakpoints]="{ '960px': '70vw', '640px': '100vw' }"
+        [draggable]="false" [resizable]="false">
+        <app-add-customer [isEditMode]="true" [customerData]="selectedCustomer"
+            (customerSaved)="onCustomerUpdated()" (cancelled)="closeEditDialog()">
+        </app-add-customer>
+    </p-dialog>
+</div>

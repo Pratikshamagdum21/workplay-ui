@@ -1,0 +1,39 @@
+<div class="add-customer-container">
+    <p-toast></p-toast>
+
+    <form [formGroup]="customerForm" (ngSubmit)="submit()">
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="name">Customer Name *</label>
+                <input pInputText id="name" formControlName="name" placeholder="Enter customer name" />
+                <small class="p-error" *ngIf="customerForm.get('name')?.touched && customerForm.get('name')?.hasError('required')">
+                    Customer name is required
+                </small>
+            </div>
+            <div class="form-field">
+                <label for="address">Address</label>
+                <input pInputText id="address" formControlName="address" placeholder="Enter address" />
+            </div>
+            <div class="form-field">
+                <label for="contactNumber">Contact Number</label>
+                <input pInputText id="contactNumber" formControlName="contactNumber"
+                    placeholder="Enter contact number" />
+            </div>
+            <div class="form-field">
+                <label for="gstin">GSTIN</label>
+                <input pInputText id="gstin" formControlName="gstin" placeholder="Enter GSTIN" />
+            </div>
+            <div class="form-field">
+                <label for="state">State</label>
+                <input pInputText id="state" formControlName="state" placeholder="Enter state" />
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <p-button label="Cancel" icon="pi pi-times" severity="secondary" [text]="true"
+                (onClick)="cancel()"></p-button>
+            <p-button [label]="isEditMode ? 'Update Customer' : 'Save Customer'" icon="pi pi-check" severity="success"
+                type="submit"></p-button>
+        </div>
+    </form>
+</div>

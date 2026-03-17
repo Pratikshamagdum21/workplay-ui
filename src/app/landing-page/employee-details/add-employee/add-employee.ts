@@ -55,7 +55,7 @@ workTypes: WorkType[] = [];
       fabricType: ['', Validators.required],
       workType: ['', Validators.required],
       isBonused: [, Validators.required],
-      advanceAmount: [0, [Validators.required, Validators.min(0)]],
+      advanceAmount: [0, [, Validators.min(0)]],
       salary: [0, [Validators.min(0)]],
       rate: [, [Validators.min(0)]],
       clothDoneInMeter: [0]

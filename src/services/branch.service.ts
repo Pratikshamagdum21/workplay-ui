@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 
 export interface Branch {
@@ -63,5 +63,9 @@ export class BranchService {
 
   setSelectedBranch(branch: Branch): void {
     this.selectedBranchSubject.next(branch);
+  }
+
+  clearAllData(): Observable<string> {
+    return this.http.delete<string>(`${this.baseUrl}/clearAllData`);
   }
 }
