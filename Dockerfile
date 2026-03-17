@@ -15,9 +15,13 @@ FROM nginx:alpine
 # Copy built Angular output to Nginx html directory
 COPY --from=build /app/dist/work-pay/browser /usr/share/nginx/html
 
-# Copy custom Nginx config for SPA routing and API proxy
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy custom Nginx config template for SPA routing and API proxy
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
-EXPOSE 80
+# Render provides PORT env var; default to 80 for local use
+ENV PORT=80
+ENV API_URL=http://localhost:8080
+
+EXPOSE ${PORT}
 
 CMD ["nginx", "-g", "daemon off;"]
