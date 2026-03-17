@@ -9,6 +9,7 @@ import { AddExpense } from './add-expense';
 import { ExpenditureService, Expenditure } from '../../../../services/expenditure.service';
 import { BranchService } from '../../../../services/branch.service';
 import { of, throwError } from 'rxjs';
+import { Camera } from '@capacitor/camera';
 
 describe('AddExpense', () => {
   let component: AddExpense;
@@ -380,6 +381,48 @@ describe('AddExpense', () => {
       expenditureService.saveExpenditure.and.returnValue(throwError(() => new Error('fail')));
       component.submit();
       expect(component.saving).toBeFalse();
+    });
+  });
+
+  describe('camera capture', () => {
+    it('should add captured photo to receipts', async () => {
+      const mockDataUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRg==';
+      spyOn(Camera, 'getPhoto').and.returnValue(Promise.resolve({
+        dataUrl: mockDataUrl,
+        format: 'jpeg',
+        saved: false,
+      }));
+
+      // Mock fetch for data URL conversion
+      const mockBlob = new Blob(['test'], { type: 'image/jpeg' });
+      spyOn(window, 'fetch').and.returnValue(Promise.resolve(new Response(mockBlob)));
+
+      await component.captureFromCamera();
+
+      expect(Camera.getPhoto).toHaveBeenCalled();
+      expect(component.selectedReceiptFiles.length).toBe(1);
+      expect(component.receiptPreviewUrls.length).toBe(1);
+      expect(component.selectedReceiptFiles[0].name).toContain('camera_receipt_');
+    });
+
+    it('should not show error when user cancels camera', async () => {
+      spyOn(Camera, 'getPhoto').and.returnValue(
+        Promise.reject({ message: 'User cancelled photos app' })
+      );
+
+      await component.captureFromCamera();
+
+      expect(component.receiptError).toBeNull();
+    });
+
+    it('should show error on camera failure', async () => {
+      spyOn(Camera, 'getPhoto').and.returnValue(
+        Promise.reject({ message: 'Camera not available' })
+      );
+
+      await component.captureFromCamera();
+
+      expect(component.receiptError).toBe('Failed to capture photo. Please try again.');
     });
   });
 
