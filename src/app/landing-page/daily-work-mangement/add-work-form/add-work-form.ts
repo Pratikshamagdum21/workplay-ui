@@ -55,8 +55,13 @@ selectedEmp!:Employee;
       const hasEndDate = !!this.entryData.endDate;
       this.isRangeMode = hasEndDate;
 
+      // Find matching employee object so the dropdown displays the label correctly
+      const matchedEmployee = this.employees.find(
+        emp => emp.name === this.entryData!.employeeName
+      ) || null;
+
       this.workForm.patchValue({
-        employeeName: this.entryData.employeeName,
+        employeeName: matchedEmployee,
         employeeType: this.entryData.employeeType,
         workType: (this.entryData as any).workType || '',
         fabricMeters: this.entryData.fabricMeters,
@@ -118,6 +123,10 @@ selectedEmp!:Employee;
       .pipe(takeUntil(this.destroy$))
       .subscribe(employees => {
         this.employees = employees.filter(emp => emp.salaryType === 'WEEKLY');
+        // Re-populate form if in edit mode so the employee dropdown matches correctly
+        if (this.entryData && this.isEditMode) {
+          this.populateForm();
+        }
       });
     this.workTypes = this.workService.getWorkTypes();
     this.shifts = this.workService.getShifts();
