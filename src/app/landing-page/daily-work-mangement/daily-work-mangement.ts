@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { WorkEntry } from './model/work-entry.model';
+import { Expenditure as ExpType } from '../../../services/expenditure.service';
 import { Subject, takeUntil } from 'rxjs';
 import { WorkManagementService } from '../../../services/work-management.service';
 import { BranchService } from '../../../services/branch.service';
@@ -33,6 +34,8 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   totalRecords: number = 0;
   displayAddWorkDialog: boolean = false;
   displayExpenseViewDialog: boolean = false;
+  selectedWorkEntry: WorkEntry | null = null;
+  selectedExpense: ExpType | null = null;
 
   private destroy$ = new Subject<void>();
 
@@ -62,19 +65,41 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   }
 
   openAddWorkDialog(): void {
+    this.selectedWorkEntry = null;
     this.displayAddWorkDialog = true;
   }
 
+  editWorkEntry(entry: WorkEntry): void {
+    this.selectedWorkEntry = entry;
+    this.displayAddWorkDialog = true;
+  }
+
+  onWorkDialogHide(): void {
+    this.selectedWorkEntry = null;
+  }
+
   openAddExpensesDialog(): void {
+    this.selectedExpense = null;
     this.displayExpenseViewDialog = true;
+  }
+
+  editExpense(expense: ExpType): void {
+    this.selectedExpense = expense;
+    this.displayExpenseViewDialog = true;
+  }
+
+  onExpenseDialogHide(): void {
+    this.selectedExpense = null;
   }
 
   onWorkEntrySaved(): void {
     this.displayAddWorkDialog = false;
+    this.selectedWorkEntry = null;
   }
 
   onExpenseSaved(): void {
     this.displayExpenseViewDialog = false;
+    this.selectedExpense = null;
     const branchId = this.branchService.getSelectedBranchSnapshot().id;
     this.expenditureService.loadExpenditures(branchId);
   }

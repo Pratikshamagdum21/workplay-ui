@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
 import { WorkManagementService } from '../../../../services/work-management.service';
-import { WorkType, Shift, Employee } from '../model/work-entry.model';
+import { WorkEntry, WorkType, Shift, Employee } from '../model/work-entry.model';
 import { SHARED_IMPORTS } from '../../../shared-imports';
 import { FabricType } from '../../employee-details/model/employee.model';
 import { EmployeeService } from '../../../../services/employee.service';
@@ -15,8 +15,10 @@ import { EmployeeService } from '../../../../services/employee.service';
   templateUrl: './add-work-form.html',
   styleUrl: './add-work-form.scss',
 })
-export class AddWorkForm implements OnInit, OnDestroy {
+export class AddWorkForm implements OnInit, OnDestroy, OnChanges {
+  @Input() entryData: WorkEntry | null = null;
   @Output() entrySaved = new EventEmitter<void>();
+  isEditMode = false;
 selectedEmp!:Employee;
   workForm!: FormGroup;
   employees: { id: string; name: string }[] = [];
@@ -39,6 +41,36 @@ selectedEmp!:Employee;
   ngOnInit(): void {
     this.initializeForm();
     this.loadMasterData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['entryData'] && this.workForm) {
+      this.populateForm();
+    }
+  }
+
+  private populateForm(): void {
+    if (this.entryData) {
+      this.isEditMode = true;
+      const hasEndDate = !!this.entryData.endDate;
+      this.isRangeMode = hasEndDate;
+
+      this.workForm.patchValue({
+        employeeName: this.entryData.employeeName,
+        employeeType: this.entryData.employeeType,
+        workType: (this.entryData as any).workType || '',
+        fabricMeters: this.entryData.fabricMeters,
+        date: hasEndDate
+          ? [new Date(this.entryData.date), new Date(this.entryData.endDate!)]
+          : new Date(this.entryData.date)
+      });
+      // Disable employee-derived fields in edit mode
+      this.workForm.get('employeeType')?.disable();
+      this.workForm.get('workType')?.disable();
+    } else {
+      this.isEditMode = false;
+      this.resetForm();
+    }
   }
 
   ngOnDestroy(): void {
@@ -158,17 +190,23 @@ selectedEmp!:Employee;
       ...(endDate && { endDate })
     };
 
-    this.workService.addEntry(workEntry)
+    const request$ = this.isEditMode && this.entryData?.id
+      ? this.workService.updateEntry(this.entryData.id, workEntry)
+      : this.workService.addEntry(workEntry);
+
+    request$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.messageService.add({
             severity: 'success',
             summary: 'Success',
-            detail: 'Work entry added successfully',
+            detail: this.isEditMode ? 'Work entry updated successfully' : 'Work entry added successfully',
             life: 3000
           });
           this.saving = false;
+          this.isEditMode = false;
+          this.entryData = null;
           this.resetForm();
           this.entrySaved.emit();
         },

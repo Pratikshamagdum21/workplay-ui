@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
 import { SHARED_IMPORTS } from '../../../shared-imports';
 import { Invoice } from '../model/invoice.model';
@@ -12,7 +12,7 @@ import { ManageFabricQualities } from '../manage-fabric-qualities/manage-fabric-
   selector: 'app-invoice-list',
   standalone: true,
   imports: [...SHARED_IMPORTS, CreateInvoice, ManageCustomers, ManageFabricQualities],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './invoice-list.html',
   styleUrl: './invoice-list.scss'
 })
@@ -31,7 +31,8 @@ export class InvoiceList implements OnInit, OnDestroy {
 
   constructor(
     private invoiceService: InvoiceService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +76,36 @@ export class InvoiceList implements OnInit, OnDestroy {
       summary: 'Success',
       detail: 'Invoice created successfully',
       life: 3000
+    });
+  }
+
+  confirmDeleteInvoice(invoice: Invoice): void {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete invoice ${invoice.invoiceNumber}?`,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => this.deleteInvoice(invoice)
+    });
+  }
+
+  private deleteInvoice(invoice: Invoice): void {
+    this.invoiceService.deleteInvoice(invoice.id).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Deleted',
+          detail: `Invoice ${invoice.invoiceNumber} has been deleted`,
+          life: 3000
+        });
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to delete invoice',
+          life: 3000
+        });
+      }
     });
   }
 

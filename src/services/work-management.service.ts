@@ -116,6 +116,33 @@ export class WorkManagementService {
     return this.workEntriesSubject.value;
   }
 
+  updateEntry(id: string, entry: Omit<WorkEntry, 'id' | 'createdAt'>): Observable<WorkEntry> {
+    const branchId = this.branchService.getSelectedBranchSnapshot().id;
+    const date = entry.date instanceof Date
+      ? entry.date.toLocaleDateString('en-CA')
+      : entry.date;
+    const endDate = entry.endDate
+      ? (entry.endDate instanceof Date ? entry.endDate.toLocaleDateString('en-CA') : entry.endDate)
+      : undefined;
+    const payload = { ...entry, branchId, date, ...(endDate && { endDate }) };
+    return this.http.put<WorkEntry>(`${this.baseUrl}/updateWork/${id}`, payload).pipe(
+      tap((saved) => {
+        if (saved) {
+          const updatedEntry: WorkEntry = {
+            ...saved,
+            date: new Date(saved.date),
+            endDate: saved.endDate ? new Date(saved.endDate) : undefined,
+            createdAt: new Date(saved.createdAt)
+          };
+          const current = this.workEntriesSubject.value.map(e =>
+            e.id === id ? updatedEntry : e
+          );
+          this.workEntriesSubject.next(this.sortByDateDesc(current));
+        }
+      })
+    );
+  }
+
   deleteEntry(id: string): Observable<string> {
     const params = new HttpParams().set('id', id.toString());
     return this.http.delete<string>(`${this.baseUrl}/deleteWork`, { 

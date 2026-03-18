@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, map, tap } from 'rxjs';
 import { Invoice } from '../app/landing-page/invoice/model/invoice.model';
 import { environment } from '../environments/environment';
 
@@ -34,6 +34,16 @@ export class InvoiceService {
         if (saved) {
           this.invoicesSubject.next([saved, ...this.invoicesSubject.value]);
         }
+      })
+    );
+  }
+
+  deleteInvoice(invoiceId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${invoiceId}`).pipe(
+      tap(() => {
+        this.invoicesSubject.next(
+          this.invoicesSubject.value.filter(inv => inv.id !== invoiceId)
+        );
       })
     );
   }
