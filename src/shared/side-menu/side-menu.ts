@@ -35,11 +35,11 @@ export class SideMenuComponent implements OnInit, OnDestroy {
       icon: 'pi pi-dollar',
       routerLink: '/salary'
     },
-    {
-      label: 'Custom Rate',
-      icon: 'pi pi-percentage',
-      routerLink: '/custom-rate'
-    },
+    // {
+    //   label: 'Custom Rate',
+    //   icon: 'pi pi-percentage',
+    //   routerLink: '/custom-rate'
+    // },
     {
       label: 'Daily Work Management',
       icon: 'pi pi-briefcase',
