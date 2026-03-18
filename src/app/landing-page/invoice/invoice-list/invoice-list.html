@@ -1,5 +1,6 @@
 <div class="invoice-list-container">
     <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
 
     <!-- Page Header -->
     <div class="page-header">
@@ -89,6 +90,10 @@
                                         <p-button icon="pi pi-download" severity="info" [text]="true" [rounded]="true"
                                             pTooltip="Download Invoice" tooltipPosition="top"
                                             (onClick)="downloadInvoice(invoice)">
+                                        </p-button>
+                                        <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true"
+                                            pTooltip="Delete Invoice" tooltipPosition="top"
+                                            (onClick)="confirmDeleteInvoice(invoice)">
                                         </p-button>
                                     </div>
                                 </td>

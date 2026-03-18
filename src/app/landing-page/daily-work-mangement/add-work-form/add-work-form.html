@@ -94,7 +94,7 @@
             <!-- Action Buttons -->
             <div class="col-12">
                 <div class="button-group">
-                    <p-button label="Add Entry" icon="pi pi-plus" type="submit" severity="success" [disabled]="workForm.invalid || dateRangeError">
+                    <p-button [label]="isEditMode ? 'Update Entry' : 'Add Entry'" [icon]="isEditMode ? 'pi pi-check' : 'pi pi-plus'" type="submit" severity="success" [disabled]="workForm.invalid || dateRangeError">
                     </p-button>
                     <p-button label="Reset" icon="pi pi-refresh" type="button" severity="secondary" [outlined]="true" (onClick)="resetForm()">
                     </p-button>
