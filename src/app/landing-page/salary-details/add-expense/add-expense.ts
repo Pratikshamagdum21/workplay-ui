@@ -299,8 +299,11 @@ export class AddExpense implements OnInit, OnChanges {
         const parts = url.split('/');
         return parts[parts.length - 1];
       });
+      // Include remaining receipt IDs in the expenditure JSON so backend
+      // knows exactly which receipts to keep (empty array = remove all)
+      const updateExpenditure = { ...expenditure, receiptIds: existingReceiptIds };
       request$ = this.expenditureService.updateExpenditure(
-        this.expenseData.id, expenditure, receiptFiles, existingReceiptIds
+        this.expenseData.id, updateExpenditure, receiptFiles, existingReceiptIds
       );
     } else {
       request$ = this.expenditureService.saveExpenditure(expenditure, receiptFiles);

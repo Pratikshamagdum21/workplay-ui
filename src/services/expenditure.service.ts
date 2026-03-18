@@ -87,13 +87,8 @@ export class ExpenditureService {
         }
       }
       if (hasExistingReceipts) {
-        if (existingReceiptIds!.length === 0) {
-          // Send empty value so backend knows to remove all receipts
-          formData.append('existingReceiptIds', '');
-        } else {
-          for (const receiptId of existingReceiptIds!) {
-            formData.append('existingReceiptIds', receiptId);
-          }
+        for (const receiptId of existingReceiptIds!) {
+          formData.append('existingReceiptIds', receiptId);
         }
       }
       return this.http.put<Expenditure>(`${this.baseUrl}/update/${id}`, formData).pipe(
