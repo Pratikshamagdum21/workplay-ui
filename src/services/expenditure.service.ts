@@ -87,7 +87,7 @@ export class ExpenditureService {
         }
       }
       if (hasExistingReceipts) {
-        for (const receiptId of existingReceiptIds) {
+        for (const receiptId of existingReceiptIds!) {
           formData.append('existingReceiptIds', receiptId);
         }
       }
