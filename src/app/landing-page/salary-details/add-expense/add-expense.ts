@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { SHARED_IMPORTS } from '../../../shared-imports';
 import { Expenditure, ExpenditureService } from '../../../../services/expenditure.service';
+import { Observable } from 'rxjs';
 import { BranchService } from '../../../../services/branch.service';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Capacitor } from '@capacitor/core';
@@ -292,9 +293,18 @@ export class AddExpense implements OnInit, OnChanges {
 
     const receiptFiles = this.selectedReceiptFiles.length > 0 ? this.selectedReceiptFiles : null;
 
-    const request$ = this.isEditMode && this.expenseData?.id
-      ? this.expenditureService.updateExpenditure(this.expenseData.id, expenditure, receiptFiles)
-      : this.expenditureService.saveExpenditure(expenditure, receiptFiles);
+    let request$: Observable<Expenditure>;
+    if (this.isEditMode && this.expenseData?.id) {
+      const existingReceiptIds = this.existingReceiptUrls.map(url => {
+        const parts = url.split('/');
+        return parts[parts.length - 1];
+      });
+      request$ = this.expenditureService.updateExpenditure(
+        this.expenseData.id, expenditure, receiptFiles, existingReceiptIds
+      );
+    } else {
+      request$ = this.expenditureService.saveExpenditure(expenditure, receiptFiles);
+    }
 
     request$.subscribe({
       next: (result) => {

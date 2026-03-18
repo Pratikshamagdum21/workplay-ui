@@ -76,7 +76,7 @@ export class ExpenditureService {
 
   updateExpenditure(id: string, expenditure: Expenditure, images?: File[] | null, existingReceiptIds?: string[]): Observable<Expenditure> {
     const hasNewImages = images && images.length > 0;
-    const hasExistingReceipts = existingReceiptIds && existingReceiptIds.length > 0;
+    const hasExistingReceipts = existingReceiptIds !== undefined;
 
     if (hasNewImages || hasExistingReceipts) {
       const formData = new FormData();
