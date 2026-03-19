@@ -75,6 +75,9 @@ body {
 // 4. FILTER TOOLBAR — collapse on ≤640px
 // ─────────────────────────────────────────────
 @media (max-width: 640px) {
+  .p-button-label{
+          font-size: 0.8rem !important;
+        }
   .filter-card {
     margin-bottom: 0.5rem;
 
@@ -119,7 +122,7 @@ body {
     }
 
     p-button {
-      flex: 0 0 auto !important;
+      // flex: 0 0 auto !important;
     }
   }
 }
@@ -151,7 +154,7 @@ body {
 
       > div[class*="col-"] {
         flex: 0 0 auto !important;
-        width: 130px !important;
+        width: 97px !important;
         max-width: 130px !important;
         padding: 0 !important;
       }
@@ -395,7 +398,7 @@ body {
     gap: 0.35rem;
   .mobile-col {
     flex: 1 1 40% !important;
-    max-width: 40% !important;
+    max-width: 50% !important;
   }
 
     > div[class*="col-"] {

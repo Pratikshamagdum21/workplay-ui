@@ -3,7 +3,6 @@
     background: #f8f9fa;
     min-height: 100vh;
     .page-header {
-        margin-bottom: 1.25rem;
         h1 {
             font-size: 1.5rem;
             font-weight: 700;
@@ -249,11 +248,8 @@
             gap: 0.5rem;
 
             > .flex.gap-2 {
-                width: 100%;
-                flex-direction: column;
 
                 .header-actions {
-                    width: 100%;
 
                     p-button {
                         width: 100%;
@@ -281,7 +277,6 @@
 
             // Stack filter action buttons on tablet
             > .col-12.md\:col-5.flex {
-                flex-direction: column !important;
                 gap: 0.35rem;
 
                 p-button {
@@ -308,7 +303,7 @@
 
             > .flex.gap-2 {
                 width: 100%;
-                flex-direction: column;
+                // flex-direction: column;
 
                 .header-actions {
                     width: 100%;
@@ -339,8 +334,6 @@
 
         // Filter card buttons
         .filter-card .grid > .col-12.flex {
-            flex-direction: column !important;
-
             p-button {
                 width: 100%;
 

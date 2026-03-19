@@ -135,7 +135,9 @@
   }
 
   .quick-actions {
-    flex-direction: column;
+    display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+
 
     p-button {
       width: 100%;
@@ -150,6 +152,6 @@
 
 @media (max-width: 360px) {
   .kpi-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
