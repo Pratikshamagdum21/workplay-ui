@@ -20,13 +20,23 @@ import { AddExpense } from '../salary-details/add-expense/add-expense';
 export class DailyWorkMangement implements OnInit, OnDestroy {
   workEntries: WorkEntry[] = [];
   filteredEntries: WorkEntry[] = [];
+  allExpenditures: Expenditure[] = [];
   expenditures: Expenditure[] = [];
   loading: boolean = false;
 
-  // Filter properties
+  // Work Records filter properties
   fromDate: Date | null = null;
   toDate: Date | null = null;
   activeFilter: string | null = null;
+  searchEmployeeName: string = '';
+  selectedWorkType: string | null = null;
+  workTypes: string[] = [];
+
+  // Expense filter properties
+  expenseFromDate: Date | null = null;
+  expenseToDate: Date | null = null;
+  selectedExpenseType: string | null = null;
+  expenseTypes: string[] = [];
 
   // Table properties
   first: number = 0;
@@ -102,6 +112,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
     this.selectedExpense = null;
     const branchId = this.branchService.getSelectedBranchSnapshot().id;
     this.expenditureService.loadExpenditures(branchId);
+    // Expenditure subject will emit and loadExpenditures subscriber will refilter
   }
 
   private loadWorkEntries(): void {
@@ -110,13 +121,9 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(entries => {
         this.workEntries = entries;
+        this.workTypes = [...new Set(entries.map(e => e.employeeType).filter(Boolean))];
         this.loading = false;
-        if (this.fromDate || this.toDate) {
-          this.applyFilter();
-        } else {
-          this.filteredEntries = entries;
-          this.totalRecords = entries.length;
-        }
+        this.applyFilter();
       });
   }
 
@@ -124,7 +131,9 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
     this.expenditureService.getAllExpenditures()
       .pipe(takeUntil(this.destroy$))
       .subscribe(expenditures => {
-        this.expenditures = expenditures;
+        this.allExpenditures = expenditures;
+        this.expenseTypes = [...new Set(expenditures.map(e => e.expenseType).filter(Boolean))];
+        this.applyExpenseFilter();
       });
   }
 
@@ -187,15 +196,82 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   }
 
   private applyFilter(): void {
-    this.filteredEntries = this.workService.filterEntries(this.fromDate, this.toDate);
-    this.totalRecords = this.filteredEntries.length;
+    let entries = this.workService.filterEntries(this.fromDate, this.toDate);
+
+    if (this.searchEmployeeName && this.searchEmployeeName.trim()) {
+      const search = this.searchEmployeeName.trim().toLowerCase();
+      entries = entries.filter(e => e.employeeName.toLowerCase().includes(search));
+    }
+
+    if (this.selectedWorkType) {
+      entries = entries.filter(e => e.employeeType === this.selectedWorkType);
+    }
+
+    this.filteredEntries = entries;
+    this.totalRecords = entries.length;
     this.first = 0;
+  }
+
+  onSearchEmployeeName(): void {
+    this.applyFilter();
+  }
+
+  onWorkTypeFilterChange(): void {
+    this.applyFilter();
+  }
+
+  applyExpenseFilter(): void {
+    let expenses = [...this.allExpenditures];
+
+    if (this.expenseFromDate || this.expenseToDate) {
+      expenses = expenses.filter(exp => {
+        const expDate = new Date(exp.date);
+        expDate.setHours(0, 0, 0, 0);
+        if (this.expenseFromDate && this.expenseToDate) {
+          const from = new Date(this.expenseFromDate);
+          from.setHours(0, 0, 0, 0);
+          const to = new Date(this.expenseToDate);
+          to.setHours(23, 59, 59, 999);
+          return expDate >= from && expDate <= to;
+        } else if (this.expenseFromDate) {
+          const from = new Date(this.expenseFromDate);
+          from.setHours(0, 0, 0, 0);
+          return expDate >= from;
+        } else if (this.expenseToDate) {
+          const to = new Date(this.expenseToDate);
+          to.setHours(23, 59, 59, 999);
+          return expDate <= to;
+        }
+        return true;
+      });
+    }
+
+    if (this.selectedExpenseType) {
+      expenses = expenses.filter(e => e.expenseType === this.selectedExpenseType);
+    }
+
+    this.expenditures = expenses;
+  }
+
+  clearExpenseFilters(): void {
+    this.expenseFromDate = null;
+    this.expenseToDate = null;
+    this.selectedExpenseType = null;
+    this.applyExpenseFilter();
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Filters Cleared',
+      detail: 'Expense filters have been reset',
+      life: 2000
+    });
   }
 
   clearFilters(showToast: boolean = true): void {
     this.fromDate = null;
     this.toDate = null;
     this.activeFilter = null;
+    this.searchEmployeeName = '';
+    this.selectedWorkType = null;
     this.filteredEntries = this.workEntries;
     this.totalRecords = this.workEntries.length;
     this.first = 0;
