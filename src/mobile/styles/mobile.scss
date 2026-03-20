@@ -829,3 +829,18 @@ body {
   min-height: 100%;
   padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
 }
+
+// ── 15i. Keyboard — scroll focused input into view inside dialogs
+//    On Android, the soft keyboard can hide the active input.
+//    scroll-margin-bottom ensures the browser auto-scrolls
+//    the focused field above the keyboard.
+.p-dialog-content input:focus,
+.p-dialog-content .p-inputnumber input:focus,
+.p-dialog-content .p-select:focus-within {
+  scroll-margin-bottom: 120px;
+}
+
+// Prevent body scroll when keyboard is open inside a dialog
+.p-dialog-content {
+  scroll-padding-bottom: 120px;
+}
