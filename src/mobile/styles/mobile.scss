@@ -626,24 +626,26 @@ body {
     }
   }
 
-  // ── 15d. Tab action buttons — stack vertically, full width
+  // ── 15d. Tab action buttons — side by side, compact
   .tab-actions {
-    flex-direction: column !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
     gap: 0.35rem !important;
     margin-bottom: 0.5rem !important;
 
     .p-button,
     p-button {
-      width: 100% !important;
+      width: auto !important;
 
       .p-button {
-        width: 100% !important;
-        justify-content: center;
+        width: auto !important;
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.6rem !important;
       }
     }
 
     .mr-2 {
-      margin-right: 0 !important;
+      margin-right: 0.25rem !important;
     }
   }
 
