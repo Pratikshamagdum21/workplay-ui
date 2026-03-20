@@ -78,27 +78,27 @@
             <div class="form-field">
                 <label for="customerName">Customer Name *</label>
                 <input pInputText id="customerName" formControlName="customerName"
-                    placeholder="Customer name" />
+                    placeholder="Customer name" [readonly]="!!selectedCustomer" />
             </div>
             <div class="form-field">
                 <label for="customerAddress">Address</label>
                 <input pInputText id="customerAddress" formControlName="customerAddress"
-                    placeholder="Customer address" />
+                    placeholder="Customer address" [readonly]="!!selectedCustomer" />
             </div>
             <div class="form-field">
                 <label for="customerContact">Contact Number</label>
                 <input pInputText id="customerContact" formControlName="customerContact"
-                    placeholder="Contact number" />
+                    placeholder="Contact number" [readonly]="!!selectedCustomer" />
             </div>
             <div class="form-field">
                 <label for="customerGstin">GSTIN</label>
                 <input pInputText id="customerGstin" formControlName="customerGstin"
-                    placeholder="Customer GSTIN" />
+                    placeholder="Customer GSTIN" [readonly]="!!selectedCustomer" />
             </div>
             <div class="form-field">
                 <label for="customerState">State</label>
                 <input pInputText id="customerState" formControlName="customerState"
-                    placeholder="Customer state" />
+                    placeholder="Customer state" [readonly]="!!selectedCustomer" />
             </div>
         </div>
 

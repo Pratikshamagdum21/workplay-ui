@@ -103,6 +103,15 @@ export class CreateInvoice implements OnInit, OnDestroy {
         customerGstin: customer.gstin,
         customerState: customer.state
       });
+    } else {
+      this.selectedCustomer = null;
+      this.invoiceForm.patchValue({
+        customerName: '',
+        customerAddress: '',
+        customerContact: '',
+        customerGstin: '',
+        customerState: ''
+      });
     }
   }
 
@@ -117,6 +126,16 @@ export class CreateInvoice implements OnInit, OnDestroy {
         peak: quality.peak,
         warp: quality.warp,
         weft: quality.weft
+      });
+    } else {
+      this.selectedQuality = null;
+      this.invoiceForm.patchValue({
+        qualityName: '',
+        width: '',
+        fani: '',
+        peak: '',
+        warp: '',
+        weft: ''
       });
     }
   }
