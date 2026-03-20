@@ -758,6 +758,12 @@ body {
       }
     }
 
+    // Customer info — keep 2 columns on mobile
+    .customer-info-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 0.5rem !important;
+    }
+
     // Form fields — single column
     .form-grid {
       grid-template-columns: 1fr !important;

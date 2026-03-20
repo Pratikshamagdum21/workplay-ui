@@ -66,7 +66,7 @@
             <p-button label="Add Customer" icon="pi pi-plus" [text]="true" severity="success"
                 (onClick)="openAddCustomerDialog()"></p-button>
         </div>
-        <div class="form-grid">
+        <div class="form-grid customer-info-grid">
             <div class="form-field full-width">
                 <label for="customerSelect">Select Customer</label>
                 <p-select id="customerSelect" [options]="customers" [(ngModel)]="selectedCustomer"
@@ -79,11 +79,6 @@
                 <label for="customerName">Customer Name *</label>
                 <input pInputText id="customerName" formControlName="customerName"
                     placeholder="Customer name" [readonly]="!!selectedCustomer" />
-            </div>
-            <div class="form-field">
-                <label for="customerAddress">Address</label>
-                <input pInputText id="customerAddress" formControlName="customerAddress"
-                    placeholder="Customer address" [readonly]="!!selectedCustomer" />
             </div>
             <div class="form-field">
                 <label for="customerContact">Contact Number</label>
@@ -99,6 +94,11 @@
                 <label for="customerState">State</label>
                 <input pInputText id="customerState" formControlName="customerState"
                     placeholder="Customer state" [readonly]="!!selectedCustomer" />
+            </div>
+            <div class="form-field full-width">
+                <label for="customerAddress">Address</label>
+                <input pInputText id="customerAddress" formControlName="customerAddress"
+                    placeholder="Customer address" [readonly]="!!selectedCustomer" />
             </div>
         </div>
 

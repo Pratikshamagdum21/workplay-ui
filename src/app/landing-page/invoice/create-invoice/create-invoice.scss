@@ -156,9 +156,17 @@ h3 {
   border-top: 1px solid var(--p-surface-border);
 }
 
+.customer-info-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+
 @media (max-width: 640px) {
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .customer-info-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
   .business-info-summary .info-grid {
