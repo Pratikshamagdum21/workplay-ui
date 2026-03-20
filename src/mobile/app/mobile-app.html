@@ -37,4 +37,15 @@
   <main class="mobile-main-content">
     <router-outlet></router-outlet>
   </main>
+
+  <nav class="mobile-bottom-tabs">
+    <button class="mobile-tab-btn" [class.active]="activeTab === 'daily-work'" (click)="navigateTo('daily-work')">
+      <i class="pi pi-calendar-clock"></i>
+      <span>Daily Work</span>
+    </button>
+    <button class="mobile-tab-btn" [class.active]="activeTab === 'invoices'" (click)="navigateTo('invoices')">
+      <i class="pi pi-file-edit"></i>
+      <span>Invoices</span>
+    </button>
+  </nav>
 </div>

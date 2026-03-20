@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit, OnDestroy, AfterViewInit, NgZone } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { PrimeNG } from 'primeng/config';
 import { Toast } from 'primeng/toast';
 import { CommonModule } from '@angular/common';
@@ -16,12 +16,18 @@ import { LoaderComponent } from '../../shared/loader/loader';
   templateUrl: './mobile-app.html',
   styleUrl: './mobile-app.scss',
 })
-export class MobileApp implements OnInit, OnDestroy {
+export class MobileApp implements OnInit, OnDestroy, AfterViewInit {
   branches: Branch[] = [];
   selectedBranch: Branch | null = null;
+  activeTab: string = 'daily-work';
   private destroy$ = new Subject<void>();
 
-  constructor(private primeng: PrimeNG, private branchService: BranchService) {}
+  constructor(
+    private primeng: PrimeNG,
+    private branchService: BranchService,
+    private router: Router,
+    private ngZone: NgZone
+  ) {}
 
   ngOnInit(): void {
     this.primeng.ripple.set(true);
@@ -37,6 +43,27 @@ export class MobileApp implements OnInit, OnDestroy {
       .subscribe(branch => {
         this.selectedBranch = branch;
       });
+
+    // Set active tab based on current route
+    this.updateActiveTab(this.router.url);
+    this.router.events.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.updateActiveTab(this.router.url);
+    });
+  }
+
+  ngAfterViewInit(): void {
+    // Prevent virtual keyboard from showing on datepicker and select inputs on Android.
+    // These inputs should only open their respective overlay panels, not the keyboard.
+    document.addEventListener('focusin', (event) => {
+      const target = event.target as HTMLElement;
+      if (target?.tagName === 'INPUT') {
+        const isDatepicker = target.closest('p-datepicker') !== null;
+        const isSelect = target.closest('p-select') !== null;
+        if (isDatepicker || isSelect) {
+          (target as HTMLInputElement).readOnly = true;
+        }
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -47,6 +74,19 @@ export class MobileApp implements OnInit, OnDestroy {
   onBranchChange(event: any): void {
     if (event.value) {
       this.branchService.setSelectedBranch(event.value);
+    }
+  }
+
+  navigateTo(route: string): void {
+    this.activeTab = route;
+    this.router.navigate(['/' + route]);
+  }
+
+  private updateActiveTab(url: string): void {
+    if (url.includes('invoices')) {
+      this.activeTab = 'invoices';
+    } else {
+      this.activeTab = 'daily-work';
     }
   }
 }
