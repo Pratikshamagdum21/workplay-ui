@@ -24,7 +24,7 @@
     <!-- Filter Section -->
     <p-card header="Filters & Reports" styleClass="filter-card mb-3">
         <div class="grid">
-            <div class="col-12 md:col-4">
+            <div class="col-12 md:col-3">
                 <label for="filterSelect" class="filter-label">
                     <i class="pi pi-filter"></i> Filter By Period
                 </label>
@@ -32,12 +32,19 @@
                 </p-select>
             </div>
 
-            <div class="col-12 md:col-5" *ngIf="showCustomDatePicker">
+            <div class="col-12 md:col-4" *ngIf="showCustomDatePicker">
                 <label for="customDate" class="filter-label">
                     <i class="pi pi-calendar"></i> Custom Date Range
                 </label>
                 <p-datepicker id="customDate" [(ngModel)]="customDateRange" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="Select date range" styleClass="w-full" (onSelect)="onCustomDateChange()">
                 </p-datepicker>
+            </div>
+
+            <div class="col-12 md:col-3">
+                <label for="salarySearchName" class="filter-label">
+                    <i class="pi pi-search"></i> Employee Name
+                </label>
+                <input pInputText id="salarySearchName" [(ngModel)]="salarySearchName" placeholder="Search by name" class="w-full" (input)="onSalarySearchName()" />
             </div>
 
             <div class="col-12 md:col-5 flex align-items-end gap-2">
@@ -51,7 +58,7 @@
         </div>
 
         <!-- Filter Summary -->
-        <div class="filter-summary mt-3" *ngIf="selectedFilter !== 'all'">
+        <div class="filter-summary mt-3" *ngIf="selectedFilter !== 'all' || salarySearchName">
             <i class="pi pi-info-circle"></i>
             <span>{{ filteredsalary.length }} salary records, {{ filteredExpenditures.length }} expense records found</span>
         </div>
@@ -192,6 +199,36 @@
                 <span class="font-bold text-primary">Total: {{ formatCurrency(getTotalExpenses()) }}</span>
             </div>
         </ng-template>
+
+        <!-- Expense Filters -->
+        <div class="grid px-3 pt-2">
+            <div class="col-12 md:col-3 mobile-col">
+                <div class="field">
+                    <label for="salExpFromDate">From Date</label>
+                    <p-datepicker id="salExpFromDate" [(ngModel)]="expenseFromDate" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="From Date" styleClass="w-full" (ngModelChange)="applyExpenseFilter()">
+                    </p-datepicker>
+                </div>
+            </div>
+            <div class="col-12 md:col-3 mobile-col">
+                <div class="field">
+                    <label for="salExpToDate">To Date</label>
+                    <p-datepicker id="salExpToDate" [(ngModel)]="expenseToDate" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="To Date" styleClass="w-full" [minDate]="expenseFromDate || undefined" (ngModelChange)="applyExpenseFilter()">
+                    </p-datepicker>
+                </div>
+            </div>
+            <div class="col-12 md:col-3 mobile-col">
+                <div class="field">
+                    <label for="salExpTypeFilter">Expense Type</label>
+                    <p-select id="salExpTypeFilter" [(ngModel)]="selectedExpenseTypeFilter" [options]="getUniqueExpenseTypes()" placeholder="All Types" [showClear]="true" styleClass="w-full" (onChange)="applyExpenseFilter()">
+                    </p-select>
+                </div>
+            </div>
+            <div class="col-12 md:col-3 mobile-col flex align-items-end mb-3">
+                <p-button label="Clear" icon="pi pi-filter-slash" severity="secondary" [outlined]="true" size="small" (onClick)="clearExpenseFilters()">
+                </p-button>
+            </div>
+        </div>
+
         <p-table [value]="filteredExpenditures" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} expenses" [tableStyle]="{ 'min-width': '40rem' }" styleClass="p-datatable-striped">
             <ng-template pTemplate="header">
                 <tr>

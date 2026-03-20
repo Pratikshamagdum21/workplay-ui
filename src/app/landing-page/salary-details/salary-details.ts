@@ -52,6 +52,12 @@ export class SalaryDetails implements OnInit, OnDestroy {
   selectedFilter: string = 'all';
   customDateRange: Date[] = [];
   showCustomDatePicker: boolean = false;
+  salarySearchName: string = '';
+
+  // Expense-specific filters
+  expenseFromDate: Date | null = null;
+  expenseToDate: Date | null = null;
+  selectedExpenseTypeFilter: string | null = null;
 
   currentYear = new Date().getFullYear();
 
@@ -242,38 +248,88 @@ export class SalaryDetails implements OnInit, OnDestroy {
     const range = this.getFilterDateRange();
 
     if (!range) {
-      // 'all' or incomplete custom range — show everything
       this.filteredsalary = [...this.allSalaryHistory];
-      this.filteredExpenditures = [...this.allExpenditures];
       this.filteredEmployees = this.employees;
     } else {
-      // Filter salary history by createdAt
       this.filteredsalary = this.allSalaryHistory.filter(record => {
         const recordDate = new Date(record.createdAt);
         return recordDate >= range.start && recordDate <= range.end;
       });
-
-      // Filter expenditures by id.date
-      this.filteredExpenditures = this.allExpenditures.filter(exp => {
-        const expDate = new Date(exp.date);
-        return expDate >= range.start && expDate <= range.end;
-      });
-
       this.filteredEmployees = this.employees;
     }
 
+    // Apply employee name search on salary
+    if (this.salarySearchName && this.salarySearchName.trim()) {
+      const search = this.salarySearchName.trim().toLowerCase();
+      this.filteredsalary = this.filteredsalary.filter(
+        (r: any) => r.employeeName?.toLowerCase().includes(search) || r.name?.toLowerCase().includes(search)
+      );
+    }
+
+    // Apply expense filters independently
+    this.applyExpenseFilter();
+
     // Recalculate totals based on filtered data
     this.totalSalaryPaid = this.filteredsalary.reduce((sum, p) => sum + p.finalPay, 0);
+  }
+
+  onSalarySearchName(): void {
+    this.applyFilter();
+  }
+
+  applyExpenseFilter(): void {
+    let expenses = [...this.allExpenditures];
+
+    if (this.expenseFromDate || this.expenseToDate) {
+      expenses = expenses.filter(exp => {
+        const expDate = new Date(exp.date);
+        expDate.setHours(0, 0, 0, 0);
+        if (this.expenseFromDate && this.expenseToDate) {
+          const from = new Date(this.expenseFromDate);
+          from.setHours(0, 0, 0, 0);
+          const to = new Date(this.expenseToDate);
+          to.setHours(23, 59, 59, 999);
+          return expDate >= from && expDate <= to;
+        } else if (this.expenseFromDate) {
+          const from = new Date(this.expenseFromDate);
+          from.setHours(0, 0, 0, 0);
+          return expDate >= from;
+        } else if (this.expenseToDate) {
+          const to = new Date(this.expenseToDate);
+          to.setHours(23, 59, 59, 999);
+          return expDate <= to;
+        }
+        return true;
+      });
+    }
+
+    if (this.selectedExpenseTypeFilter) {
+      expenses = expenses.filter(e => e.expenseType === this.selectedExpenseTypeFilter);
+    }
+
+    this.filteredExpenditures = expenses;
+  }
+
+  clearExpenseFilters(): void {
+    this.expenseFromDate = null;
+    this.expenseToDate = null;
+    this.selectedExpenseTypeFilter = null;
+    this.applyExpenseFilter();
   }
 
   clearFilter(): void {
     this.selectedFilter = 'all';
     this.customDateRange = [];
     this.showCustomDatePicker = false;
+    this.salarySearchName = '';
     this.filteredsalary = [...this.allSalaryHistory];
     this.filteredExpenditures = [...this.allExpenditures];
     this.filteredEmployees = this.employees;
     this.totalSalaryPaid = this.allSalaryHistory.reduce((sum, p) => sum + p.finalPay, 0);
+    // Also clear expense filters
+    this.expenseFromDate = null;
+    this.expenseToDate = null;
+    this.selectedExpenseTypeFilter = null;
   }
 
   /**
