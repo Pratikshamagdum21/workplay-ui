@@ -115,30 +115,32 @@
                     (onChange)="onQualityChange($event)" appendTo="body" [showClear]="true">
                 </p-select>
             </div>
-            <div class="form-field">
+            <div class="form-field full-width">
                 <label for="qualityName">Quality Name *</label>
                 <input pInputText id="qualityName" formControlName="qualityName"
                     placeholder="Quality name" readonly />
             </div>
+        </div>
+        <div class="quality-details-row">
             <div class="form-field">
                 <label for="width">Width</label>
-                <input pInputText id="width" formControlName="width" placeholder="Width" readonly />
+                <input pInputText id="width" formControlName="width" placeholder="-" readonly />
             </div>
             <div class="form-field">
                 <label for="fani">Fani</label>
-                <input pInputText id="fani" formControlName="fani" placeholder="Fani" readonly />
+                <input pInputText id="fani" formControlName="fani" placeholder="-" readonly />
             </div>
             <div class="form-field">
                 <label for="peak">Peak</label>
-                <input pInputText id="peak" formControlName="peak" placeholder="Peak" readonly />
+                <input pInputText id="peak" formControlName="peak" placeholder="-" readonly />
             </div>
             <div class="form-field">
                 <label for="warp">Warp</label>
-                <input pInputText id="warp" formControlName="warp" placeholder="Warp" readonly />
+                <input pInputText id="warp" formControlName="warp" placeholder="-" readonly />
             </div>
             <div class="form-field">
                 <label for="weft">Weft</label>
-                <input pInputText id="weft" formControlName="weft" placeholder="Weft" readonly />
+                <input pInputText id="weft" formControlName="weft" placeholder="-" readonly />
             </div>
         </div>
 

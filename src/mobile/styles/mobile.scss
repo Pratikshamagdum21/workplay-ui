@@ -777,6 +777,23 @@ body {
       }
     }
 
+    // Quality details — single row, compact on mobile
+    .quality-details-row {
+      gap: 0.35rem !important;
+      margin-top: 0.35rem;
+
+      .form-field {
+        label {
+          font-size: 0.65rem !important;
+        }
+
+        input {
+          font-size: 0.75rem !important;
+          padding: 0.3rem 0.2rem !important;
+        }
+      }
+    }
+
     // Amount summary — compact
     .amount-summary {
       padding: 0.5rem;
