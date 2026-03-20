@@ -558,3 +558,274 @@ body {
     }
   }
 }
+
+// =============================================================
+// 15. INVOICE TAB — mobile overrides for invoice list,
+//     manage customers, manage fabric qualities, and
+//     create invoice dialog
+// =============================================================
+
+// ── 15a. Invoice list container — compact padding
+.invoice-list-container {
+  padding: 0.5rem !important;
+}
+
+@media (max-width: 640px) {
+  // ── 15b. Invoice page header — compact title
+  .invoice-list-container .page-header {
+    margin-bottom: 0.4rem;
+
+    .header-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    h1 {
+      font-size: 1.05rem !important;
+      gap: 0.35rem;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 0.72rem !important;
+      margin: 0;
+    }
+  }
+
+  // ── 15c. Tabs — scrollable tab strip, compact tab items
+  .invoice-list-container .p-tabs {
+    .p-tablist {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .p-tab {
+      font-size: 0.78rem !important;
+      padding: 0.5rem 0.6rem !important;
+      gap: 0.3rem !important;
+      white-space: nowrap;
+
+      i {
+        font-size: 0.85rem;
+      }
+    }
+
+    .p-tabpanel {
+      padding: 0.35rem 0 0 !important;
+    }
+
+    // Remove PrimeNG tabpanels inner padding
+    .p-tabpanels {
+      padding: 0 !important;
+    }
+  }
+
+  // ── 15d. Tab action buttons — stack vertically, full width
+  .tab-actions {
+    flex-direction: column !important;
+    gap: 0.35rem !important;
+    margin-bottom: 0.5rem !important;
+
+    .p-button,
+    p-button {
+      width: 100% !important;
+
+      .p-button {
+        width: 100% !important;
+        justify-content: center;
+      }
+    }
+
+    .mr-2 {
+      margin-right: 0 !important;
+    }
+  }
+
+  // ── 15e. Invoice table — tighter cells
+  .invoice-table-card {
+    .p-datatable table {
+      min-width: 520px;
+    }
+
+    .invoice-number {
+      font-size: 0.75rem;
+    }
+
+    .customer-name-cell {
+      font-size: 0.75rem;
+      gap: 0.3rem;
+
+      i {
+        font-size: 0.7rem;
+      }
+    }
+
+    .amount-value {
+      font-size: 0.75rem;
+    }
+
+    .action-buttons {
+      gap: 0;
+    }
+  }
+
+  // ── 15f. Section headers (customers, fabric qualities) — compact
+  .manage-customers-container,
+  .manage-qualities-container {
+    padding: 0.35rem 0 !important;
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.35rem;
+      margin-bottom: 0.5rem;
+
+      h2 {
+        font-size: 0.95rem !important;
+        gap: 0.3rem;
+      }
+
+      p-button,
+      .p-button {
+        width: 100%;
+
+        .p-button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+
+    // Tables inside customer/quality management
+    .p-datatable table {
+      min-width: 480px;
+    }
+
+    .name-cell {
+      font-size: 0.75rem;
+      gap: 0.3rem;
+    }
+
+    .action-buttons {
+      gap: 0;
+    }
+  }
+
+  // ── 15g. Create invoice form — single column, compact spacing
+  .create-invoice-container {
+    padding: 0.25rem !important;
+
+    h3 {
+      font-size: 0.9rem !important;
+      margin-bottom: 0.5rem;
+      gap: 0.35rem;
+    }
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    // Business info grid — 2 cols on mobile
+    .business-info-summary .info-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 0.5rem;
+
+      .info-item {
+        label {
+          font-size: 0.68rem;
+        }
+
+        span {
+          font-size: 0.78rem;
+        }
+      }
+    }
+
+    .business-info-warning {
+      padding: 0.5rem;
+      font-size: 0.78rem;
+
+      i {
+        font-size: 1rem;
+      }
+    }
+
+    // Form fields — single column
+    .form-grid {
+      grid-template-columns: 1fr !important;
+      gap: 0.5rem;
+
+      .form-field {
+        gap: 0.2rem;
+
+        label {
+          font-size: 0.78rem;
+        }
+
+        input {
+          font-size: 0.8rem;
+          padding: 0.4rem 0.5rem;
+        }
+      }
+    }
+
+    // Amount summary — compact
+    .amount-summary {
+      padding: 0.5rem;
+
+      .summary-row {
+        padding: 0.3rem 0;
+
+        .summary-label {
+          font-size: 0.78rem;
+        }
+
+        .summary-value {
+          font-size: 0.85rem;
+
+          &.words {
+            font-size: 0.72rem;
+            max-width: 55%;
+          }
+        }
+
+        &.total-row {
+          .summary-label,
+          .summary-value {
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+
+    // Form action buttons — full width
+    .form-actions {
+      margin-top: 0.75rem;
+      padding-top: 0.5rem;
+      gap: 0.35rem;
+
+      p-button {
+        flex: 1;
+
+        .p-button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}
+
+// ── 15h. Invoice page — safe-area bottom padding
+.invoice-list-container {
+  min-height: 100%;
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+}
