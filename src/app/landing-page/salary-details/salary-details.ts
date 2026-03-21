@@ -196,6 +196,12 @@ export class SalaryDetails implements OnInit, OnDestroy {
     return [...new Set(this.filteredExpenditures.map(e => e.expenseType))];
   }
 
+  private parseLocalDate(dateStr: string): Date {
+    // Parse "YYYY-MM-DD" as local date (not UTC)
+    const parts = dateStr.split('-');
+    return new Date(+parts[0], +parts[1] - 1, +parts[2]);
+  }
+
   private getFilterDateRange(): { start: Date; end: Date } | null {
     const now = new Date();
 
@@ -259,7 +265,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
 
       // Filter expenses by same date range
       this.filteredExpenditures = this.allExpenditures.filter(exp => {
-        const expDate = new Date(exp.date);
+        const expDate = this.parseLocalDate(exp.date);
         return expDate >= range.start && expDate <= range.end;
       });
 

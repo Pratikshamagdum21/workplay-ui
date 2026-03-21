@@ -211,26 +211,27 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
     this.filterExpenses();
   }
 
+  private parseLocalDate(dateStr: string): Date {
+    // Parse "YYYY-MM-DD" as local date (not UTC)
+    const parts = dateStr.split('-');
+    return new Date(+parts[0], +parts[1] - 1, +parts[2]);
+  }
+
   private filterExpenses(): void {
     let expenses = [...this.allExpenditures];
 
     if (this.fromDate || this.toDate) {
       expenses = expenses.filter(exp => {
-        const expDate = new Date(exp.date);
-        expDate.setHours(0, 0, 0, 0);
+        const expDate = this.parseLocalDate(exp.date);
         if (this.fromDate && this.toDate) {
-          const from = new Date(this.fromDate);
-          from.setHours(0, 0, 0, 0);
-          const to = new Date(this.toDate);
-          to.setHours(23, 59, 59, 999);
+          const from = new Date(this.fromDate.getFullYear(), this.fromDate.getMonth(), this.fromDate.getDate());
+          const to = new Date(this.toDate.getFullYear(), this.toDate.getMonth(), this.toDate.getDate(), 23, 59, 59, 999);
           return expDate >= from && expDate <= to;
         } else if (this.fromDate) {
-          const from = new Date(this.fromDate);
-          from.setHours(0, 0, 0, 0);
+          const from = new Date(this.fromDate.getFullYear(), this.fromDate.getMonth(), this.fromDate.getDate());
           return expDate >= from;
         } else if (this.toDate) {
-          const to = new Date(this.toDate);
-          to.setHours(23, 59, 59, 999);
+          const to = new Date(this.toDate.getFullYear(), this.toDate.getMonth(), this.toDate.getDate(), 23, 59, 59, 999);
           return expDate <= to;
         }
         return true;
