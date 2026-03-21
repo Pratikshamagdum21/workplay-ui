@@ -54,11 +54,6 @@ export class SalaryDetails implements OnInit, OnDestroy {
   showCustomDatePicker: boolean = false;
   salarySearchName: string = '';
 
-  // Expense-specific filters
-  expenseFromDate: Date | null = null;
-  expenseToDate: Date | null = null;
-  selectedExpenseTypeFilter: string | null = null;
-
   currentYear = new Date().getFullYear();
 
   private destroy$ = new Subject<void>();
@@ -253,12 +248,21 @@ export class SalaryDetails implements OnInit, OnDestroy {
 
     if (!range) {
       this.filteredsalary = [...this.allSalaryHistory];
+      this.filteredExpenditures = [...this.allExpenditures];
       this.filteredEmployees = this.employees;
     } else {
+      // Filter salary history by createdAt
       this.filteredsalary = this.allSalaryHistory.filter(record => {
         const recordDate = new Date(record.createdAt);
         return recordDate >= range.start && recordDate <= range.end;
       });
+
+      // Filter expenses by same date range
+      this.filteredExpenditures = this.allExpenditures.filter(exp => {
+        const expDate = new Date(exp.date);
+        return expDate >= range.start && expDate <= range.end;
+      });
+
       this.filteredEmployees = this.employees;
     }
 
@@ -270,55 +274,12 @@ export class SalaryDetails implements OnInit, OnDestroy {
       );
     }
 
-    // Apply expense filters independently
-    this.applyExpenseFilter();
-
     // Recalculate totals based on filtered data
     this.totalSalaryPaid = this.filteredsalary.reduce((sum, p) => sum + p.finalPay, 0);
   }
 
   onSalarySearchName(): void {
     this.applyFilter();
-  }
-
-  applyExpenseFilter(): void {
-    let expenses = [...this.allExpenditures];
-
-    if (this.expenseFromDate || this.expenseToDate) {
-      expenses = expenses.filter(exp => {
-        const expDate = new Date(exp.date);
-        expDate.setHours(0, 0, 0, 0);
-        if (this.expenseFromDate && this.expenseToDate) {
-          const from = new Date(this.expenseFromDate);
-          from.setHours(0, 0, 0, 0);
-          const to = new Date(this.expenseToDate);
-          to.setHours(23, 59, 59, 999);
-          return expDate >= from && expDate <= to;
-        } else if (this.expenseFromDate) {
-          const from = new Date(this.expenseFromDate);
-          from.setHours(0, 0, 0, 0);
-          return expDate >= from;
-        } else if (this.expenseToDate) {
-          const to = new Date(this.expenseToDate);
-          to.setHours(23, 59, 59, 999);
-          return expDate <= to;
-        }
-        return true;
-      });
-    }
-
-    if (this.selectedExpenseTypeFilter) {
-      expenses = expenses.filter(e => e.expenseType === this.selectedExpenseTypeFilter);
-    }
-
-    this.filteredExpenditures = expenses;
-  }
-
-  clearExpenseFilters(): void {
-    this.expenseFromDate = null;
-    this.expenseToDate = null;
-    this.selectedExpenseTypeFilter = null;
-    this.applyExpenseFilter();
   }
 
   clearFilter(): void {
@@ -330,10 +291,6 @@ export class SalaryDetails implements OnInit, OnDestroy {
     this.filteredExpenditures = [...this.allExpenditures];
     this.filteredEmployees = this.employees;
     this.totalSalaryPaid = this.allSalaryHistory.reduce((sum, p) => sum + p.finalPay, 0);
-    // Also clear expense filters
-    this.expenseFromDate = null;
-    this.expenseToDate = null;
-    this.selectedExpenseTypeFilter = null;
   }
 
   /**

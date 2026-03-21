@@ -24,19 +24,13 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   expenditures: Expenditure[] = [];
   loading: boolean = false;
 
-  // Work Records filter properties
+  // Filter properties (shared for work records and expenses)
   fromDate: Date | null = null;
   toDate: Date | null = null;
   activeFilter: string | null = null;
   searchEmployeeName: string = '';
   selectedWorkType: string | null = null;
   workTypes: string[] = [];
-
-  // Expense filter properties
-  expenseFromDate: Date | null = null;
-  expenseToDate: Date | null = null;
-  selectedExpenseType: string | null = null;
-  expenseTypes: string[] = [];
 
   // Table properties
   first: number = 0;
@@ -132,8 +126,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(expenditures => {
         this.allExpenditures = expenditures;
-        this.expenseTypes = [...new Set(expenditures.map(e => e.expenseType).filter(Boolean))];
-        this.applyExpenseFilter();
+        this.filterExpenses();
       });
   }
 
@@ -153,13 +146,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
 
     this.fromDate = firstDay;
     this.toDate = lastDay;
-
-    // Also apply to expenses
-    this.expenseFromDate = new Date(firstDay);
-    this.expenseToDate = new Date(lastDay);
-
     this.applyFilter();
-    this.applyExpenseFilter();
   }
 
   filterThisMonth(): void {
@@ -171,12 +158,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
 
     this.fromDate = firstDay;
     this.toDate = lastDay;
-
-    this.expenseFromDate = new Date(firstDay);
-    this.expenseToDate = new Date(lastDay);
-
     this.applyFilter();
-    this.applyExpenseFilter();
   }
 
   filterThisYear(): void {
@@ -188,12 +170,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
 
     this.fromDate = firstDay;
     this.toDate = lastDay;
-
-    this.expenseFromDate = new Date(firstDay);
-    this.expenseToDate = new Date(lastDay);
-
     this.applyFilter();
-    this.applyExpenseFilter();
   }
 
   onFromDateChange(value: Date): void {
@@ -214,6 +191,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   }
 
   private applyFilter(): void {
+    // Filter work records
     let entries = this.workService.filterEntries(this.fromDate, this.toDate);
 
     if (this.searchEmployeeName && this.searchEmployeeName.trim()) {
@@ -228,6 +206,38 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
     this.filteredEntries = entries;
     this.totalRecords = entries.length;
     this.first = 0;
+
+    // Filter expenses with the same date range
+    this.filterExpenses();
+  }
+
+  private filterExpenses(): void {
+    let expenses = [...this.allExpenditures];
+
+    if (this.fromDate || this.toDate) {
+      expenses = expenses.filter(exp => {
+        const expDate = new Date(exp.date);
+        expDate.setHours(0, 0, 0, 0);
+        if (this.fromDate && this.toDate) {
+          const from = new Date(this.fromDate);
+          from.setHours(0, 0, 0, 0);
+          const to = new Date(this.toDate);
+          to.setHours(23, 59, 59, 999);
+          return expDate >= from && expDate <= to;
+        } else if (this.fromDate) {
+          const from = new Date(this.fromDate);
+          from.setHours(0, 0, 0, 0);
+          return expDate >= from;
+        } else if (this.toDate) {
+          const to = new Date(this.toDate);
+          to.setHours(23, 59, 59, 999);
+          return expDate <= to;
+        }
+        return true;
+      });
+    }
+
+    this.expenditures = expenses;
   }
 
   onSearchEmployeeName(): void {
@@ -236,52 +246,6 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
 
   onWorkTypeFilterChange(): void {
     this.applyFilter();
-  }
-
-  applyExpenseFilter(): void {
-    let expenses = [...this.allExpenditures];
-
-    if (this.expenseFromDate || this.expenseToDate) {
-      expenses = expenses.filter(exp => {
-        const expDate = new Date(exp.date);
-        expDate.setHours(0, 0, 0, 0);
-        if (this.expenseFromDate && this.expenseToDate) {
-          const from = new Date(this.expenseFromDate);
-          from.setHours(0, 0, 0, 0);
-          const to = new Date(this.expenseToDate);
-          to.setHours(23, 59, 59, 999);
-          return expDate >= from && expDate <= to;
-        } else if (this.expenseFromDate) {
-          const from = new Date(this.expenseFromDate);
-          from.setHours(0, 0, 0, 0);
-          return expDate >= from;
-        } else if (this.expenseToDate) {
-          const to = new Date(this.expenseToDate);
-          to.setHours(23, 59, 59, 999);
-          return expDate <= to;
-        }
-        return true;
-      });
-    }
-
-    if (this.selectedExpenseType) {
-      expenses = expenses.filter(e => e.expenseType === this.selectedExpenseType);
-    }
-
-    this.expenditures = expenses;
-  }
-
-  clearExpenseFilters(): void {
-    this.expenseFromDate = null;
-    this.expenseToDate = null;
-    this.selectedExpenseType = null;
-    this.applyExpenseFilter();
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Filters Cleared',
-      detail: 'Expense filters have been reset',
-      life: 2000
-    });
   }
 
   clearFilters(showToast: boolean = true): void {
@@ -293,12 +257,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
     this.filteredEntries = this.workEntries;
     this.totalRecords = this.workEntries.length;
     this.first = 0;
-
-    // Also clear expense filters
-    this.expenseFromDate = null;
-    this.expenseToDate = null;
-    this.selectedExpenseType = null;
-    this.applyExpenseFilter();
+    this.expenditures = [...this.allExpenditures];
 
     if (showToast) {
       this.messageService.add({
