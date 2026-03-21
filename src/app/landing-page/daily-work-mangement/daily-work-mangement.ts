@@ -25,16 +25,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   loading: boolean = false;
 
   // Filter properties (shared for work records and expenses)
-  filterOptions = [
-    { label: 'All Time', value: 'all' },
-    { label: 'This Week', value: 'week' },
-    { label: 'This Month', value: 'month' },
-    { label: 'This Year', value: 'year' },
-    { label: 'Custom Range', value: 'custom' }
-  ];
-  selectedFilter: string = 'all';
   customDateRange: Date[] = [];
-  showCustomDatePicker: boolean = false;
 
   // Table properties
   first: number = 0;
@@ -133,66 +124,8 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
       });
   }
 
-  onFilterChange(event: any): void {
-    this.selectedFilter = event.value;
-    this.showCustomDatePicker = this.selectedFilter === 'custom';
-    if (this.selectedFilter !== 'custom') {
-      this.customDateRange = [];
-    }
-  }
-
-  onCustomDateChange(): void {
-    // No-op; user must click Apply
-  }
-
   onApplyFilter(): void {
     this.applyFilter();
-  }
-
-  private getFilterDateRange(): { start: Date; end: Date } | null {
-    const now = new Date();
-
-    switch (this.selectedFilter) {
-      case 'all':
-        return null;
-      case 'week': {
-        const dayOfWeek = now.getDay();
-        const daysSinceSaturday = (dayOfWeek + 1) % 7;
-        const start = new Date(now);
-        start.setDate(now.getDate() - daysSinceSaturday);
-        start.setHours(0, 0, 0, 0);
-        const end = new Date(start);
-        end.setDate(start.getDate() + 6);
-        end.setHours(23, 59, 59, 999);
-        return { start, end };
-      }
-      case 'month': {
-        const start = new Date(now.getFullYear(), now.getMonth(), 1);
-        start.setHours(0, 0, 0, 0);
-        const end = new Date(now);
-        end.setHours(23, 59, 59, 999);
-        return { start, end };
-      }
-      case 'year': {
-        const start = new Date(now.getFullYear(), 0, 1);
-        start.setHours(0, 0, 0, 0);
-        const end = new Date(now);
-        end.setHours(23, 59, 59, 999);
-        return { start, end };
-      }
-      case 'custom': {
-        if (this.customDateRange && this.customDateRange.length === 2 && this.customDateRange[1]) {
-          const start = new Date(this.customDateRange[0]);
-          start.setHours(0, 0, 0, 0);
-          const end = new Date(this.customDateRange[1]);
-          end.setHours(23, 59, 59, 999);
-          return { start, end };
-        }
-        return null;
-      }
-      default:
-        return null;
-    }
   }
 
   private parseLocalDate(dateStr: string): Date {
@@ -201,23 +134,24 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   }
 
   private applyFilter(): void {
-    const range = this.getFilterDateRange();
+    if (this.customDateRange && this.customDateRange.length === 2 && this.customDateRange[1]) {
+      const start = new Date(this.customDateRange[0]);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(this.customDateRange[1]);
+      end.setHours(23, 59, 59, 999);
 
-    if (!range) {
-      this.filteredEntries = [...this.workEntries];
-      this.expenditures = [...this.allExpenditures];
-    } else {
-      // Filter work records by date
       this.filteredEntries = this.workEntries.filter(entry => {
         const entryDate = new Date(entry.date);
-        return entryDate >= range.start && entryDate <= range.end;
+        return entryDate >= start && entryDate <= end;
       });
 
-      // Filter expenses by same date range
       this.expenditures = this.allExpenditures.filter(exp => {
         const expDate = this.parseLocalDate(exp.date);
-        return expDate >= range.start && expDate <= range.end;
+        return expDate >= start && expDate <= end;
       });
+    } else {
+      this.filteredEntries = [...this.workEntries];
+      this.expenditures = [...this.allExpenditures];
     }
 
     this.totalRecords = this.filteredEntries.length;
@@ -225,9 +159,7 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   }
 
   clearFilters(showToast: boolean = true): void {
-    this.selectedFilter = 'all';
     this.customDateRange = [];
-    this.showCustomDatePicker = false;
     this.filteredEntries = [...this.workEntries];
     this.totalRecords = this.workEntries.length;
     this.first = 0;

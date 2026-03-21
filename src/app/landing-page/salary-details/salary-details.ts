@@ -12,11 +12,6 @@ import autoTable from 'jspdf-autotable';
 import { Employee } from '../employee-details/model/employee.model';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
-interface FilterOption {
-  label: string;
-  value: string;
-}
-
 @Component({
   selector: 'app-salary-details',
   imports: [[...SHARED_IMPORTS], PaySalary, AddExpense],
@@ -41,18 +36,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
   totalSalaryPaid: number = 0;
   total_Year_end_Bonus:number = 0;
 
-  filterOptions: FilterOption[] = [
-    { label: 'All Time', value: 'all' },
-    { label: 'This Week', value: 'week' },
-    { label: 'This Month', value: 'month' },
-    { label: 'This Year', value: 'year' },
-    { label: 'Custom Range', value: 'custom' }
-  ];
-
-  selectedFilter: string = 'all';
   customDateRange: Date[] = [];
-  showCustomDatePicker: boolean = false;
-  salarySearchName: string = '';
 
   currentYear = new Date().getFullYear();
 
@@ -161,18 +145,6 @@ export class SalaryDetails implements OnInit, OnDestroy {
     });
   }
 
-  onFilterChange(event: any): void {
-    this.selectedFilter = event.value;
-    this.showCustomDatePicker = this.selectedFilter === 'custom';
-    if (this.selectedFilter !== 'custom') {
-      this.customDateRange = [];
-    }
-  }
-
-  onCustomDateChange(): void {
-    // No-op; user must click Apply
-  }
-
   onApplyFilter(): void {
     this.applyFilter();
   }
@@ -196,102 +168,37 @@ export class SalaryDetails implements OnInit, OnDestroy {
   }
 
   private parseLocalDate(dateStr: string): Date {
-    // Parse "YYYY-MM-DD" as local date (not UTC)
     const parts = dateStr.split('-');
     return new Date(+parts[0], +parts[1] - 1, +parts[2]);
   }
 
-  private getFilterDateRange(): { start: Date; end: Date } | null {
-    const now = new Date();
-
-    switch (this.selectedFilter) {
-      case 'all':
-        return null;
-      case 'week': {
-        // Week runs Saturday (6) to Friday (5)
-        const dayOfWeek = now.getDay();
-        const daysSinceSaturday = (dayOfWeek + 1) % 7;
-        const start = new Date(now);
-        start.setDate(now.getDate() - daysSinceSaturday);
-        start.setHours(0, 0, 0, 0);
-        const end = new Date(start);
-        end.setDate(start.getDate() + 6);
-        end.setHours(23, 59, 59, 999);
-        return { start, end };
-      }
-      case 'month': {
-        const start = new Date(now.getFullYear(), now.getMonth(), 1);
-        start.setHours(0, 0, 0, 0);
-        const end = new Date(now);
-        end.setHours(23, 59, 59, 999);
-        return { start, end };
-      }
-      case 'year': {
-        const start = new Date(now.getFullYear(), 0, 1);
-        start.setHours(0, 0, 0, 0);
-        const end = new Date(now);
-        end.setHours(23, 59, 59, 999);
-        return { start, end };
-      }
-      case 'custom': {
-        if (this.customDateRange && this.customDateRange.length === 2 && this.customDateRange[1]) {
-          const start = new Date(this.customDateRange[0]);
-          start.setHours(0, 0, 0, 0);
-          const end = new Date(this.customDateRange[1]);
-          end.setHours(23, 59, 59, 999);
-          return { start, end };
-        }
-        return null;
-      }
-      default:
-        return null;
-    }
-  }
-
   private applyFilter(): void {
-    const range = this.getFilterDateRange();
+    if (this.customDateRange && this.customDateRange.length === 2 && this.customDateRange[1]) {
+      const start = new Date(this.customDateRange[0]);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(this.customDateRange[1]);
+      end.setHours(23, 59, 59, 999);
 
-    if (!range) {
-      this.filteredsalary = [...this.allSalaryHistory];
-      this.filteredExpenditures = [...this.allExpenditures];
-      this.filteredEmployees = this.employees;
-    } else {
-      // Filter salary history by createdAt
       this.filteredsalary = this.allSalaryHistory.filter(record => {
         const recordDate = new Date(record.createdAt);
-        return recordDate >= range.start && recordDate <= range.end;
+        return recordDate >= start && recordDate <= end;
       });
 
-      // Filter expenses by same date range
       this.filteredExpenditures = this.allExpenditures.filter(exp => {
         const expDate = this.parseLocalDate(exp.date);
-        return expDate >= range.start && expDate <= range.end;
+        return expDate >= start && expDate <= end;
       });
-
-      this.filteredEmployees = this.employees;
+    } else {
+      this.filteredsalary = [...this.allSalaryHistory];
+      this.filteredExpenditures = [...this.allExpenditures];
     }
 
-    // Apply employee name search on salary
-    if (this.salarySearchName && this.salarySearchName.trim()) {
-      const search = this.salarySearchName.trim().toLowerCase();
-      this.filteredsalary = this.filteredsalary.filter(
-        (r: any) => r.employeeName?.toLowerCase().includes(search) || r.name?.toLowerCase().includes(search)
-      );
-    }
-
-    // Recalculate totals based on filtered data
+    this.filteredEmployees = this.employees;
     this.totalSalaryPaid = this.filteredsalary.reduce((sum, p) => sum + p.finalPay, 0);
   }
 
-  onSalarySearchName(): void {
-    this.applyFilter();
-  }
-
   clearFilter(): void {
-    this.selectedFilter = 'all';
     this.customDateRange = [];
-    this.showCustomDatePicker = false;
-    this.salarySearchName = '';
     this.filteredsalary = [...this.allSalaryHistory];
     this.filteredExpenditures = [...this.allExpenditures];
     this.filteredEmployees = this.employees;
