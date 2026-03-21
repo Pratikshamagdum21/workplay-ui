@@ -105,8 +105,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(history => {
         this.allSalaryHistory = history as any[];
-        this.filteredsalary = [...this.allSalaryHistory];
-        this.totalSalaryPaid = this.filteredsalary.reduce((sum, p) => sum + p.finalPay, 0);
+        this.applyFilter();
         this.calculateTotalYearEndBonus();
       });
   }
@@ -117,7 +116,7 @@ export class SalaryDetails implements OnInit, OnDestroy {
       .subscribe(expenditures => {
         this.allExpenditures = expenditures;
         this.expenditures = expenditures;
-        this.filteredExpenditures = [...expenditures];
+        this.applyFilter();
       });
   }
 
