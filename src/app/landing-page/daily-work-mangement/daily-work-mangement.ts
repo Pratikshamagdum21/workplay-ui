@@ -140,9 +140,11 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   filterThisWeek(): void {
     this.activeFilter = 'week';
     const today = new Date();
+    // Week runs Saturday (6) to Friday (5)
     const dayOfWeek = today.getDay();
+    const daysSinceSaturday = (dayOfWeek + 1) % 7; // Sat=0, Sun=1, Mon=2, ...
     const firstDay = new Date(today);
-    firstDay.setDate(today.getDate() - dayOfWeek);
+    firstDay.setDate(today.getDate() - daysSinceSaturday);
     firstDay.setHours(0, 0, 0, 0);
 
     const lastDay = new Date(firstDay);
@@ -151,7 +153,13 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
 
     this.fromDate = firstDay;
     this.toDate = lastDay;
+
+    // Also apply to expenses
+    this.expenseFromDate = new Date(firstDay);
+    this.expenseToDate = new Date(lastDay);
+
     this.applyFilter();
+    this.applyExpenseFilter();
   }
 
   filterThisMonth(): void {
@@ -163,7 +171,12 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
 
     this.fromDate = firstDay;
     this.toDate = lastDay;
+
+    this.expenseFromDate = new Date(firstDay);
+    this.expenseToDate = new Date(lastDay);
+
     this.applyFilter();
+    this.applyExpenseFilter();
   }
 
   filterThisYear(): void {
@@ -175,7 +188,12 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
 
     this.fromDate = firstDay;
     this.toDate = lastDay;
+
+    this.expenseFromDate = new Date(firstDay);
+    this.expenseToDate = new Date(lastDay);
+
     this.applyFilter();
+    this.applyExpenseFilter();
   }
 
   onFromDateChange(value: Date): void {
@@ -275,6 +293,12 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
     this.filteredEntries = this.workEntries;
     this.totalRecords = this.workEntries.length;
     this.first = 0;
+
+    // Also clear expense filters
+    this.expenseFromDate = null;
+    this.expenseToDate = null;
+    this.selectedExpenseType = null;
+    this.applyExpenseFilter();
 
     if (showToast) {
       this.messageService.add({

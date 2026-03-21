@@ -208,10 +208,14 @@ export class SalaryDetails implements OnInit, OnDestroy {
       case 'all':
         return null;
       case 'week': {
+        // Week runs Saturday (6) to Friday (5)
+        const dayOfWeek = now.getDay();
+        const daysSinceSaturday = (dayOfWeek + 1) % 7;
         const start = new Date(now);
-        start.setDate(now.getDate() - now.getDay());
+        start.setDate(now.getDate() - daysSinceSaturday);
         start.setHours(0, 0, 0, 0);
-        const end = new Date(now);
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
         end.setHours(23, 59, 59, 999);
         return { start, end };
       }
