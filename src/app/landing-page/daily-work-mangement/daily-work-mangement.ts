@@ -25,12 +25,16 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
   loading: boolean = false;
 
   // Filter properties (shared for work records and expenses)
-  fromDate: Date | null = null;
-  toDate: Date | null = null;
-  activeFilter: string | null = null;
-  searchEmployeeName: string = '';
-  selectedWorkType: string | null = null;
-  workTypes: string[] = [];
+  filterOptions = [
+    { label: 'All Time', value: 'all' },
+    { label: 'This Week', value: 'week' },
+    { label: 'This Month', value: 'month' },
+    { label: 'This Year', value: 'year' },
+    { label: 'Custom Range', value: 'custom' }
+  ];
+  selectedFilter: string = 'all';
+  customDateRange: Date[] = [];
+  showCustomDatePicker: boolean = false;
 
   // Table properties
   first: number = 0;
@@ -115,7 +119,6 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(entries => {
         this.workEntries = entries;
-        this.workTypes = [...new Set(entries.map(e => e.employeeType).filter(Boolean))];
         this.loading = false;
         this.applyFilter();
       });
@@ -126,136 +129,106 @@ export class DailyWorkMangement implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(expenditures => {
         this.allExpenditures = expenditures;
-        this.filterExpenses();
+        this.applyFilter();
       });
   }
 
-  filterThisWeek(): void {
-    this.activeFilter = 'week';
-    const today = new Date();
-    // Week runs Saturday (6) to Friday (5)
-    const dayOfWeek = today.getDay();
-    const daysSinceSaturday = (dayOfWeek + 1) % 7; // Sat=0, Sun=1, Mon=2, ...
-    const firstDay = new Date(today);
-    firstDay.setDate(today.getDate() - daysSinceSaturday);
-    firstDay.setHours(0, 0, 0, 0);
-
-    const lastDay = new Date(firstDay);
-    lastDay.setDate(firstDay.getDate() + 6);
-    lastDay.setHours(23, 59, 59, 999);
-
-    this.fromDate = firstDay;
-    this.toDate = lastDay;
-    this.applyFilter();
-  }
-
-  filterThisMonth(): void {
-    this.activeFilter = 'month';
-    const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    lastDay.setHours(23, 59, 59, 999);
-
-    this.fromDate = firstDay;
-    this.toDate = lastDay;
-    this.applyFilter();
-  }
-
-  filterThisYear(): void {
-    this.activeFilter = 'year';
-    const today = new Date();
-    const firstDay = new Date(today.getFullYear(), 0, 1);
-    const lastDay = new Date(today.getFullYear(), 11, 31);
-    lastDay.setHours(23, 59, 59, 999);
-
-    this.fromDate = firstDay;
-    this.toDate = lastDay;
-    this.applyFilter();
-  }
-
-  onFromDateChange(value: Date): void {
-    this.fromDate = value;
-    this.activeFilter = 'custom';
-    this.applyFilter();
-  }
-
-  onToDateChange(value: Date): void {
-    this.toDate = value;
-    this.activeFilter = 'custom';
-    this.applyFilter();
-  }
-
-  onCustomDateFilter(): void {
-    this.activeFilter = 'custom';
-    this.applyFilter();
-  }
-
-  private applyFilter(): void {
-    // Filter work records
-    let entries = this.workService.filterEntries(this.fromDate, this.toDate);
-
-    if (this.searchEmployeeName && this.searchEmployeeName.trim()) {
-      const search = this.searchEmployeeName.trim().toLowerCase();
-      entries = entries.filter(e => e.employeeName.toLowerCase().includes(search));
+  onFilterChange(event: any): void {
+    this.selectedFilter = event.value;
+    this.showCustomDatePicker = this.selectedFilter === 'custom';
+    if (this.selectedFilter !== 'custom') {
+      this.customDateRange = [];
     }
+  }
 
-    if (this.selectedWorkType) {
-      entries = entries.filter(e => e.employeeType === this.selectedWorkType);
+  onCustomDateChange(): void {
+    // No-op; user must click Apply
+  }
+
+  onApplyFilter(): void {
+    this.applyFilter();
+  }
+
+  private getFilterDateRange(): { start: Date; end: Date } | null {
+    const now = new Date();
+
+    switch (this.selectedFilter) {
+      case 'all':
+        return null;
+      case 'week': {
+        const dayOfWeek = now.getDay();
+        const daysSinceSaturday = (dayOfWeek + 1) % 7;
+        const start = new Date(now);
+        start.setDate(now.getDate() - daysSinceSaturday);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        end.setHours(23, 59, 59, 999);
+        return { start, end };
+      }
+      case 'month': {
+        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(now);
+        end.setHours(23, 59, 59, 999);
+        return { start, end };
+      }
+      case 'year': {
+        const start = new Date(now.getFullYear(), 0, 1);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(now);
+        end.setHours(23, 59, 59, 999);
+        return { start, end };
+      }
+      case 'custom': {
+        if (this.customDateRange && this.customDateRange.length === 2 && this.customDateRange[1]) {
+          const start = new Date(this.customDateRange[0]);
+          start.setHours(0, 0, 0, 0);
+          const end = new Date(this.customDateRange[1]);
+          end.setHours(23, 59, 59, 999);
+          return { start, end };
+        }
+        return null;
+      }
+      default:
+        return null;
     }
-
-    this.filteredEntries = entries;
-    this.totalRecords = entries.length;
-    this.first = 0;
-
-    // Filter expenses with the same date range
-    this.filterExpenses();
   }
 
   private parseLocalDate(dateStr: string): Date {
-    // Parse "YYYY-MM-DD" as local date (not UTC)
     const parts = dateStr.split('-');
     return new Date(+parts[0], +parts[1] - 1, +parts[2]);
   }
 
-  private filterExpenses(): void {
-    let expenses = [...this.allExpenditures];
+  private applyFilter(): void {
+    const range = this.getFilterDateRange();
 
-    if (this.fromDate || this.toDate) {
-      expenses = expenses.filter(exp => {
+    if (!range) {
+      this.filteredEntries = [...this.workEntries];
+      this.expenditures = [...this.allExpenditures];
+    } else {
+      // Filter work records by date
+      this.filteredEntries = this.workEntries.filter(entry => {
+        const entryDate = new Date(entry.date);
+        return entryDate >= range.start && entryDate <= range.end;
+      });
+
+      // Filter expenses by same date range
+      this.expenditures = this.allExpenditures.filter(exp => {
         const expDate = this.parseLocalDate(exp.date);
-        if (this.fromDate && this.toDate) {
-          const from = new Date(this.fromDate.getFullYear(), this.fromDate.getMonth(), this.fromDate.getDate());
-          const to = new Date(this.toDate.getFullYear(), this.toDate.getMonth(), this.toDate.getDate(), 23, 59, 59, 999);
-          return expDate >= from && expDate <= to;
-        } else if (this.fromDate) {
-          const from = new Date(this.fromDate.getFullYear(), this.fromDate.getMonth(), this.fromDate.getDate());
-          return expDate >= from;
-        } else if (this.toDate) {
-          const to = new Date(this.toDate.getFullYear(), this.toDate.getMonth(), this.toDate.getDate(), 23, 59, 59, 999);
-          return expDate <= to;
-        }
-        return true;
+        return expDate >= range.start && expDate <= range.end;
       });
     }
 
-    this.expenditures = expenses;
-  }
-
-  onSearchEmployeeName(): void {
-    this.applyFilter();
-  }
-
-  onWorkTypeFilterChange(): void {
-    this.applyFilter();
+    this.totalRecords = this.filteredEntries.length;
+    this.first = 0;
   }
 
   clearFilters(showToast: boolean = true): void {
-    this.fromDate = null;
-    this.toDate = null;
-    this.activeFilter = null;
-    this.searchEmployeeName = '';
-    this.selectedWorkType = null;
-    this.filteredEntries = this.workEntries;
+    this.selectedFilter = 'all';
+    this.customDateRange = [];
+    this.showCustomDatePicker = false;
+    this.filteredEntries = [...this.workEntries];
     this.totalRecords = this.workEntries.length;
     this.first = 0;
     this.expenditures = [...this.allExpenditures];

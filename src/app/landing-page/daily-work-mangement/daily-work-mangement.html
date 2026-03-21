@@ -27,68 +27,36 @@
     </p-dialog>
 
     <!-- Filters Section -->
-    <p-card header="Filter Records" styleClass="filter-card">
-        <p-toolbar styleClass="filter-toolbar">
-            <ng-template pTemplate="left">
-                <div class="quick-filters">
-                    <p-button label="This Week" icon="pi pi-calendar" [outlined]="activeFilter !== 'week'" severity="info" size="small" (onClick)="filterThisWeek()">
-                    </p-button>
-                    <p-button label="This Month" icon="pi pi-calendar" [outlined]="activeFilter !== 'month'" severity="info" size="small" (onClick)="filterThisMonth()">
-                    </p-button>
-                    <p-button label="This Year" icon="pi pi-calendar" [outlined]="activeFilter !== 'year'" severity="info" size="small" (onClick)="filterThisYear()">
-                    </p-button>
-                </div>
-            </ng-template>
-            <ng-template pTemplate="right">
-                <p-button label="Clear Filters" icon="pi pi-filter-slash" severity="secondary" [outlined]="true" size="small" (onClick)="clearFilters()">
-                </p-button>
-            </ng-template>
-        </p-toolbar>
-
-        <p-divider></p-divider>
-
-        <!-- Custom Date Range Filter -->
-        <div class="custom-filter-section">
-            <h3 class="filter-heading">
-                <i class="pi pi-sliders-h"></i> Custom Date Range & Filters
-            </h3>
-            <div class="grid">
-                <div class="col-12 md:col-3 mobile-col">
-                    <div class="field">
-                        <label for="fromDate">From Date</label>
-                        <p-datepicker id="fromDate" [(ngModel)]="fromDate" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="Select From Date" styleClass="w-full" (ngModelChange)="onFromDateChange($event)">
-                        </p-datepicker>
-                    </div>
-                </div>
-
-                <div class="col-12 md:col-3 mobile-col">
-                    <div class="field">
-                        <label for="toDate">To Date</label>
-                        <p-datepicker id="toDate" [(ngModel)]="toDate" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="Select To Date" styleClass="w-full" [minDate]="fromDate || undefined" (ngModelChange)="onToDateChange($event)">
-                        </p-datepicker>
-                    </div>
-                </div>
-
-                <div class="col-12 md:col-3 mobile-col">
-                    <div class="field">
-                        <label for="searchEmployee">Employee Name</label>
-                        <input pInputText id="searchEmployee" [(ngModel)]="searchEmployeeName" placeholder="Search by name" class="w-full" (input)="onSearchEmployeeName()" />
-                    </div>
-                </div>
-
-                <div class="col-12 md:col-2 mobile-col">
-                    <div class="field">
-                        <label for="workTypeFilter">Work Type</label>
-                        <p-select id="workTypeFilter" [(ngModel)]="selectedWorkType" [options]="workTypes" placeholder="All Types" [showClear]="true" styleClass="w-full" (onChange)="onWorkTypeFilterChange()">
-                        </p-select>
-                    </div>
-                </div>
-
-                <div class="col-12 md:col-1 mobile-col flex align-items-end mb-3">
-                    <p-button label="Apply" icon="pi pi-check" severity="success" styleClass="w-full" (onClick)="onCustomDateFilter()">
-                    </p-button>
-                </div>
+    <p-card header="Filter Records" styleClass="filter-card mb-3">
+        <div class="grid">
+            <div class="col-12 md:col-3">
+                <label for="filterSelect" class="filter-label">
+                    <i class="pi pi-filter"></i> Filter By Period
+                </label>
+                <p-select id="filterSelect" [(ngModel)]="selectedFilter" [options]="filterOptions" optionLabel="label" optionValue="value" placeholder="Select filter" styleClass="w-full" (onChange)="onFilterChange($event)">
+                </p-select>
             </div>
+
+            <div class="col-12 md:col-4" *ngIf="showCustomDatePicker">
+                <label for="customDate" class="filter-label">
+                    <i class="pi pi-calendar"></i> Custom Date Range
+                </label>
+                <p-datepicker id="customDate" [(ngModel)]="customDateRange" selectionMode="range" [showIcon]="true" dateFormat="dd/mm/yy" placeholder="Select date range" styleClass="w-full" (onSelect)="onCustomDateChange()">
+                </p-datepicker>
+            </div>
+
+            <div class="col-12 md:col-5 flex align-items-end gap-2">
+                <p-button label="Apply" icon="pi pi-check" severity="primary" styleClass="w-full" (onClick)="onApplyFilter()">
+                </p-button>
+                <p-button label="Clear Filter" icon="pi pi-filter-slash" severity="secondary" [outlined]="true" styleClass="w-full" (onClick)="clearFilters()">
+                </p-button>
+            </div>
+        </div>
+
+        <!-- Filter Summary -->
+        <div class="filter-summary mt-3" *ngIf="selectedFilter !== 'all'">
+            <i class="pi pi-info-circle"></i>
+            <span>{{ filteredEntries.length }} work records, {{ expenditures.length }} expense records found</span>
         </div>
     </p-card>
 
