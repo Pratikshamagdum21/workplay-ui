@@ -95,6 +95,10 @@
                                             pTooltip="Delete Invoice" tooltipPosition="top"
                                             (onClick)="confirmDeleteInvoice(invoice)">
                                         </p-button>
+                                        <p-button icon="pi pi-pencil" severity="warn" [text]="true" [rounded]="true"
+                                            pTooltip="Edit Invoice" tooltipPosition="top"
+                                            (onClick)="openEditDialog(invoice)">
+                                        </p-button>
                                     </div>
                                 </td>
                             </tr>
@@ -134,6 +138,7 @@
         [draggable]="false" [resizable]="false" styleClass="create-invoice-dialog">
         <app-create-invoice
             (invoiceSaved)="onInvoiceCreated()"
+            [invoiceToEdit]="selectedInvoiceForEdit"
             (cancelled)="closeCreateDialog()">
         </app-create-invoice>
     </p-dialog>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, map, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Invoice } from '../app/landing-page/invoice/model/invoice.model';
 import { environment } from '../environments/environment';
 
@@ -28,11 +28,27 @@ export class InvoiceService {
     return this.invoices$;
   }
 
+  getInvoiceById(id: number): Observable<Invoice> {
+    return this.http.get<Invoice>(`${this.baseUrl}/${id}`);
+  }
+
   createInvoice(invoice: Omit<Invoice, 'id' | 'createdAt'>): Observable<Invoice> {
     return this.http.post<Invoice>(this.baseUrl, invoice).pipe(
       tap((saved) => {
         if (saved) {
           this.invoicesSubject.next([saved, ...this.invoicesSubject.value]);
+        }
+      })
+    );
+  }
+
+  updateInvoice(id: number, invoice: Partial<Invoice>): Observable<Invoice> {
+    return this.http.put<Invoice>(`${this.baseUrl}/${id}`, invoice).pipe(
+      tap((updated) => {
+        if (updated) {
+          this.invoicesSubject.next(
+            this.invoicesSubject.value.map(inv => inv.id === id ? { ...inv, ...updated } : inv)
+          );
         }
       })
     );

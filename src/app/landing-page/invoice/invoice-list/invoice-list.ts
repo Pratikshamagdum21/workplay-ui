@@ -28,7 +28,7 @@ export class InvoiceList implements OnInit, OnDestroy {
   totalRecords = 0;
 
   private destroy$ = new Subject<void>();
-
+selectedInvoiceForEdit: Invoice | null = null;
   constructor(
     private invoiceService: InvoiceService,
     private messageService: MessageService,
@@ -62,6 +62,7 @@ export class InvoiceList implements OnInit, OnDestroy {
 
   openCreateDialog(): void {
     this.displayCreateDialog = true;
+    this.selectedInvoiceForEdit = null; // Reset the selected invoice for edit when opening the create dialog
   }
 
   closeCreateDialog(): void {
@@ -151,6 +152,11 @@ export class InvoiceList implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  openEditDialog(invoice: Invoice): void {
+    this.selectedInvoiceForEdit = invoice;
+    this.displayCreateDialog = true;
   }
 
   private triggerDownload(blob: Blob, filename: string): void {

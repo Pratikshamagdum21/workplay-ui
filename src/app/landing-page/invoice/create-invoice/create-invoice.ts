@@ -1,9 +1,9 @@
-import { Component, EventEmitter, OnInit, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnDestroy, Output, OnChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
 import { SHARED_IMPORTS } from '../../../shared-imports';
-import { Customer, FabricQuality, BusinessInfo } from '../model/invoice.model';
+import { Customer, FabricQuality, BusinessInfo, Invoice } from '../model/invoice.model';
 import { InvoiceService } from '../../../../services/invoice.service';
 import { CustomerService } from '../../../../services/customer.service';
 import { FabricQualityService } from '../../../../services/fabric-quality.service';
@@ -19,7 +19,8 @@ import { BusinessInfoConfig } from '../business-info/business-info';
   templateUrl: './create-invoice.html',
   styleUrl: './create-invoice.scss'
 })
-export class CreateInvoice implements OnInit, OnDestroy {
+export class CreateInvoice implements OnInit,OnChanges, OnDestroy {
+  @Input() invoiceToEdit: Invoice | null = null;
   @Output() invoiceSaved = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 
@@ -29,6 +30,8 @@ export class CreateInvoice implements OnInit, OnDestroy {
   businessInfo: BusinessInfo | null = null;
   selectedCustomer: Customer | null = null;
   selectedQuality: FabricQuality | null = null;
+
+  isEditMode = false;
 
   displayAddCustomerDialog = false;
   displayBusinessInfoDialog = false;
@@ -46,12 +49,37 @@ export class CreateInvoice implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initForm();
+    this.isEditMode = !!this.invoiceToEdit;
     this.loadData();
+
+    if (this.invoiceToEdit) {
+      this.invoiceService.getInvoiceById(this.invoiceToEdit.id).subscribe({
+        next: (invoice) => {
+          this.invoiceToEdit = invoice;
+          this.patchFormForEdit(invoice);
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  ngOnChanges(values: any): void {
+    if (values.invoiceToEdit && values.invoiceToEdit.currentValue) {
+      this.isEditMode = true;
+      this.invoiceService.getInvoiceById(values.invoiceToEdit.currentValue.id).subscribe({
+        next: (invoice) => {
+          this.invoiceToEdit = invoice;
+          this.patchFormForEdit(invoice);
+        }
+      });
+    } else {
+      this.isEditMode = false;
+      this.invoiceForm?.reset();
+    }
   }
 
   private initForm(): void {
@@ -81,15 +109,48 @@ export class CreateInvoice implements OnInit, OnDestroy {
   private loadData(): void {
     this.customerService.getCustomers()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(customers => this.customers = customers);
+      .subscribe(customers => {
+        this.customers = customers;
+        if (this.invoiceToEdit) {
+          this.selectedCustomer = customers.find(c => c.name === this.invoiceToEdit!.customerName) || null;
+        }
+      });
 
     this.fabricQualityService.getQualities()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(qualities => this.fabricQualities = qualities);
+      .subscribe(qualities => {
+        this.fabricQualities = qualities;
+        if (this.invoiceToEdit) {
+          this.selectedQuality = qualities.find(q => q.name === this.invoiceToEdit!.qualityName) || null;
+        }
+      });
 
     this.businessInfoService.getBusinessInfo()
       .pipe(takeUntil(this.destroy$))
       .subscribe(info => this.businessInfo = info);
+  }
+
+  private patchFormForEdit(invoice: Invoice): void {
+    const invoiceDate = invoice.invoiceDate ? new Date(invoice.invoiceDate) : new Date();
+
+    this.invoiceForm.patchValue({
+      invoiceNumber: invoice.invoiceNumber,
+      invoiceDate,
+      customerName: invoice.customerName,
+      customerAddress: invoice.customerAddress,
+      customerContact: invoice.customerContact,
+      customerGstin: invoice.customerGstin,
+      customerState: invoice.customerState,
+      qualityName: invoice.qualityName,
+      width: invoice.width,
+      fani: invoice.fani,
+      peak: invoice.peak,
+      warp: invoice.warp,
+      weft: invoice.weft,
+      rolls: invoice.rolls,
+      meters: invoice.meters,
+      rate: invoice.rate
+    });
   }
 
   onCustomerChange(event: any): void {
@@ -220,7 +281,11 @@ export class CreateInvoice implements OnInit, OnDestroy {
       amountInWords: this.amountInWords
     };
 
-    this.invoiceService.createInvoice(invoice).subscribe({
+    const request$ = this.isEditMode && this.invoiceToEdit?.id
+      ? this.invoiceService.updateInvoice(this.invoiceToEdit.id, invoice)
+      : this.invoiceService.createInvoice(invoice);
+
+    request$.subscribe({
       next: () => {
         this.invoiceSaved.emit();
       },
@@ -228,7 +293,7 @@ export class CreateInvoice implements OnInit, OnDestroy {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to create invoice',
+          detail: this.isEditMode ? 'Failed to update invoice' : 'Failed to create invoice',
           life: 3000
         });
       }
